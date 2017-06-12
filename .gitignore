@@ -1,0 +1,11 @@
+.gradle
+/build/
+/classes
+!gradle/wrapper/gradle-wrapper.jar
+
+.idea
+*.iws
+*.iml
+*.ipr
+
+config.properties
