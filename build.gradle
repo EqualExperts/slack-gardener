@@ -54,3 +54,11 @@ dependencies {
 	testCompile "com.github.tomakehurst:wiremock:2.6.0"
 	testCompile "org.assertj:assertj-core:3.6.2"
 }
+
+//fat jar
+jar {
+    manifest {
+        attributes 'Main-Class': 'com.equalexperts.slack.gardener.MainKt'
+    }
+    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}

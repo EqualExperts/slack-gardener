@@ -31,10 +31,10 @@ fun main(vararg args : String) {
     println("done in ${nanoTime / 1_000_000} ms")
 }
 
-object slack : PropertyGroup() {
-    val uri by uriType
-    val apiKey by stringType
-    object bot : PropertyGroup() {
-        val apiKey by stringType
-    }
-}
+//private object slack : PropertyGroup() {
+//    val uri by uriType
+//    val apiKey by stringType
+//    object bot : PropertyGroup() {
+//        val apiKey by stringType
+//    }
+//}
