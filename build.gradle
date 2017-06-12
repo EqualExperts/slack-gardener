@@ -7,6 +7,7 @@ buildscript {
 	}
 	dependencies {
 		classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
+// 		classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
 	}
 }
 
@@ -51,3 +52,9 @@ dependencies {
 	testCompile "com.github.tomakehurst:wiremock:2.6.0"
 	testCompile "org.assertj:assertj-core:3.6.2"
 }
+
+// apply plugin: "kotlin-allopen"
+//
+// allOpen {
+//   annotation("com.mycompany.myapp.annotation")
+// }
