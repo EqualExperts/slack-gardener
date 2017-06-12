@@ -63,11 +63,6 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
             return false
         }
 
-//        return setOf(
-//            "nativeappreviews", //a degenerate case with *lots* of bot posts
-//            "opslogger",
-//            "general-code",
-//            "gardener-test-b").contains(channel.name)
         return true
     }
 
