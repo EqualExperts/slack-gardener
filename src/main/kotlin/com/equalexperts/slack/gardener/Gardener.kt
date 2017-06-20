@@ -13,7 +13,7 @@ import java.util.stream.Collectors
 
 class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val idlePeriod: Period, private val warningPeriod: Period) {
     private companion object {
-        val channelWhiteList = setOf("general", "announce", "ask-aws", "meta-slack", "random", "ee-alumni", "remembering_torben")
+        val channelWhiteList = setOf("general", "announce", "ask-aws", "meta-slack", "random", "ee-alumni", "feedback-to-ee", "remembering_torben")
     }
 
     private val botUser by lazy {
