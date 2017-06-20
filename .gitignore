@@ -9,3 +9,5 @@
 *.ipr
 
 config.properties
+
+.DS_Store
