@@ -10,6 +10,7 @@ import java.time.Period
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
+import kotlin.system.measureNanoTime
 
 class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val idlePeriod: Period, private val warningPeriod: Period) {
     private companion object {
@@ -21,41 +22,45 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
     }
 
     fun process() {
-        val channels = slackApi.listChannels().channels
-        println("${channels.size} channels found")
+        val nanoTime = measureNanoTime {
+            val channels = slackApi.listChannels().channels
+            println("${channels.size} channels found")
 
-        val data = channels.parallelStream()
-            .filter { this.isEligibleForGardening(it) }
-            .map { Tuple(it, this.determineChannelState(it)) }
-            .peek { (it, state) ->
-                val staleMessage = when (state) {
-                    Active -> "not stale"
-                    Stale -> "stale"
-                    is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
+            val data = channels.parallelStream()
+                .filter { this.isEligibleForGardening(it) }
+                .map { Tuple(it, this.determineChannelState(it)) }
+                .peek { (it, state) ->
+                    val staleMessage = when (state) {
+                        Active -> "not stale"
+                        Stale -> "stale"
+                        is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
+                    }
+                    println("\t${it.name}(id: ${it.id}, created ${it.created}, ${staleMessage}, ${it.members} members)")
                 }
-                println("\t${it.name}(id: ${it.id}, created ${it.created}, ${staleMessage}, ${it.members} members)")
-            }
-            .collect(Collectors.toList())
+                .collect(Collectors.toList())
 
-        val active = data.count { it.state == Active }
-        val stale = data.count { it.state == Stale }
-        val staleAndWarned = data.count { it.state is StaleAndWarned }
-        val emptyChannels = data.count { it.channel.members == 0 }
+            val active = data.count { it.state == Active }
+            val stale = data.count { it.state == Stale }
+            val staleAndWarned = data.count { it.state is StaleAndWarned }
+            val emptyChannels = data.count { it.channel.members == 0 }
 
-        println()
-        println("${data.size}\tchannels")
-        println("${active}\tactive channels")
-        println("${stale + staleAndWarned}\tstale channels (${staleAndWarned} warned)")
-        println("${emptyChannels}\tempty channels")
-        println()
+            println()
+            println("${data.size}\tchannels")
+            println("${active}\tactive channels")
+            println("${stale + staleAndWarned}\tstale channels (${staleAndWarned} warned)")
+            println("${emptyChannels}\tempty channels")
+            println()
 
-        println("Posting warnings:")
-        data.parallelStream().forEach { postWarning(it) }
-        println()
+            println("Posting warnings:")
+            data.parallelStream().forEach { postWarning(it) }
+            println()
 
-        println("Archiving:")
-        data.parallelStream().forEach { archive(it) }
-        println()
+            println("Archiving:")
+            data.parallelStream().forEach { archive(it) }
+            println()
+        }
+
+        println("done in ${nanoTime / 1_000_000} ms")
     }
 
     private fun isEligibleForGardening(channel: ChannelInfo): Boolean {
