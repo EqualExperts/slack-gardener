@@ -12,9 +12,10 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val idlePeriod: Period, private val warningPeriod: Period) {
+class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val defaultIdlePeriod: Period, private val warningPeriod: Period) {
     private companion object {
         val channelWhiteList = setOf("general", "announce", "ask-aws", "meta-slack", "random", "ee-alumni", "feedback-to-ee", "remembering_torben")
+        val onlyCheckYearly = setOf("coderetreat")
     }
 
     private val botUser by lazy {
@@ -72,7 +73,7 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
     }
 
     private fun determineChannelState(channel: ChannelInfo) : ChannelState {
-        val timeLimit = ZonedDateTime.now(clock) - idlePeriod
+        val timeLimit = ZonedDateTime.now(clock) - determineIdlePeriod(channel)
         if (channel.created >= timeLimit) {
             return ChannelState.Active //new channels count as active
         }
@@ -140,6 +141,13 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
             1L -> "1 day ago"
             else -> "${daysAgo} days ago"
         }
+    }
+
+    private fun determineIdlePeriod(channel: ChannelInfo) : Period {
+        if (onlyCheckYearly.contains(channel.name)) {
+            return Period.ofYears(1)
+        }
+        return defaultIdlePeriod
     }
 
     private data class Tuple(val channel: ChannelInfo, val state: ChannelState)

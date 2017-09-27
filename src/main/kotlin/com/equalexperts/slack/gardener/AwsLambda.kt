@@ -17,10 +17,10 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey])
 
         val clock = Clock.systemUTC()
-        val idlePeriod = Period.ofMonths(3)
+        val defaultIdlePeriod = Period.ofMonths(3)
         val warningPeriod = Period.ofWeeks(1)
 
-        Gardener(slackApi, slackBotApi, clock, idlePeriod, warningPeriod).process()
+        Gardener(slackApi, slackBotApi, clock, defaultIdlePeriod, warningPeriod).process()
     }
 }
 
