@@ -31,15 +31,15 @@ dependencies {
 	compile "org.jetbrains.kotlin:kotlin-stdlib-jre8:${kotlinVersion}"
 	compile "org.jetbrains.kotlin:kotlin-reflect:${kotlinVersion}"
 
-	def feignVersion = "8.18.0"
+	def feignVersion = "9.5.1"
 	def jacksonVersion = "2.8.7"
 
 	compile "com.natpryce:konfig:1.6.1.0"
 
 	//feign + okhttp
-	compile "com.netflix.feign:feign-core:${feignVersion}"
-	compile "com.netflix.feign:feign-jackson:${feignVersion}"
-	compile "com.netflix.feign:feign-okhttp:${feignVersion}"
+	compile "io.github.openfeign:feign-core:${feignVersion}"
+	compile "io.github.openfeign:feign-jackson:${feignVersion}"
+	compile "io.github.openfeign:feign-okhttp:${feignVersion}"
 
 	//feign uses an older version of jackson so force a newer one
     compile "com.fasterxml.jackson.core:jackson-databind:${jacksonVersion}"
