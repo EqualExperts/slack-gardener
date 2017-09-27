@@ -27,7 +27,7 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
             val channels = slackApi.listChannels().channels
             println("${channels.size} channels found")
 
-            val data = channels.stream()
+            val data = channels.parallelStream()
                 .filter { this.isEligibleForGardening(it) }
                 .map { Tuple(it, this.determineChannelState(it)) }
                 .peek { (it, state) ->
