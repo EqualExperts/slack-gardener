@@ -15,7 +15,7 @@ import kotlin.system.measureNanoTime
 class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val defaultIdlePeriod: Period, private val warningPeriod: Period) {
     private companion object {
         val channelWhiteList = setOf("general", "announce", "ask-aws", "meta-slack", "random", "ee-alumni", "feedback-to-ee", "remembering_torben")
-        val onlyCheckYearly = setOf("coderetreat", "sk-ee-trip")
+        val onlyCheckYearly = setOf("coderetreat", "pt-global-coderetreat", "sk-ee-trip")
     }
 
     private val botUser by lazy {
