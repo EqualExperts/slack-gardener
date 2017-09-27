@@ -5,6 +5,11 @@ import com.github.tomakehurst.wiremock.WireMockServer
 import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.getRequestedFor
 import com.github.tomakehurst.wiremock.client.WireMock.urlEqualTo
+import com.github.tomakehurst.wiremock.stubbing.Scenario
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.verify
 import org.assertj.core.api.Assertions
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
@@ -32,7 +37,8 @@ class SlackBotApiTest {
     }
 
     private val expectedToken = UUID.randomUUID().toString()
-    private val api by lazy { SlackBotApi.factory(URI("http://localhost:${wiremock.port()}/"), expectedToken) }
+    private val sleeper : (Long) -> Unit = mock()
+    private val api by lazy { SlackBotApi.factory(URI("http://localhost:${wiremock.port()}/"), expectedToken, sleeper) }
 
     @Test
     fun `authenticate should return a populated AuthInfo instance given a client with a valid token`() {
@@ -227,6 +233,79 @@ class SlackBotApiTest {
 
         //assert
         wiremock.verify(1, getRequestedFor(urlEqualTo(expectedUrl)))
+    }
+
+    @Test
+    fun `calls should not retry when a 429 isn't returned`() {
+        //setup
+        stubRequest("/api/auth.test?token=${expectedToken}",
+        """
+            {
+                "ok": true,
+                "url": "https://equalexperts.slack.com/",
+                "team": "Equal Experts",
+                "user": "some-user-name",
+                "team_id": "T1234567",
+                "user_id": "12345"
+            }
+        """.trimIndent()
+        )
+
+        //execute
+        val result = api.authenticate()
+
+        //assert
+        assertThat(result.id).isEqualTo(UserId("12345"))
+        verify(sleeper, never()).invoke(any())
+    }
+
+    @Test
+    fun `calls should retry when the server responds with a 429`() {
+        //setup
+        val url = "/api/auth.test?token=${expectedToken}"
+
+        //the first call should fail due to rate limiting
+        wiremock.stubFor(WireMock.get(urlEqualTo(url))
+            .inScenario("retry")
+            .whenScenarioStateIs(Scenario.STARTED)
+            .willReturn(
+                WireMock.aResponse()
+                    .withStatus(429)
+                    .withHeader("Content-Type", "application/json; charset=utf-8")
+                    .withHeader("Retry-After", "3")
+                    .withBody("{\"ok\": \"false\"}")
+            )
+            .willSetStateTo("shouldSucceed")
+        )
+
+        //the second second call should succeed
+        wiremock.stubFor(WireMock.get(urlEqualTo(url))
+            .inScenario("retry")
+            .whenScenarioStateIs("shouldSucceed")
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json; charset=utf-8")
+                    .withBody(
+                        """
+                        {
+                            "ok": true,
+                            "url": "https://equalexperts.slack.com/",
+                            "team": "Equal Experts",
+                            "user": "some-user-name",
+                            "team_id": "T1234567",
+                            "user_id": "12345"
+                        }
+                        """.trimIndent()
+                    )
+            )
+        )
+
+        //execute
+        val result = api.authenticate()
+
+        //assert
+        verify(sleeper).invoke(3000)
+        assertThat(result.id).isEqualTo(UserId("12345"))
     }
 
     private fun stubRequest(url: String, body: String) {

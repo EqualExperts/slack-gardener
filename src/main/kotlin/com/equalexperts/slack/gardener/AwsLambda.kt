@@ -14,7 +14,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val slackUri = config[slack.uri]
 
         val slackApi = SlackApi.factory(slackUri, config[slack.apiKey], Thread::sleep)
-        val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey])
+        val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey], Thread::sleep)
 
         val clock = Clock.systemUTC()
         val defaultIdlePeriod = Period.ofMonths(3)

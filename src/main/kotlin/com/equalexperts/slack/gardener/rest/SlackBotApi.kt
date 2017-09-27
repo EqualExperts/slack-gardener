@@ -17,12 +17,14 @@ interface SlackBotApi {
         @Param("channel", expander = ChannelInfo.ChannelIdExpander::class) channel: ChannelInfo,
         @Param("user", expander = User.UsernameExpander::class) user: User,
         @Param("text") text: String
-    ): Unit
+    )
 
     companion object {
-        fun factory(uri: URI, token: String) : SlackBotApi {
+        fun factory(uri: URI, token: String, sleeper: (Long) -> Unit) : SlackBotApi {
             return feignBuilder()
                 .requestInterceptor{ it.query("token", token) }
+                .errorDecoder(SlackRetrySupport.SlackErrorDecoder())
+                .retryer(SlackRetrySupport(sleeper))
                 .target(SlackBotApi::class.java, uri.toString())
         }
     }
