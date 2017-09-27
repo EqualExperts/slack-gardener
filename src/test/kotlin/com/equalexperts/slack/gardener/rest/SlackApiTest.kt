@@ -335,7 +335,7 @@ class SlackApiTest {
         val result = slackApi.listChannels()
 
         //assert
-        verify(sleeper).invoke(2000)
+        verify(sleeper).invoke(3000) //add an extra second
         assertThat(result.channels.size).isEqualTo(1)
     }
 

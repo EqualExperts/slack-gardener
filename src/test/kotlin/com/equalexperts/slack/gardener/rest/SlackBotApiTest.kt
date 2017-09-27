@@ -304,7 +304,7 @@ class SlackBotApiTest {
         val result = api.authenticate()
 
         //assert
-        verify(sleeper).invoke(3000)
+        verify(sleeper).invoke(4000) //add an extra second
         assertThat(result.id).isEqualTo(UserId("12345"))
     }
 
