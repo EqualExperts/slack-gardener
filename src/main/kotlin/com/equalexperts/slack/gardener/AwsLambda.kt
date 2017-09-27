@@ -13,7 +13,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val config = EnvironmentVariables
         val slackUri = config[slack.uri]
 
-        val slackApi = SlackApi.factory(slackUri, config[slack.apiKey])
+        val slackApi = SlackApi.factory(slackUri, config[slack.apiKey], Thread::sleep)
         val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey])
 
         val clock = Clock.systemUTC()

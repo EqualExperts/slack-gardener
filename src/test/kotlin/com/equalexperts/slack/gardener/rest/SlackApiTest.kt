@@ -4,7 +4,13 @@ import com.equalexperts.slack.gardener.rest.model.BotId
 import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import com.equalexperts.slack.gardener.rest.model.Timestamp
 import com.github.tomakehurst.wiremock.WireMockServer
+import com.github.tomakehurst.wiremock.client.WireMock
 import com.github.tomakehurst.wiremock.client.WireMock.*
+import com.github.tomakehurst.wiremock.stubbing.Scenario.STARTED
+import com.nhaarman.mockito_kotlin.any
+import com.nhaarman.mockito_kotlin.mock
+import com.nhaarman.mockito_kotlin.never
+import com.nhaarman.mockito_kotlin.verify
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.After
 import org.junit.Before
@@ -29,7 +35,8 @@ class SlackApiTest {
     }
 
     private val expectedToken = UUID.randomUUID().toString()
-    private val slackApi by lazy { SlackApi.factory(URI("http://localhost:${wiremock.port()}/"), expectedToken) }
+    private val sleeper : (Long) -> Unit = mock()
+    private val slackApi by lazy { SlackApi.factory(URI("http://localhost:${wiremock.port()}/"), expectedToken, sleeper) }
 
     @Test
     fun `listChannels should return a populated channel list of non-archived channels`() {
@@ -263,13 +270,82 @@ class SlackApiTest {
         wiremock.verify(1, getRequestedFor(urlEqualTo(expectedUrl)))
     }
 
-    private fun stubRequest(url: String, body: String) {
+    @Test
+    fun `calls should not retry when a 429 isn't returned`() {
+        //setup
+        stubRequest("/api/channels.list?exclude_archived=true&exclude_members=true&token=${expectedToken}",
+        """
+            {
+                "ok": true,
+                "channels": []
+            }
+        """.trimIndent()
+        )
+
+        //execute
+        val result = slackApi.listChannels()
+
+        //assert
+        assertThat(result.channels).isEmpty()
+        verify(sleeper, never()).invoke(any())
+    }
+
+    @Test
+    fun `calls should retry when the server responds with a 429`() {
+        //setup
+        val url = "/api/channels.list?exclude_archived=true&exclude_members=true&token=${expectedToken}"
+
+        //the first call should fail due to rate limiting
         wiremock.stubFor(get(urlEqualTo(url))
-                .willReturn(
-                    aResponse()
-                        .withHeader("Content-Type", "application/json; charset=utf-8")
-                        .withBody(body)
-                )
+            .inScenario("retry")
+            .whenScenarioStateIs(STARTED)
+            .willReturn(
+                aResponse()
+                    .withStatus(429)
+                    .withHeader("Content-Type", "application/json; charset=utf-8")
+                    .withHeader("Retry-After", "2")
+                    .withBody("{\"ok\": \"false\"}")
+            )
+            .willSetStateTo("shouldSucceed")
+        )
+
+        //the second second call should succeed
+        wiremock.stubFor(get(urlEqualTo(url))
+            .inScenario("retry")
+            .whenScenarioStateIs("shouldSucceed")
+            .willReturn(
+                aResponse()
+                    .withHeader("Content-Type", "application/json; charset=utf-8")
+                    .withBody("""
+            {
+                "ok": true,
+                "channels": [
+                    {
+                        "id": "C0GRY5SJZ",
+                        "name": "channel_a"
+                    }
+                ]
+            }
+            """.trimIndent()
+                    )
+            )
+        )
+
+        //execute
+        val result = slackApi.listChannels()
+
+        //assert
+        verify(sleeper).invoke(2000)
+        assertThat(result.channels.size).isEqualTo(1)
+    }
+
+    private fun stubRequest(url: String, body: String) {
+        wiremock.stubFor(WireMock.get(WireMock.urlEqualTo(url))
+            .willReturn(
+                WireMock.aResponse()
+                    .withHeader("Content-Type", "application/json; charset=utf-8")
+                    .withBody(body)
+            )
         )
     }
 }
