@@ -1,12 +1,8 @@
 package com.equalexperts.slack.gardener.rest
 
-import com.equalexperts.slack.gardener.rest.decoders.SlackDecoder
 import com.equalexperts.slack.gardener.rest.model.*
-import feign.Feign
 import feign.Param
 import feign.RequestLine
-import feign.jackson.JacksonEncoder
-import feign.okhttp.OkHttpClient
 import java.net.URI
 
 interface SlackBotApi {

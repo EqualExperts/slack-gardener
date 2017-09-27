@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener.rest.decoders
+package com.equalexperts.slack.gardener.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Response
