@@ -1,7 +1,6 @@
 package com.equalexperts.slack.gardener.rest.decoders
 
 import com.fasterxml.jackson.databind.ObjectMapper
-import com.sun.xml.internal.fastinfoset.util.StringArray
 import feign.Response
 import feign.Util
 import feign.codec.Decoder
@@ -20,7 +19,7 @@ class SlackDecoder(private val objectMapper: ObjectMapper) : Decoder {
             if (ByteArray::class.java == type) {
                 return Util.toByteArray(response.body().asInputStream())
             }
-            if (StringArray::class.java == type) {
+            if (String::class.java == type) {
                 return Util.toString(response.body().asReader())
             }
 
