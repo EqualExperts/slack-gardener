@@ -23,7 +23,7 @@ interface SlackApi {
     @RequestLine("GET /api/channels.archive?channel={channel}")
     fun archiveChannel(
         @Param("channel", expander = ChannelIdExpander::class) channel: ChannelInfo
-    ): Unit
+    )
 
     companion object {
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit) : SlackApi {

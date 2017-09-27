@@ -9,7 +9,7 @@ import java.time.Clock
 import java.time.Period
 
 class AwsLambda : RequestHandler<Any, Unit> {
-    override fun handleRequest(input: Any?, context: Context?): Unit {
+    override fun handleRequest(input: Any?, context: Context?) {
         val config = EnvironmentVariables
         val slackUri = config[slack.uri]
 
