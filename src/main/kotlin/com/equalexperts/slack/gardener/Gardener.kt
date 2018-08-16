@@ -5,6 +5,7 @@ import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import com.equalexperts.slack.gardener.rest.SlackApi
 import com.equalexperts.slack.gardener.rest.SlackBotApi
 import com.equalexperts.slack.gardener.rest.model.Timestamp
+import com.equalexperts.slack.gardener.rest.model.User
 import java.time.Clock
 import java.time.Period
 import java.time.ZonedDateTime
@@ -12,15 +13,16 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBotApi, private val clock: Clock, private val defaultIdlePeriod: Period, private val warningPeriod: Period) {
-    private companion object {
-        val channelWhiteList = setOf("general", "announce", "ask-aws", "meta-slack", "random", "ee-alumni", "feedback-to-ee", "remembering_torben")
-        val onlyCheckYearly = setOf("coderetreat", "pt-global-coderetreat", "sk-ee-trip")
-    }
+class Gardener (private val slackApi: SlackApi,
+                private val slackBotApi: SlackBotApi,
+                private val clock: Clock,
+                private val defaultIdlePeriod: Period,
+                private val warningPeriod: Period,
+                private val channelWhiteList: Set<String>,
+                private val longIdlePeriodChannels: Set<String>,
+                private val longIdlePeriod :Period,
+                private val warningMessage: String) {
 
-    private val botUser by lazy {
-        slackBotApi.getUserInfo(slackBotApi.authenticate().id).user
-    }
 
     fun process() {
         val nanoTime = measureNanoTime {
@@ -36,7 +38,7 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
                         Stale -> "stale"
                         is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
                     }
-                    println("\t${it.name}(id: ${it.id}, created ${it.created}, ${staleMessage}, ${it.members} members)")
+                    println("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
                 }
                 .collect(Collectors.toList())
 
@@ -48,7 +50,7 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
             println()
             println("${data.size}\tchannels")
             println("${active}\tactive channels")
-            println("${stale + staleAndWarned}\tstale channels (${staleAndWarned} warned)")
+            println("${stale + staleAndWarned}\tstale channels ($staleAndWarned warned)")
             println("${emptyChannels}\tempty channels")
             println()
 
@@ -73,7 +75,8 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
     }
 
     private fun determineChannelState(channel: ChannelInfo) : ChannelState {
-        val timeLimit = ZonedDateTime.now(clock) - determineIdlePeriod(channel)
+        val idlePeriod = determineIdlePeriod(channel)
+        val timeLimit = ZonedDateTime.now(clock) - idlePeriod
         if (channel.created >= timeLimit) {
             return ChannelState.Active //new channels count as active
         }
@@ -94,7 +97,9 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
                 return ChannelState.Active //found a message typed by an actual human being
             }
 
-            val lastBotMessage = messages.findLast { it.botId == botUser.profile.botId && it.subtype == "bot_message" }
+            val lastBotMessage = messages.findLast {
+                it.botId == getBotUser().profile.botId && it.subtype == "bot_message"
+            }
             lastWarning = lastBotMessage?.timestamp?.toZonedDateTime() ?: lastWarning
             timestamp = messages.last().timestamp
         } while (history.hasMore)
@@ -110,27 +115,26 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
             return
         }
 
-        val warning = """Hi <!channel>.
-        |This channel hasn't been used in a while, so I’d like to archive it.
-        |This will keep the list of channels smaller and help users find things more easily.
-        |If you _don't_ want this channel to be archived, just post a message and I'll leave it alone for a while.
-        |You can archive the channel now using the `/archive` command.
-        |If nobody posts in a few days I will come back and archive the channel for you.""".trimMargin().replace('\n', ' ')
-
-        slackBotApi.postMessage(it.channel, botUser, warning)
+        slackBotApi.postMessage(it.channel, getBotUser(), warningMessage)
         println("\t${it.channel.name}")
     }
 
     private fun archive(it: Tuple) {
-        if (!(it.state is StaleAndWarned)) {
+        if (it.state !is StaleAndWarned) {
             return //not stale, or no warning issued yet
         }
-        if (it.state.oldestWarning >= ZonedDateTime.now(clock) - warningPeriod) {
+        val warningThreshold = ZonedDateTime.now(clock) - warningPeriod
+        if (it.state.oldestWarning >= warningThreshold) {
             return //warning hasn't been issued long enough ago
         }
 
         slackApi.archiveChannel(it.channel)
         println("\t${it.channel.name}")
+    }
+
+    private fun getBotUser() : User {
+        val userId = slackBotApi.authenticate().id
+        return slackBotApi.getUserInfo(userId).user
     }
 
     //a-la moment.js
@@ -144,8 +148,8 @@ class Gardener (private val slackApi: SlackApi, private val slackBotApi: SlackBo
     }
 
     private fun determineIdlePeriod(channel: ChannelInfo) : Period {
-        if (onlyCheckYearly.contains(channel.name)) {
-            return Period.ofYears(1)
+        if (longIdlePeriodChannels.contains(channel.name)) {
+            return longIdlePeriod
         }
         return defaultIdlePeriod
     }

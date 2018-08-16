@@ -11,23 +11,18 @@ import java.time.Period
 class AwsLambda : RequestHandler<Any, Unit> {
     override fun handleRequest(input: Any?, context: Context?) {
         val config = EnvironmentVariables
-        val slackUri = config[slack.uri]
 
-        val slackApi = SlackApi.factory(slackUri, config[slack.apiKey], Thread::sleep)
-        val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey], Thread::sleep)
-
-        val clock = Clock.systemUTC()
-        val defaultIdlePeriod = Period.ofMonths(3)
-        val warningPeriod = Period.ofWeeks(1)
-
-        Gardener(slackApi, slackBotApi, clock, defaultIdlePeriod, warningPeriod).process()
+        val gardener = GardenerFactory().build(config[Slack.uri], config[Slack.apiKey], config[Slack.Bot.apiKey])
+        gardener.process()
     }
+
+
 }
 
-object slack : PropertyGroup() {
+object Slack : PropertyGroup() {
     val uri by uriType
     val apiKey by stringType
-    object bot : PropertyGroup() {
+    object Bot : PropertyGroup() {
         val apiKey by stringType
     }
 }

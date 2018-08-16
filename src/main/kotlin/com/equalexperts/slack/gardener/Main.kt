@@ -9,14 +9,11 @@ import java.time.Period
 
 fun main(vararg args : String) {
     val config = fromFile(File("config.properties"))
-    val slackUri = config[slack.uri]
+    val slackUri = config[Slack.uri]
 
-    val slackApi = SlackApi.factory(slackUri, config[slack.apiKey], Thread::sleep)
-    val slackBotApi = SlackBotApi.factory(slackUri, config[slack.bot.apiKey], Thread::sleep)
+    val apiKey = config[Slack.apiKey]
+    val slackApi = SlackApi.factory(slackUri, apiKey, Thread::sleep)
 
-    val clock = Clock.systemUTC()
-    val defaultIdlePeriod = Period.ofMonths(3)
-    val warningPeriod = Period.ofWeeks(1)
-
-    Gardener(slackApi, slackBotApi, clock, defaultIdlePeriod, warningPeriod).process()
+    val gardener = GardenerFactory().build(config[Slack.uri], config[Slack.apiKey], config[Slack.Bot.apiKey])
+    gardener.process()
 }
