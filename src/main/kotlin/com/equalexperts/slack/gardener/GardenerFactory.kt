@@ -6,11 +6,14 @@ import java.net.URI
 import java.time.Clock
 import java.time.Period
 
-class GardenerFactory{
+class GardenerFactory {
 
-    fun build(slackUri: URI, slackApiKey: String, slackBotApiKey: String): Gardener {
-        val slackApi = SlackApi.factory(slackUri, slackApiKey, Thread::sleep)
-        val slackBotApi = SlackBotApi.factory(slackUri, slackBotApiKey, Thread::sleep)
+
+    fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String): Gardener {
+
+
+        val slackApi = SlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
+        val slackBotApi = SlackBotApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
         val clock = Clock.systemUTC()
         val defaultIdlePeriod = Period.ofMonths(3)

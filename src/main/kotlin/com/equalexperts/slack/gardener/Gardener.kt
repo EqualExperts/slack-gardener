@@ -1,11 +1,12 @@
 package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.gardener.ChannelState.*
-import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import com.equalexperts.slack.gardener.rest.SlackApi
 import com.equalexperts.slack.gardener.rest.SlackBotApi
+import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import com.equalexperts.slack.gardener.rest.model.Timestamp
 import com.equalexperts.slack.gardener.rest.model.User
+import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Period
 import java.time.ZonedDateTime
@@ -13,57 +14,57 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener (private val slackApi: SlackApi,
-                private val slackBotApi: SlackBotApi,
-                private val clock: Clock,
-                private val defaultIdlePeriod: Period,
-                private val warningPeriod: Period,
-                private val channelWhiteList: Set<String>,
-                private val longIdlePeriodChannels: Set<String>,
-                private val longIdlePeriod :Period,
-                private val warningMessage: String) {
-
+class Gardener(private val slackApi: SlackApi,
+               private val slackBotApi: SlackBotApi,
+               private val clock: Clock,
+               private val defaultIdlePeriod: Period,
+               private val warningPeriod: Period,
+               private val channelWhiteList: Set<String>,
+               private val longIdlePeriodChannels: Set<String>,
+               private val longIdlePeriod: Period,
+               private val warningMessage: String) {
+    private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun process() {
         val nanoTime = measureNanoTime {
             val channels = slackApi.listChannels().channels
-            println("${channels.size} channels found")
+            logger.info("${channels.size} channels found")
 
             val data = channels.parallelStream()
-                .filter { this.isEligibleForGardening(it) }
-                .map { Tuple(it, this.determineChannelState(it)) }
-                .peek { (it, state) ->
-                    val staleMessage = when (state) {
-                        Active -> "not stale"
-                        Stale -> "stale"
-                        is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
+                    .filter { this.isEligibleForGardening(it) }
+                    .map { Tuple(it, this.determineChannelState(it)) }
+                    .peek { (it, state) ->
+                        val staleMessage = when (state) {
+                            Active -> "not stale"
+                            Stale -> "stale"
+                            is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
+                        }
+                        logger.info("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
                     }
-                    println("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
-                }
-                .collect(Collectors.toList())
+                    .collect(Collectors.toList())
 
             val active = data.count { it.state == Active }
             val stale = data.count { it.state == Stale }
             val staleAndWarned = data.count { it.state is StaleAndWarned }
             val emptyChannels = data.count { it.channel.members == 0 }
 
-            println()
-            println("${data.size}\tchannels")
-            println("${active}\tactive channels")
-            println("${stale + staleAndWarned}\tstale channels ($staleAndWarned warned)")
-            println("${emptyChannels}\tempty channels")
-            println()
 
-            println("Posting warnings:")
+            logger.info("${data.size}\tchannels")
+            logger.info("${active}\tactive channels")
+            logger.info("${stale + staleAndWarned}\tstale channels ($staleAndWarned warned)")
+            logger.info("${emptyChannels}\tempty channels")
+
+
+            logger.info("Posting warnings:")
             data.parallelStream().forEach { postWarning(it) }
-            println()
 
-            println("Archiving:")
+
+            logger.info("Archiving:")
             data.parallelStream().forEach { archive(it) }
-            println()
+
         }
 
-        println("done in ${nanoTime / 1_000_000} ms")
+        logger.info("done in ${nanoTime / 1_000_000} ms")
     }
 
     private fun isEligibleForGardening(channel: ChannelInfo): Boolean {
@@ -74,7 +75,7 @@ class Gardener (private val slackApi: SlackApi,
         return true
     }
 
-    private fun determineChannelState(channel: ChannelInfo) : ChannelState {
+    private fun determineChannelState(channel: ChannelInfo): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val timeLimit = ZonedDateTime.now(clock) - idlePeriod
         if (channel.created >= timeLimit) {
@@ -116,7 +117,7 @@ class Gardener (private val slackApi: SlackApi,
         }
 
         slackBotApi.postMessage(it.channel, getBotUser(), warningMessage)
-        println("\t${it.channel.name}")
+        logger.info("\t${it.channel.name}")
     }
 
     private fun archive(it: Tuple) {
@@ -129,10 +130,10 @@ class Gardener (private val slackApi: SlackApi,
         }
 
         slackApi.archiveChannel(it.channel)
-        println("\t${it.channel.name}")
+        logger.info("\t${it.channel.name}")
     }
 
-    private fun getBotUser() : User {
+    private fun getBotUser(): User {
         val userId = slackBotApi.authenticate().id
         return slackBotApi.getUserInfo(userId).user
     }
@@ -147,7 +148,7 @@ class Gardener (private val slackApi: SlackApi,
         }
     }
 
-    private fun determineIdlePeriod(channel: ChannelInfo) : Period {
+    private fun determineIdlePeriod(channel: ChannelInfo): Period {
         if (longIdlePeriodChannels.contains(channel.name)) {
             return longIdlePeriod
         }

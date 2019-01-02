@@ -1,6 +1,5 @@
 package com.equalexperts.slack.gardener.rest
 
-import com.equalexperts.slack.gardener.rest.SlackRetrySupport.SlackRetryException
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Response
 import feign.Util

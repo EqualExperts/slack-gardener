@@ -1,11 +1,11 @@
 package com.equalexperts.slack.gardener.rest
 
+import com.equalexperts.slack.gardener.rest.SlackRetrySupport.SlackErrorDecoder
 import com.equalexperts.slack.gardener.rest.model.ChannelHistory
 import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import com.equalexperts.slack.gardener.rest.model.ChannelInfo.ChannelIdExpander
 import com.equalexperts.slack.gardener.rest.model.ChannelList
 import com.equalexperts.slack.gardener.rest.model.Timestamp
-import com.equalexperts.slack.gardener.rest.SlackRetrySupport.SlackErrorDecoder
 import feign.Param
 import feign.RequestLine
 import java.net.URI

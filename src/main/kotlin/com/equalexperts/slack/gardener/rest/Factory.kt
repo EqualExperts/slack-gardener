@@ -4,8 +4,10 @@ import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
 import com.fasterxml.jackson.module.kotlin.registerKotlinModule
 import feign.Feign
+import feign.Logger
 import feign.jackson.JacksonEncoder
 import feign.okhttp.OkHttpClient
+import feign.slf4j.Slf4jLogger
 
 private val httpClient = OkHttpClient()
 
@@ -18,4 +20,6 @@ fun feignBuilder(): Feign.Builder {
         .client(httpClient)
         .encoder(JacksonEncoder(jackson))
         .decoder(SlackDecoder(jackson))
+        .logger(Slf4jLogger())
+        .logLevel(Logger.Level.HEADERS)
 }

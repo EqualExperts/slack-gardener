@@ -4,7 +4,9 @@ import feign.Response
 import feign.RetryableException
 import feign.Retryer
 import feign.codec.ErrorDecoder
-import java.lang.Exception
+import java.time.LocalDateTime
+import java.time.ZoneOffset
+import java.util.*
 
 class SlackRetrySupport(private val sleeper: (Long) -> Unit) : Retryer {
     override fun clone(): Retryer {
@@ -19,15 +21,12 @@ class SlackRetrySupport(private val sleeper: (Long) -> Unit) : Retryer {
         throw e
     }
 
-    class SlackRetryException(internal val secondsToWait: Int) :
-        RetryableException("Retrying due to a slack 429 response", null) {
+    class SlackRetryException(internal val secondsToWait: Long) : RetryableException("Retrying due to a slack 429 response", null, Date.from(LocalDateTime.now().plusSeconds(secondsToWait).toInstant(ZoneOffset.UTC)))
 
-    }
-
-    class SlackErrorDecoder() : ErrorDecoder {
+    class SlackErrorDecoder : ErrorDecoder {
         override fun decode(methodKey: String, response: Response): Exception {
             if (response.status() == 429) {
-                throw SlackRetryException(response.headers()["Retry-After"]!!.first().toInt())
+                throw SlackRetryException(response.headers()["Retry-After"]!!.first().toLong())
             }
             return default.decode(methodKey, response)
         }
