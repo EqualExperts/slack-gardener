@@ -11,10 +11,10 @@ The slack bot will need a bot user to be created, as well as needing the below p
 ```
 channels:history
 channels:read
+channels:write
 incoming-webhook
 bot
 ```
-It might potentially need to permission archive channels (yet to be fulled tested)
 
 Then once the app is installed to the workspace you will need to provide the gardener the below access tokens: 
 
