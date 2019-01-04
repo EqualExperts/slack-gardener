@@ -27,12 +27,13 @@ class Gardener(private val slackApi: SlackApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = slackApi.listChannels().channels
+            val channels = getChannels()
             logger.info("${channels.size} channels found")
+            val botUser = getBotUser()
 
             val data = channels.parallelStream()
                     .filter { this.isEligibleForGardening(it) }
-                    .map { Tuple(it, this.determineChannelState(it)) }
+                    .map { Tuple(it, this.determineChannelState(it, botUser)) }
                     .peek { (it, state) ->
                         val staleMessage = when (state) {
                             Active -> "not stale"
@@ -67,6 +68,31 @@ class Gardener(private val slackApi: SlackApi,
         logger.info("done in ${nanoTime / 1_000_000} ms")
     }
 
+    private fun getChannels(): Set<ChannelInfo> {
+        var channels = setOf<ChannelInfo>()
+
+        var moreChannelsToList = false
+        var cursorValue : String = ""
+        do {
+            val channelList = slackApi.listChannels(cursorValue)
+            val next_cursor = channelList.response_metadata.next_cursor
+
+            channels += channelList.channels
+
+            if (!next_cursor.isBlank()) {
+                moreChannelsToList = true
+                cursorValue = next_cursor
+
+            } else {
+                moreChannelsToList = false
+            }
+
+
+        }  while (moreChannelsToList)
+        return channels
+    }
+
+
     private fun isEligibleForGardening(channel: ChannelInfo): Boolean {
         if (channelWhiteList.contains(channel.name)) {
             return false
@@ -75,7 +101,7 @@ class Gardener(private val slackApi: SlackApi,
         return true
     }
 
-    private fun determineChannelState(channel: ChannelInfo): ChannelState {
+    private fun determineChannelState(channel: ChannelInfo, botUser : User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val timeLimit = ZonedDateTime.now(clock) - idlePeriod
         if (channel.created >= timeLimit) {
@@ -86,6 +112,7 @@ class Gardener(private val slackApi: SlackApi,
 
         var lastWarning: ZonedDateTime? = null
         var timestamp = Timestamp(timeLimit)
+
         do {
             val history = slackApi.getChannelHistory(channel, timestamp)
             val messages = history.messages
@@ -99,7 +126,7 @@ class Gardener(private val slackApi: SlackApi,
             }
 
             val lastBotMessage = messages.findLast {
-                it.botId == getBotUser().profile.botId && it.subtype == "bot_message"
+                it.botId == botUser.profile.botId && it.subtype == "bot_message"
             }
             lastWarning = lastBotMessage?.timestamp?.toZonedDateTime() ?: lastWarning
             timestamp = messages.last().timestamp
@@ -117,7 +144,7 @@ class Gardener(private val slackApi: SlackApi,
         }
 
         slackBotApi.postMessage(it.channel, getBotUser(), warningMessage)
-        logger.info("\t${it.channel.name}")
+        logger.info("Warned ${it.channel.name}")
     }
 
     private fun archive(it: Tuple) {
@@ -130,7 +157,7 @@ class Gardener(private val slackApi: SlackApi,
         }
 
         slackApi.archiveChannel(it.channel)
-        logger.info("\t${it.channel.name}")
+        logger.info("Archived ${it.channel.name}")
     }
 
     private fun getBotUser(): User {

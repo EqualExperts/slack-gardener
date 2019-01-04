@@ -19,8 +19,8 @@ class GardenerFactory {
         val defaultIdlePeriod = Period.ofMonths(3)
         val warningPeriod = Period.ofWeeks(1)
         val longIdlePeriod = Period.ofYears(1)
-
-        val channelWhitelist = setOf("announce", "ask-aws", "meta-Slack", "ee-alumni", "feedback-to-ee", "remembering_torben")
+//cve-alerts causes issues with loading messages (as it posts 1000's of messages monthly), and causes the lambda to time out
+        val channelWhitelist = setOf("announcements", "ask-aws", "meta-Slack", "ee-alumni", "feedback-to-ee", "remembering_torben", "ber-flynn", "cve-alerts")
         val longIdlePeriodChannels = setOf("coderetreat", "pt-global-coderetreat", "sk-ee-trip")
 
         val warningMessage = """Hi <!channel>.
