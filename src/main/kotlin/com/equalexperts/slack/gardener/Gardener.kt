@@ -1,6 +1,6 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.channel.ChannelRetriever
+import com.equalexperts.slack.channel.ChannelInfoRetriever
 import com.equalexperts.slack.gardener.ChannelState.*
 import com.equalexperts.slack.gardener.rest.SlackApi
 import com.equalexperts.slack.gardener.rest.SlackBotApi
@@ -28,7 +28,7 @@ class Gardener(private val slackApi: SlackApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = ChannelRetriever(slackApi).getChannels()
+            val channels = ChannelInfoRetriever(slackApi).getChannels()
             logger.info("${channels.size} channels found")
             val botUser = getBotUser()
 
@@ -80,7 +80,9 @@ class Gardener(private val slackApi: SlackApi,
     private fun determineChannelState(channel: ChannelInfo, botUser : User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val timeLimit = ZonedDateTime.now(clock) - idlePeriod
-        if (channel.created >= timeLimit) {
+
+        val channelCreatedAfterTimeLimitThreshold = channel.created >= timeLimit
+        if (channelCreatedAfterTimeLimitThreshold) {
             return ChannelState.Active //new channels count as active
         }
 
@@ -93,18 +95,25 @@ class Gardener(private val slackApi: SlackApi,
             val history = slackApi.getChannelHistory(channel, timestamp)
             val messages = history.messages
 
-            if (messages.isEmpty()) {
+            val noMessagesSinceThreshold = messages.isEmpty()
+            if (noMessagesSinceThreshold) {
                 break
             }
 
-            if (!messages.none { it.type == "message" && it.subtype == null }) {
-                return ChannelState.Active //found a message typed by an actual human being
+            val messageSentFromHumanBeingOrBotBeforeThreshold = !messages.none {
+                val humanMessage = it.type == "message" && it.subtype == null
+                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" &&  it.botId != botUser.profile.botId
+                humanMessage || nonGardenerBotMessage
             }
 
-            val lastBotMessage = messages.findLast {
+            if (messageSentFromHumanBeingOrBotBeforeThreshold) {
+                return ChannelState.Active //found a message typed by an actual human being or a non-gardener bot
+            }
+
+            val lastGardenerMessage = messages.findLast {
                 it.botId == botUser.profile.botId && it.subtype == "bot_message"
             }
-            lastWarning = lastBotMessage?.timestamp?.toZonedDateTime() ?: lastWarning
+            lastWarning = lastGardenerMessage?.timestamp?.toZonedDateTime() ?: lastWarning
             timestamp = messages.last().timestamp
         } while (history.hasMore)
 

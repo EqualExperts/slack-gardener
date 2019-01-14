@@ -52,11 +52,11 @@ class GardenerTest {
     private val longIdlePeriodChannel = ChannelInfo("TEST_ID", longIdlePeriodChannelName, Instant.EPOCH.epochSecond, 1)
 
 
-    private fun getWhitelistedChannels() = ChannelList(listOf(whitelistedChannel), ResponseMetadata("next_cursor_token"))
+    private fun getWhitelistedChannels() = ChannelList(listOf(whitelistedChannel), ResponseMetadata(""))
 
-    private fun getNonWhitelistedChannels() = ChannelList(listOf(nonWhitelistedChannel), ResponseMetadata("next_cursor_token"))
+    private fun getNonWhitelistedChannels() = ChannelList(listOf(nonWhitelistedChannel), ResponseMetadata(""))
 
-    private fun getLongIdlePeriodChannels() = ChannelList(listOf(longIdlePeriodChannel), ResponseMetadata("next_cursor_token"))
+    private fun getLongIdlePeriodChannels() = ChannelList(listOf(longIdlePeriodChannel), ResponseMetadata(""))
 
 
     @BeforeEach

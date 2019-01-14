@@ -4,7 +4,7 @@ import com.equalexperts.slack.gardener.rest.SlackApi
 import com.equalexperts.slack.gardener.rest.model.ChannelInfo
 import org.slf4j.LoggerFactory
 
-class ChannelRetriever(val slackApi: SlackApi) {
+class ChannelInfoRetriever(val slackApi: SlackApi) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
