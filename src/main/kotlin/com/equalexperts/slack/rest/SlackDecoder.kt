@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener.rest
+package com.equalexperts.slack.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Response
@@ -9,7 +9,7 @@ import java.lang.reflect.Type
 class SlackDecoder(private val objectMapper: ObjectMapper) : Decoder {
 
     override fun decode(response: Response, type: Type?): Any? {
-        try {
+        response.use { response ->
             if (response.status() == 404) {
                 return Util.emptyValueOf(type)
             }
@@ -30,8 +30,6 @@ class SlackDecoder(private val objectMapper: ObjectMapper) : Decoder {
                 throw RuntimeException(json["error"].textValue())
             }
             return objectMapper.convertValue(json, objectMapper.constructType(type))
-        } finally {
-            response.close()
         }
     }
 

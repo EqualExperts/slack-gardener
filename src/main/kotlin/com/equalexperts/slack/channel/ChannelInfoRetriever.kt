@@ -1,10 +1,10 @@
 package com.equalexperts.slack.channel
 
-import com.equalexperts.slack.gardener.rest.SlackApi
-import com.equalexperts.slack.gardener.rest.model.ChannelInfo
+import com.equalexperts.slack.rest.SlackApi
+import com.equalexperts.slack.rest.model.ChannelInfo
 import org.slf4j.LoggerFactory
 
-class ChannelInfoRetriever(val slackApi: SlackApi) {
+class ChannelInfoRetriever(private val slackApi: SlackApi) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
@@ -14,8 +14,8 @@ class ChannelInfoRetriever(val slackApi: SlackApi) {
 
         var channels = setOf<ChannelInfo>()
 
-        var moreChannelsToList = false
-        var cursorValue : String = ""
+        var moreChannelsToList: Boolean
+        var cursorValue = ""
         do {
             val channelList = slackApi.listChannels(cursorValue)
             val nextCursor = channelList.response_metadata.next_cursor

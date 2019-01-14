@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener.rest.model
+package com.equalexperts.slack.rest.model
 
 import feign.Param
 

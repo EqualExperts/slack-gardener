@@ -2,11 +2,11 @@ package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.channel.ChannelInfoRetriever
 import com.equalexperts.slack.gardener.ChannelState.*
-import com.equalexperts.slack.gardener.rest.SlackApi
-import com.equalexperts.slack.gardener.rest.SlackBotApi
-import com.equalexperts.slack.gardener.rest.model.ChannelInfo
-import com.equalexperts.slack.gardener.rest.model.Timestamp
-import com.equalexperts.slack.gardener.rest.model.User
+import com.equalexperts.slack.rest.SlackApi
+import com.equalexperts.slack.rest.SlackBotApi
+import com.equalexperts.slack.rest.model.ChannelInfo
+import com.equalexperts.slack.rest.model.Timestamp
+import com.equalexperts.slack.rest.model.User
 import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Period
@@ -52,9 +52,9 @@ class Gardener(private val slackApi: SlackApi,
 
 
             logger.info("${data.size}\tchannels")
-            logger.info("${active}\tactive channels")
+            logger.info("$active\tactive channels")
             logger.info("${stale + staleAndWarned}\tstale channels ($staleAndWarned warned)")
-            logger.info("${emptyChannels}\tempty channels")
+            logger.info("$emptyChannels\tempty channels")
 
 
             logger.info("Posting warnings:")
@@ -156,7 +156,7 @@ class Gardener(private val slackApi: SlackApi,
         return when (daysAgo) {
             0L -> "less than a day ago"
             1L -> "1 day ago"
-            else -> "${daysAgo} days ago"
+            else -> "$daysAgo days ago"
         }
     }
 

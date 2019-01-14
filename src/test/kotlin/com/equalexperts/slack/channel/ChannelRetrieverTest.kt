@@ -1,9 +1,9 @@
 package com.equalexperts.slack.channel
 
-import com.equalexperts.slack.gardener.rest.SlackApi
-import com.equalexperts.slack.gardener.rest.model.ChannelInfo
-import com.equalexperts.slack.gardener.rest.model.ChannelList
-import com.equalexperts.slack.gardener.rest.model.ResponseMetadata
+import com.equalexperts.slack.rest.SlackApi
+import com.equalexperts.slack.rest.model.ChannelInfo
+import com.equalexperts.slack.rest.model.ChannelList
+import com.equalexperts.slack.rest.model.ResponseMetadata
 import com.nhaarman.mockito_kotlin.*
 import org.junit.jupiter.api.Test
 

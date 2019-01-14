@@ -1,7 +1,7 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.gardener.rest.SlackApi
-import com.equalexperts.slack.gardener.rest.SlackBotApi
+import com.equalexperts.slack.rest.SlackApi
+import com.equalexperts.slack.rest.SlackBotApi
 import java.net.URI
 import java.time.Clock
 import java.time.Period
@@ -19,7 +19,7 @@ class GardenerFactory {
         val defaultIdlePeriod = Period.ofMonths(3)
         val warningPeriod = Period.ofWeeks(1)
         val longIdlePeriod = Period.ofYears(1)
-//cve-alerts causes issues with loading messages (as it posts 1000's of messages monthly), and causes the lambda to time out
+
         val channelWhitelist = setOf("announcements", "ask-aws", "meta-Slack", "ee-alumni", "feedback-to-ee", "remembering_torben", "ber-flynn")
         val longIdlePeriodChannels = setOf("coderetreat", "pt-global-coderetreat", "sk-ee-trip")
 

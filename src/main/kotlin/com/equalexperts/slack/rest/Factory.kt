@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener.rest
+package com.equalexperts.slack.rest
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper

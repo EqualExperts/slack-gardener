@@ -1,8 +1,8 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.gardener.rest.SlackApi
-import com.equalexperts.slack.gardener.rest.SlackBotApi
-import com.equalexperts.slack.gardener.rest.model.*
+import com.equalexperts.slack.rest.SlackApi
+import com.equalexperts.slack.rest.SlackBotApi
+import com.equalexperts.slack.rest.model.*
 import com.nhaarman.mockito_kotlin.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test

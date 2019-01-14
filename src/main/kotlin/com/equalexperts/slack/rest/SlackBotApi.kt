@@ -1,6 +1,6 @@
-package com.equalexperts.slack.gardener.rest
+package com.equalexperts.slack.rest
 
-import com.equalexperts.slack.gardener.rest.model.*
+import com.equalexperts.slack.rest.model.*
 import feign.Param
 import feign.RequestLine
 import java.net.URI
