@@ -11,7 +11,7 @@ import feign.RequestLine
 import java.net.URI
 
 interface SlackApi {
-    @RequestLine("GET /api/channels.list?exclude_archived=true&exclude_members=true&cursor={cursorValue}")
+    @RequestLine("GET /api/conversations.list?exclude_archived=true&exclude_members=true&cursor={cursorValue}")
     fun listChannels(@Param("cursorValue") cursorValue: String = "") : ChannelList
 
     @RequestLine("GET /api/channels.history?channel={channel}&oldest={oldest}&count=1000")
