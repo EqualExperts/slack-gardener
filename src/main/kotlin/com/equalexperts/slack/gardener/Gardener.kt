@@ -1,5 +1,6 @@
 package com.equalexperts.slack.gardener
 
+import com.equalexperts.slack.channel.ChannelRetriever
 import com.equalexperts.slack.gardener.ChannelState.*
 import com.equalexperts.slack.gardener.rest.SlackApi
 import com.equalexperts.slack.gardener.rest.SlackBotApi
@@ -27,7 +28,7 @@ class Gardener(private val slackApi: SlackApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = getChannels()
+            val channels = ChannelRetriever(slackApi).getChannels()
             logger.info("${channels.size} channels found")
             val botUser = getBotUser()
 
@@ -67,31 +68,6 @@ class Gardener(private val slackApi: SlackApi,
 
         logger.info("done in ${nanoTime / 1_000_000} ms")
     }
-
-    private fun getChannels(): Set<ChannelInfo> {
-        var channels = setOf<ChannelInfo>()
-
-        var moreChannelsToList = false
-        var cursorValue : String = ""
-        do {
-            val channelList = slackApi.listChannels(cursorValue)
-            val next_cursor = channelList.response_metadata.next_cursor
-
-            channels += channelList.channels
-
-            if (!next_cursor.isBlank()) {
-                moreChannelsToList = true
-                cursorValue = next_cursor
-
-            } else {
-                moreChannelsToList = false
-            }
-
-
-        }  while (moreChannelsToList)
-        return channels
-    }
-
 
     private fun isEligibleForGardening(channel: ChannelInfo): Boolean {
         if (channelWhiteList.contains(channel.name)) {
