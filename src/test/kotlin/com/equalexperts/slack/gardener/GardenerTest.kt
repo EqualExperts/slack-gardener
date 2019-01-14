@@ -51,6 +51,14 @@ class GardenerTest {
     private val whitelistedChannel = ChannelInfo("TEST_ID", whitelistedChannelName, Instant.EPOCH.epochSecond, 1)
     private val longIdlePeriodChannel = ChannelInfo("TEST_ID", longIdlePeriodChannelName, Instant.EPOCH.epochSecond, 1)
 
+
+    private fun getWhitelistedChannels() = ChannelList(listOf(whitelistedChannel), ResponseMetadata("next_cursor_token"))
+
+    private fun getNonWhitelistedChannels() = ChannelList(listOf(nonWhitelistedChannel), ResponseMetadata("next_cursor_token"))
+
+    private fun getLongIdlePeriodChannels() = ChannelList(listOf(longIdlePeriodChannel), ResponseMetadata("next_cursor_token"))
+
+
     @BeforeEach
     fun setup() {
         mockSlackApi = mock()
@@ -83,7 +91,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnWhitelistedChannels() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(whitelistedChannel))
+        val channelList = getWhitelistedChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
@@ -100,7 +108,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnLongIdlePeriodChannelsDuringLongIdlePeriod() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(longIdlePeriodChannel))
+        val channelList = getLongIdlePeriodChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessageDuringLongPeriodThreshold)
@@ -117,7 +125,7 @@ class GardenerTest {
     fun shouldArchiveWhenStaleAndAfterWarning() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(nonWhitelistedChannel))
+        val channelList = getNonWhitelistedChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
@@ -133,7 +141,7 @@ class GardenerTest {
     fun shouldNotArchiveWhenStaleAndBeforeWarning() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(nonWhitelistedChannel))
+        val channelList = getNonWhitelistedChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageBeforeWarningThreshold)
@@ -149,7 +157,7 @@ class GardenerTest {
     fun shouldWarnWhenStale() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(nonWhitelistedChannel))
+        val channelList = getNonWhitelistedChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = emptyList<Message>()
@@ -165,7 +173,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnWhenActive() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = ChannelList(listOf(nonWhitelistedChannel))
+        val channelList = getNonWhitelistedChannels()
         whenever(mockSlackApi.listChannels()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessage)
@@ -177,7 +185,6 @@ class GardenerTest {
         verify(mockSlackApi, never()).archiveChannel(nonWhitelistedChannel)
         verify(mockSlackBotApi, never()).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
     }
-
 
     private fun getGardener(whitelistedChannels: Set<String>, longIdlePeriodChannels: Set<String>): Gardener {
         return Gardener(mockSlackApi, mockSlackBotApi, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod,  warningMessageContent)
