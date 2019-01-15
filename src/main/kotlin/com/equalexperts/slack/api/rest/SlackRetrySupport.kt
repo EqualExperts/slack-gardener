@@ -1,4 +1,4 @@
-package com.equalexperts.slack.rest
+package com.equalexperts.slack.api.rest
 
 import feign.Response
 import feign.RetryableException

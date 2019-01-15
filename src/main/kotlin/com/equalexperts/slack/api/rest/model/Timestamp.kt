@@ -1,4 +1,4 @@
-package com.equalexperts.slack.rest.model
+package com.equalexperts.slack.api.rest.model
 
 import java.time.Instant
 import java.time.ZoneOffset.UTC

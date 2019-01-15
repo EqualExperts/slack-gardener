@@ -1,22 +1,18 @@
-package com.equalexperts.slack.rest
+package com.equalexperts.slack.api.rest
 
-import com.equalexperts.slack.rest.model.*
+import com.equalexperts.slack.api.conversations.model.Conversation
+import com.equalexperts.slack.api.users.model.User
 import feign.Param
 import feign.RequestLine
 import java.net.URI
 
 interface SlackBotApi {
-    @RequestLine("GET /api/auth.test")
-    fun authenticate() : AuthInfo
-
-    @RequestLine("GET /api/users.info?user={user}")
-    fun getUserInfo(@Param("user") userId: UserId) : UserInfo
 
     @RequestLine("GET /api/chat.postMessage?channel={channel}&username={user}&text={text}")
     fun postMessage(
-        @Param("channel", expander = ChannelInfo.ChannelIdExpander::class) channel: ChannelInfo,
-        @Param("user", expander = User.UsernameExpander::class) user: User,
-        @Param("text") text: String
+            @Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation,
+            @Param("user", expander = User.UsernameExpander::class) user: User,
+            @Param("text") text: String
     )
 
     companion object {

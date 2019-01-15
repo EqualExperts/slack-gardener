@@ -1,4 +1,4 @@
-package com.equalexperts.slack.rest
+package com.equalexperts.slack.api.rest
 
 import com.fasterxml.jackson.databind.ObjectMapper
 import feign.Response

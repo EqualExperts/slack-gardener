@@ -1,4 +1,4 @@
-package com.equalexperts.slack.rest
+package com.equalexperts.slack.api.rest
 
 import com.fasterxml.jackson.databind.DeserializationFeature
 import com.fasterxml.jackson.databind.ObjectMapper
@@ -21,5 +21,5 @@ fun feignBuilder(): Feign.Builder {
         .encoder(JacksonEncoder(jackson))
         .decoder(SlackDecoder(jackson))
         .logger(Slf4jLogger())
-        .logLevel(Logger.Level.HEADERS)
+        .logLevel(Logger.Level.NONE)
 }

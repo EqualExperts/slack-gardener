@@ -1,23 +1,23 @@
-package com.equalexperts.slack.channel
+package com.equalexperts.slack.api.conversations
 
-import com.equalexperts.slack.rest.SlackApi
-import com.equalexperts.slack.rest.model.ChannelInfo
+import com.equalexperts.slack.api.conversations.model.Conversation
+import com.equalexperts.slack.api.conversations.model.ConversationMembers
 import org.slf4j.LoggerFactory
 
-class ChannelInfoRetriever(private val slackApi: SlackApi) {
+class ConversationApi(private val conversationsSlackApi: ConversationsSlackApi) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
-    fun getChannels(): Set<ChannelInfo> {
+    fun list(): Set<Conversation> {
 
         logger.info("Retrieving Channels")
 
-        var channels = setOf<ChannelInfo>()
+        var channels = setOf<Conversation>()
 
         var moreChannelsToList: Boolean
         var cursorValue = ""
         do {
-            val channelList = slackApi.listChannels(cursorValue)
+            val channelList = conversationsSlackApi.list(cursorValue)
             val nextCursor = channelList.response_metadata.next_cursor
 
             logger.debug("Channels found, adding to list ${channelList.channels}")
@@ -36,6 +36,10 @@ class ChannelInfoRetriever(private val slackApi: SlackApi) {
         }  while (moreChannelsToList)
         logger.info("${channels.size} channels found")
         return channels
+    }
+
+    fun members(conversation: Conversation): ConversationMembers {
+        return conversationsSlackApi.members(conversation.id)
     }
 
 

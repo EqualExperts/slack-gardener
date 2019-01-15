@@ -1,12 +1,12 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.channel.ChannelInfoRetriever
+import com.equalexperts.slack.api.channels.ChannelsSlackApi
+import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.gardener.ChannelState.*
-import com.equalexperts.slack.rest.SlackApi
-import com.equalexperts.slack.rest.SlackBotApi
-import com.equalexperts.slack.rest.model.ChannelInfo
-import com.equalexperts.slack.rest.model.Timestamp
-import com.equalexperts.slack.rest.model.User
+import com.equalexperts.slack.api.rest.SlackBotApi
+import com.equalexperts.slack.api.conversations.model.Conversation
+import com.equalexperts.slack.api.rest.model.Timestamp
+import com.equalexperts.slack.api.users.model.User
 import org.slf4j.LoggerFactory
 import java.time.Clock
 import java.time.Period
@@ -15,8 +15,10 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener(private val slackApi: SlackApi,
+class Gardener(private val channelsSlackApi: ChannelsSlackApi,
+               private val conversationApi: ConversationApi,
                private val slackBotApi: SlackBotApi,
+               private val botUser: User,
                private val clock: Clock,
                private val defaultIdlePeriod: Period,
                private val warningPeriod: Period,
@@ -28,9 +30,8 @@ class Gardener(private val slackApi: SlackApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = ChannelInfoRetriever(slackApi).getChannels()
+            val channels = conversationApi.list()
             logger.info("${channels.size} channels found")
-            val botUser = getBotUser()
 
             val data = channels.parallelStream()
                     .filter { this.isEligibleForGardening(it) }
@@ -69,7 +70,7 @@ class Gardener(private val slackApi: SlackApi,
         logger.info("done in ${nanoTime / 1_000_000} ms")
     }
 
-    private fun isEligibleForGardening(channel: ChannelInfo): Boolean {
+    private fun isEligibleForGardening(channel: Conversation): Boolean {
         if (channelWhiteList.contains(channel.name)) {
             return false
         }
@@ -77,7 +78,7 @@ class Gardener(private val slackApi: SlackApi,
         return true
     }
 
-    private fun determineChannelState(channel: ChannelInfo, botUser : User): ChannelState {
+    private fun determineChannelState(channel: Conversation, botUser : User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val timeLimit = ZonedDateTime.now(clock) - idlePeriod
 
@@ -92,7 +93,7 @@ class Gardener(private val slackApi: SlackApi,
         var timestamp = Timestamp(timeLimit)
 
         do {
-            val history = slackApi.getChannelHistory(channel, timestamp)
+            val history = channelsSlackApi.channelHistory(channel, timestamp)
             val messages = history.messages
 
             val noMessagesSinceThreshold = messages.isEmpty()
@@ -128,7 +129,7 @@ class Gardener(private val slackApi: SlackApi,
             return
         }
 
-        slackBotApi.postMessage(it.channel, getBotUser(), warningMessage)
+        slackBotApi.postMessage(it.channel, botUser, warningMessage)
         logger.info("Warned ${it.channel.name}")
     }
 
@@ -141,13 +142,8 @@ class Gardener(private val slackApi: SlackApi,
             return //warning hasn't been issued long enough ago
         }
 
-        slackApi.archiveChannel(it.channel)
+        channelsSlackApi.channelsArchive(it.channel)
         logger.info("Archived ${it.channel.name}")
-    }
-
-    private fun getBotUser(): User {
-        val userId = slackBotApi.authenticate().id
-        return slackBotApi.getUserInfo(userId).user
     }
 
     //a-la moment.js
@@ -160,12 +156,12 @@ class Gardener(private val slackApi: SlackApi,
         }
     }
 
-    private fun determineIdlePeriod(channel: ChannelInfo): Period {
+    private fun determineIdlePeriod(channel: Conversation): Period {
         if (longIdlePeriodChannels.contains(channel.name)) {
             return longIdlePeriod
         }
         return defaultIdlePeriod
     }
 
-    private data class Tuple(val channel: ChannelInfo, val state: ChannelState)
+    private data class Tuple(val channel: Conversation, val state: ChannelState)
 }

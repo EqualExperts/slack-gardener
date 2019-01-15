@@ -1,4 +1,4 @@
-package com.equalexperts.slack.rest.model
+package com.equalexperts.slack.api.rest.model
 
 import feign.Param
 
