@@ -28,7 +28,7 @@ Once the app is installed to the workspace, you will need to provide the gardene
 ## Installation
 Provide step by step series of examples and explanations about how to get a development env running.
 
-The Slack Gardener is by default setup to be used as an AWS Lambda, once the lambda has been created, then upload the jar created to the s3 bucket for lambda to consume via the below command 
+The Slack Gardener is by default setup to be used as an AWS Lambda, once the lambda has been created, then upload the jar (with hash) created to the s3 bucket for lambda to consume via the below command 
 
 ```
 ./gradlew clean build test upload
@@ -37,8 +37,7 @@ terragrunt plan-all
 terragrunt apply-all
 ```
 
-It's recommended you set up a CloudWatch event to trigger the lambda at 9am weekdays.
-
+An SNS topic will need to be provisioned manually and the relevant terraform resources changed to point to it (this wasn't done in) so emails fire when the lambda has errors. 
 
 ## Built with
 
