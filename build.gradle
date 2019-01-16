@@ -1,3 +1,11 @@
+import jp.classmethod.aws.gradle.s3.AmazonS3FileUploadTask
+
+import com.amazonaws.services.s3.model.ObjectMetadata
+
+import java.nio.file.Files
+import java.security.MessageDigest
+import java.security.NoSuchAlgorithmException
+
 buildscript {
     ext {
         kotlinVersion = '1.3.+'
@@ -7,17 +15,22 @@ buildscript {
     }
     repositories {
         mavenCentral()
+        maven { url "https://plugins.gradle.org/m2/" }
     }
     dependencies {
         classpath("org.jetbrains.kotlin:kotlin-gradle-plugin:${kotlinVersion}")
         classpath("org.jetbrains.kotlin:kotlin-allopen:${kotlinVersion}")
+        classpath "jp.classmethod.aws:gradle-aws-plugin:0.+"
     }
 
 }
 
+apply plugin: 'java'
 apply plugin: 'idea'
 apply plugin: 'kotlin'
 apply plugin: 'kotlin-kapt'
+apply plugin: 'jp.classmethod.aws'
+apply plugin: "jp.classmethod.aws.s3"
 
 group = 'com.equalexperts'
 version = '0.0.1-SNAPSHOT'
@@ -70,10 +83,47 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
 }
 
-//fat jar
-jar {
-    manifest {
-        attributes 'Main-Class': 'com.equalexperts.slack.gardener.MainKt'
+aws {
+    profileName = 'default'
+    region = 'eu-west-1'
+}
+
+task base64sha256(type: Exec, dependsOn: build) {
+    commandLine "./scripts/generate_lambda_file_hash.sh"
+    
+    standardOutput = new ByteArrayOutputStream()
+    ext.hash = {
+        standardOutput.toString('UTF-8')
     }
-    from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
+}
+
+task buildHashFile(dependsOn: base64sha256) {
+    def result = file("build/ee-slack-gardener-lambda.base64sha256")
+    outputs.file result
+    doLast {
+        def hash = tasks.base64sha256.hash()
+        println hash
+        result.write(hash, 'UTF-8')
+    }
+}
+
+task uploadLambdaHash(type: AmazonS3FileUploadTask, dependsOn: buildHashFile){
+    file file("build/ee-slack-gardener-lambda.base64sha256")
+    bucketName 'ee-slack-gardener-lambdas'
+    key "ee-slack-gardener-lambda.jar.base64sha256"
+
+    def m = new ObjectMetadata()
+    m.setContentType("text/plain")
+    objectMetadata = m
+}
+
+task uploadLambda(type: AmazonS3FileUploadTask, dependsOn: build) {
+    file file("build/libs/ee-slack-gardener-0.0.1-SNAPSHOT.jar")
+    bucketName 'ee-slack-gardener-lambdas'
+    key "ee-slack-gardener-lambda.jar"
+}
+
+task upload(){
+    dependsOn uploadLambda
+    dependsOn uploadLambdaHash
 }

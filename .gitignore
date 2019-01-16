@@ -11,3 +11,4 @@
 config.properties
 
 .DS_Store
+infra/environments/prod/slack_lambda/.terragrunt-cache
