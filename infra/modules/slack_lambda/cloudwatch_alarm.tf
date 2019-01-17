@@ -7,7 +7,7 @@ resource "aws_cloudwatch_metric_alarm" "slack_gardener_error" {
   alarm_name = "Slack Gardener"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods = "1"
-  metric_name = "Error"
+  metric_name = "Errors"
   namespace = "AWS/Lambda"
   period = "86400"
   statistic = "Minimum"
@@ -17,7 +17,7 @@ resource "aws_cloudwatch_metric_alarm" "slack_gardener_error" {
     "${aws_sns_topic.gardener_error_alarm.arn}"]
 
   dimensions {
-    FunctionName = "slack-gardener"
+    FunctionName = "ee-slack-gardener"
   }
 }
 
