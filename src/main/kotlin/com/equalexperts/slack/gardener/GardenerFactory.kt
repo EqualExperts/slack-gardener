@@ -17,7 +17,8 @@ class GardenerFactory {
 
         val channelsSlackApi = ChannelsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
         val authSlackApi = AuthSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
-        val usersSlackApi = UsersSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
+
+        val usersSlackApi = UsersSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
         val conversationsSlackApi = ConversationsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
         val conversationApi = ConversationApi(conversationsSlackApi)
