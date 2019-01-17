@@ -5,7 +5,7 @@ resource "aws_lambda_function" "ee_slack_gardener_lambda" {
 
   function_name    = "ee-slack-gardener"
   description      = "slack gardener lambda to clean up inactive ee slack channels"
-  role             = "arn:aws:iam::044357138720:role/service-role/noPermissionsNeeded"
+  role             = "${aws_iam_role.ee_slack_gardener_iam_role.arn}"
   handler          = "com.equalexperts.slack.gardener.AwsLambda"
   runtime          = "java8"
   timeout          = 300
