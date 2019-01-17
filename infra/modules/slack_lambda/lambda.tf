@@ -11,15 +11,6 @@ resource "aws_lambda_function" "ee_slack_gardener_lambda" {
   timeout          = 300
   memory_size = 512
 
-
-  environment {
-    variables = {
-      SLACK_APIKEY  = "API_KEY"
-      SLACK_BOT_APIKEY = "BOT_API_KEY"
-      SLACK_URI    = "https://api.slack.com"
-    }
-  }
-
   tags {
     category = "ee"
   }
