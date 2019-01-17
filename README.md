@@ -28,7 +28,8 @@ Once the app is installed to the workspace, you will need to provide the gardene
 ## Installation
 Provide step by step series of examples and explanations about how to get a development env running.
 
-The Slack Gardener is by default setup to be used as an AWS Lambda, once the lambda has been created, then upload the jar (with hash) created to the s3 bucket for lambda to consume via the below command 
+The Slack Gardener is by default setup to be used as an AWS Lambda.
+Once the lambda has been created, then upload the jar (with hash) created to the s3 bucket for lambda to consume via the below command 
 
 ```
 ./gradlew clean build test upload
@@ -37,7 +38,8 @@ terragrunt plan-all
 terragrunt apply-all
 ```
 
-An SNS topic will need to be provisioned manually and the relevant terraform resources changed to point to it (this wasn't done in) so emails fire when the lambda has errors. 
+An SNS topic will need to be provisioned manually and the relevant terraform resources changed to point to it so emails fire when the lambda has errors.
+Slack oauth access tokens required are stored in aws parameter store and the SSM calls happening in the lambda rather than getting the secrets via environment variables. 
 
 ## Built with
 
