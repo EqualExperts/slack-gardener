@@ -11,7 +11,7 @@ resource "aws_cloudwatch_dashboard" "ee-slack-gardener-dashboard" {
             "width": 24,
             "height": 6,
             "properties": {
-                "query": "SOURCE '/aws/lambda/ee-slack-gardener' | fields @timestamp, @message\n| sort @timestamp desc\n| limit 1000",
+                "query": "SOURCE '/aws/lambda/ee-slack-gardener' | fields @timestamp, @message\n| sort @timestamp desc",
                 "region": "eu-west-1"
             }
         },
