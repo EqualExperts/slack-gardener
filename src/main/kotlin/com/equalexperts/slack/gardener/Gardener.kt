@@ -170,7 +170,15 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
     private data class Tuple(val channel: Conversation, val state: ChannelState)
 
     companion object {
-        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String): Gardener {
+        fun build(slackUri: URI,
+                  slackOauthAccessToken: String,
+                  slackBotOauthAccessToken: String,
+                  idleMonths: Int,
+                  warningWeeks: Int,
+                  longIdleYears: Int,
+                  channelWhitelist: Set<String>,
+                  longIdlePeriodChannels: Set<String>,
+                  warningMessage: String): Gardener {
 
             val channelsSlackApi = ChannelsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
@@ -186,19 +194,9 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
             val botUser = usersSlackApi.getUserInfo(botUserId).user
 
             val clock = Clock.systemUTC()
-            val defaultIdlePeriod = Period.ofMonths(3)
-            val warningPeriod = Period.ofWeeks(1)
-            val longIdlePeriod = Period.ofYears(1)
-
-            val channelWhitelist = setOf("announcements", "ask-aws", "meta-Slack", "ee-alumni", "feedback-to-ee", "remembering_torben", "ber-flynn")
-            val longIdlePeriodChannels = setOf("coderetreat", "pt-global-coderetreat", "sk-ee-trip")
-
-            val warningMessage = """Hi <!channel>.
-                |This channel hasn't been used in a while, so I’d like to archive it.
-                |This will keep the list of channels smaller and help users find things more easily.
-                |If you _don't_ want this channel to be archived, just post a message and I'll leave it alone for a while.
-                |You can archive the channel now using the `/archive` command.
-                |If nobody posts in a few days I will come back and archive the channel for you.""".trimMargin().replace('\n', ' ')
+            val defaultIdlePeriod = Period.ofMonths(idleMonths)
+            val warningPeriod = Period.ofWeeks(warningWeeks)
+            val longIdlePeriod = Period.ofYears(longIdleYears)
 
             return Gardener(channelsSlackApi, conversationApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
