@@ -17,7 +17,8 @@
 
 * Service Deployed Version Information: 
 
-    * There is no versioning attached to the running service, however the build artifacts are stored in S3 are versioned for posterity 
+    * Build artifacts are stored in S3 are versioned for posterity
+    * AWS Lambda is versioned 
 
 ## Technical information:
 
