@@ -39,7 +39,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
 
             val data = channels.parallelStream()
                     .filter { this.isEligibleForGardening(it) }
-                    .map { Tuple(it, this.determineChannelState(it, botUser)) }
+                    .map { Pair(it, this.determineChannelState(it, botUser)) }
                     .peek { (it, state) ->
                         val staleMessage = when (state) {
                             Active -> "not stale"
@@ -50,10 +50,10 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
                     }
                     .collect(Collectors.toList())
 
-            val active = data.count { it.state == Active }
-            val stale = data.count { it.state == Stale }
-            val staleAndWarned = data.count { it.state is StaleAndWarned }
-            val emptyChannels = data.count { it.channel.members == 0 }
+            val active = data.count { it.second == Active }
+            val stale = data.count { it.second == Stale }
+            val staleAndWarned = data.count { it.second is StaleAndWarned }
+            val emptyChannels = data.count { it.first.members == 0 }
 
 
             logger.info("${data.size}\tchannels")
@@ -128,26 +128,26 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
         return ChannelState.Stale
     }
 
-    private fun postWarning(it: Tuple) {
-        if (it.state != Stale) {
+    private fun postWarning(it: Pair<Conversation, ChannelState>) {
+        if (it.second != Stale) {
             return
         }
 
-        slackBotApi.postMessage(it.channel, botUser, warningMessage)
-        logger.info("Warned ${it.channel.name}")
+        slackBotApi.postMessage(it.first, botUser, warningMessage)
+        logger.info("Warned ${it.first.name}")
     }
 
-    private fun archive(it: Tuple) {
-        if (it.state !is StaleAndWarned) {
+    private fun archive(it: Pair<Conversation, ChannelState>) {
+        if (it.second !is StaleAndWarned) {
             return //not stale, or no warning issued yet
         }
         val warningThreshold = ZonedDateTime.now(clock) - warningPeriod
-        if (it.state.oldestWarning >= warningThreshold) {
+        if ((it.second as StaleAndWarned).oldestWarning >= warningThreshold) {
             return //warning hasn't been issued long enough ago
         }
 
-        channelsSlackApi.channelsArchive(it.channel)
-        logger.info("Archived ${it.channel.name}")
+        channelsSlackApi.channelsArchive(it.first)
+        logger.info("Archived ${it.first.name}")
     }
 
     //a-la moment.js
@@ -167,7 +167,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
         return defaultIdlePeriod
     }
 
-    private data class Tuple(val channel: Conversation, val state: ChannelState)
+
 
     companion object {
         fun build(slackUri: URI,
