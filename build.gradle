@@ -79,17 +79,10 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
 }
 
-ext.getGitHash = {
-    def p1 = 'git rev-parse HEAD'.execute()
-    p1.waitFor()
-    return p1.text
-}
-
 jar {
     manifest {
         attributes(
-                "Implementation-Revision": getGitHash(),
-                'Main-Class': 'com.equalexperts.slack.gardener.AwsLambda'
+                'Main-Class': 'com.equalexperts.slack.gardener.MainKt'
         )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
@@ -100,22 +93,12 @@ aws {
     region = 'eu-west-1'
 }
 
-task base64sha256(type: Exec, dependsOn: build) {
-    commandLine "./scripts/generate_lambda_file_hash.sh"
-    
-    standardOutput = new ByteArrayOutputStream()
-    ext.hash = {
-        standardOutput.toString('UTF-8')
-    }
-}
-
-task buildHashFile(dependsOn: base64sha256) {
+task buildHashFile() {
     def result = file("build/ee-slack-gardener-lambda.base64sha256")
     outputs.file result
     doLast {
-        def hash = tasks.base64sha256.hash()
-        println hash
-        result.write(hash, 'UTF-8')
+        println "./scripts/generate_lambda_file_hash.sh".execute().text.trim()
+        result.write("./scripts/generate_lambda_file_hash.sh".execute().text.trim(), 'UTF-8')
     }
 }
 
