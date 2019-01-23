@@ -79,9 +79,18 @@ dependencies {
     testRuntime "org.junit.jupiter:junit-jupiter-engine:${jUnitVersion}"
 }
 
+ext.getGitHash = {
+    def p1 = 'git rev-parse HEAD'.execute()
+    p1.waitFor()
+    return p1.text
+}
+
 jar {
     manifest {
-        attributes 'Main-Class': 'com.equalexperts.slack.gardener.MainKt'
+        attributes(
+                "Implementation-Revision": getGitHash(),
+                'Main-Class': 'com.equalexperts.slack.gardener.AwsLambda'
+        )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }
 }
