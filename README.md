@@ -26,8 +26,24 @@ Once the app is installed to the workspace, you will need to provide the gardene
 * Bot User OAuth Access Token - "slack.gardener.bot.oauth.access_token"
 
 
-## Installation
-Provide step by step series of examples and explanations about how to get a development env running.
+## AWS Lambda Installation
+
+Configure app
+1. Change configuration values as appropriate in src/main/kotlin/com/equalexperts/slack/gardener/AwsLambda.kt
+```
+val idleMonths = 3
+val warningWeeks = 1
+val longIdleYears = 1
+val channelWhitelist = setOf("announcements", "random")
+val longIdlePeriodChannels = setOf("sk-ee-trip")
+val warningMessage = """Hi <!channel>.
+                |This channel hasn't been used in a while, so I’d like to archive it.
+                |This will keep the list of channels smaller and help users find things more easily.
+                |If you _don't_ want this channel to be archived, just post a message and I'll leave it alone for a while.
+                |You can archive the channel now using the `/archive` command.
+                |If nobody posts in a few days I will come back and archive the channel for you.""".trimMargin().replace('\n', ' ')
+```
+
 
 Creating slack dependencies
 1. Create slack user (due to current limitations, users must archive channels rather than bots)
