@@ -21,5 +21,5 @@ fun feignBuilder(): Feign.Builder {
         .encoder(JacksonEncoder(jackson))
         .decoder(SlackDecoder(jackson))
         .logger(Slf4jLogger())
-        .logLevel(Logger.Level.NONE)
+        .logLevel(Logger.Level.HEADERS)
 }
