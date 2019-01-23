@@ -7,16 +7,21 @@ import com.amazonaws.services.simplesystemsmanagement.model.GetParametersRequest
 import org.slf4j.LoggerFactory
 import java.net.URI
 
+fun main(args: Array<String>) {
+    System.setProperty("org.slf4j.simpleLogger.logFile", "System.out")
+    AwsLambda().process()
+}
+
 
 class AwsLambda : RequestHandler<Any, Unit> {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     override fun handleRequest(input: Any?, context: Context?) {
-        main()
+        process()
     }
 
-    fun main() {
+    fun process() {
         val version = AwsLambda::class.java.getPackage().implementationVersion
         logger.info("Running version: $version")
 
