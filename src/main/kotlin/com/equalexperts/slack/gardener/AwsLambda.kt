@@ -7,11 +7,6 @@ import com.amazonaws.services.simplesystemsmanagement.model.GetParametersRequest
 import org.slf4j.LoggerFactory
 import java.net.URI
 
-fun main(args: Array<String>) {
-    System.setProperty("org.slf4j.simpleLogger.logFile", "System.out")
-    AwsLambda().process()
-}
-
 
 class AwsLambda : RequestHandler<Any, Unit> {
 
@@ -22,9 +17,6 @@ class AwsLambda : RequestHandler<Any, Unit> {
     }
 
     fun process() {
-        val version = AwsLambda::class.java.getPackage().implementationVersion
-        logger.info("Running version: $version")
-
         val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
         val request = GetParametersRequest()
         request.withNames("slack.gardener.oauth.access_token", "slack.gardener.bot.oauth.access_token").withDecryption = true
