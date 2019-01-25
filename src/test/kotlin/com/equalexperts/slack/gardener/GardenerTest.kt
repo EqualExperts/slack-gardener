@@ -4,7 +4,7 @@ import com.equalexperts.slack.api.channels.ChannelHistory
 import com.equalexperts.slack.api.channels.ChannelsSlackApi
 import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.rest.SlackBotApi
+import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.rest.model.Message
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserProfile
@@ -22,7 +22,7 @@ class GardenerTest {
 
     private lateinit var mockChannelsSlackApi: ChannelsSlackApi
     private lateinit var mockConversationsApi: ConversationApi
-    private lateinit var mockSlackBotApi: SlackBotApi
+    private lateinit var mockChatSlackApi: ChatSlackApi
     private lateinit var clock: Clock
 
     private val defaultIdlePeriod = Period.ofDays(5)
@@ -91,7 +91,7 @@ class GardenerTest {
     fun setup() {
         mockChannelsSlackApi = mock()
         mockConversationsApi = mock()
-        mockSlackBotApi = mock()
+        mockChatSlackApi = mock()
         clock = mock()
 
         whenever(clock.instant()).thenReturn(getNow())
@@ -127,7 +127,7 @@ class GardenerTest {
         gardener.process()
 
         verify(mockChannelsSlackApi, never()).channelsArchive(whitelistedChannel)
-        verify(mockSlackBotApi, never()).postMessage(whitelistedChannel, botUser, warningMessageContent)
+        verify(mockChatSlackApi, never()).postMessage(whitelistedChannel, botUser, warningMessageContent)
     }
 
     @Test
@@ -144,7 +144,7 @@ class GardenerTest {
         gardener.process()
 
         verify(mockChannelsSlackApi, never()).channelsArchive(longIdlePeriodChannel)
-        verify(mockSlackBotApi, never()).postMessage(longIdlePeriodChannel, botUser, warningMessageContent)
+        verify(mockChatSlackApi, never()).postMessage(longIdlePeriodChannel, botUser, warningMessageContent)
     }
 
     @Test
@@ -192,7 +192,7 @@ class GardenerTest {
 
         gardener.process()
 
-        verify(mockSlackBotApi, times(1)).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
+        verify(mockChatSlackApi, times(1)).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
     }
 
     @Test
@@ -209,11 +209,11 @@ class GardenerTest {
         gardener.process()
 
         verify(mockChannelsSlackApi, never()).channelsArchive(nonWhitelistedChannel)
-        verify(mockSlackBotApi, never()).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
+        verify(mockChatSlackApi, never()).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
     }
 
     private fun getGardener(whitelistedChannels: Set<String>, longIdlePeriodChannels: Set<String>): Gardener {
-        return Gardener(mockChannelsSlackApi, mockConversationsApi, mockSlackBotApi, botUser, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
+        return Gardener(mockChannelsSlackApi, mockConversationsApi, mockChatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
     }
 
     private fun getNow(): Instant? {
