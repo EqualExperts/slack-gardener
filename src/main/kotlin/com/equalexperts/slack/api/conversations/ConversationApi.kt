@@ -1,7 +1,9 @@
 package com.equalexperts.slack.api.conversations
 
+import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.conversations.model.ConversationMembers
+import com.equalexperts.slack.api.rest.model.Timestamp
 import org.slf4j.LoggerFactory
 
 class ConversationApi(private val conversationsSlackApi: ConversationsSlackApi) {
@@ -40,6 +42,14 @@ class ConversationApi(private val conversationsSlackApi: ConversationsSlackApi) 
 
     fun members(conversation: Conversation): ConversationMembers {
         return conversationsSlackApi.members(conversation.id)
+    }
+
+    fun archive(conversation: Conversation) {
+        return conversationsSlackApi.channelsArchive(conversation)
+    }
+
+    fun history(channel: Conversation, timestamp: Timestamp): ConversationHistory {
+        return conversationsSlackApi.channelHistory(channel, timestamp)
     }
 
 

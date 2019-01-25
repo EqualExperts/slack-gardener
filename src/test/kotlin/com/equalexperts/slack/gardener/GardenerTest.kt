@@ -1,7 +1,6 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.api.channels.ChannelHistory
-import com.equalexperts.slack.api.channels.ChannelsSlackApi
+import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.chat.ChatSlackApi
@@ -20,7 +19,6 @@ import java.util.*
 @TestInstance(PER_CLASS)
 class GardenerTest {
 
-    private lateinit var mockChannelsSlackApi: ChannelsSlackApi
     private lateinit var mockConversationsApi: ConversationApi
     private lateinit var mockChatSlackApi: ChatSlackApi
     private lateinit var clock: Clock
@@ -89,7 +87,7 @@ class GardenerTest {
 
     @BeforeEach
     fun setup() {
-        mockChannelsSlackApi = mock()
+        mockConversationsApi = mock()
         mockConversationsApi = mock()
         mockChatSlackApi = mock()
         clock = mock()
@@ -121,12 +119,12 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
-        verify(mockChannelsSlackApi, never()).channelsArchive(whitelistedChannel)
+        verify(mockConversationsApi, never()).archive(whitelistedChannel)
         verify(mockChatSlackApi, never()).postMessage(whitelistedChannel, botUser, warningMessageContent)
     }
 
@@ -138,12 +136,12 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessageDuringLongPeriodThreshold)
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
-        verify(mockChannelsSlackApi, never()).channelsArchive(longIdlePeriodChannel)
+        verify(mockConversationsApi, never()).archive(longIdlePeriodChannel)
         verify(mockChatSlackApi, never()).postMessage(longIdlePeriodChannel, botUser, warningMessageContent)
     }
 
@@ -155,12 +153,12 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
-        verify(mockChannelsSlackApi, times(1)).channelsArchive(nonWhitelistedChannel)
+        verify(mockConversationsApi, times(1)).archive(nonWhitelistedChannel)
     }
 
     @Test
@@ -171,12 +169,12 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageBeforeWarningThreshold)
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
-        verify(mockChannelsSlackApi, never()).channelsArchive(nonWhitelistedChannel)
+        verify(mockConversationsApi, never()).archive(nonWhitelistedChannel)
     }
 
     @Test
@@ -187,8 +185,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = emptyList<Message>()
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
@@ -203,17 +201,17 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessage)
-        val channelHistory = ChannelHistory(false, channelMessages)
-        whenever(mockChannelsSlackApi.channelHistory(any(), any())).doReturn(channelHistory)
+        val history = ConversationHistory(false, channelMessages)
+        whenever(mockConversationsApi.history(any(), any())).doReturn(history)
 
         gardener.process()
 
-        verify(mockChannelsSlackApi, never()).channelsArchive(nonWhitelistedChannel)
+        verify(mockConversationsApi, never()).archive(nonWhitelistedChannel)
         verify(mockChatSlackApi, never()).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
     }
 
     private fun getGardener(whitelistedChannels: Set<String>, longIdlePeriodChannels: Set<String>): Gardener {
-        return Gardener(mockChannelsSlackApi, mockConversationsApi, mockChatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
+        return Gardener(mockConversationsApi, mockChatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
     }
 
     private fun getNow(): Instant? {
