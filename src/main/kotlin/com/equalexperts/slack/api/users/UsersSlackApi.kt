@@ -15,6 +15,9 @@ interface UsersSlackApi {
     @RequestLine("GET /api/users.info?user={user}")
     fun getUserInfo(@Param("user") userId: UserId) : UserInfo
 
+    @RequestLine("GET /api/users.list")
+    fun list(@Param("user") userId: UserId) : UserInfo
+
     companion object {
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): UsersSlackApi {
             return feignBuilder()

@@ -1,7 +1,6 @@
 package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.api.auth.AuthSlackApi
-import com.equalexperts.slack.api.channels.ChannelsSlackApi
 import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.gardener.ChannelState.*
@@ -19,8 +18,7 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener(private val channelsSlackApi: ChannelsSlackApi,
-               private val conversationApi: ConversationApi,
+class Gardener(private val conversationApi: ConversationApi,
                private val slackBotApi: ChatSlackApi,
                private val botUser: User,
                private val clock: Clock,
@@ -97,7 +95,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
         var timestamp = Timestamp(timeLimit)
 
         do {
-            val history = channelsSlackApi.channelHistory(channel, timestamp)
+            val history = conversationApi.history(channel, timestamp)
             val messages = history.messages
 
             val noMessagesSinceThreshold = messages.isEmpty()
@@ -146,7 +144,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
             return //warning hasn't been issued long enough ago
         }
 
-        channelsSlackApi.channelsArchive(it.first)
+        conversationApi.archive(it.first)
         logger.info("Archived ${it.first.name}")
     }
 
@@ -180,7 +178,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
                   longIdlePeriodChannels: Set<String>,
                   warningMessage: String): Gardener {
 
-            val channelsSlackApi = ChannelsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
+
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
             val usersSlackApi = UsersSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
@@ -198,7 +196,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(channelsSlackApi, conversationApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            return Gardener(conversationApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
     }
 }
