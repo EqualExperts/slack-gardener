@@ -5,7 +5,7 @@ import com.equalexperts.slack.api.channels.ChannelsSlackApi
 import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.gardener.ChannelState.*
-import com.equalexperts.slack.api.rest.SlackBotApi
+import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.rest.model.Timestamp
 import com.equalexperts.slack.api.users.UsersSlackApi
@@ -21,7 +21,7 @@ import kotlin.system.measureNanoTime
 
 class Gardener(private val channelsSlackApi: ChannelsSlackApi,
                private val conversationApi: ConversationApi,
-               private val slackBotApi: SlackBotApi,
+               private val slackBotApi: ChatSlackApi,
                private val botUser: User,
                private val clock: Clock,
                private val defaultIdlePeriod: Period,
@@ -188,7 +188,7 @@ class Gardener(private val channelsSlackApi: ChannelsSlackApi,
             val conversationsSlackApi = ConversationsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
             val conversationApi = ConversationApi(conversationsSlackApi)
 
-            val slackBotApi = SlackBotApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
+            val slackBotApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
             val botUserId = authSlackApi.authenticate().id
             val botUser = usersSlackApi.getUserInfo(botUserId).user
