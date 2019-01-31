@@ -10,6 +10,7 @@ import com.equalexperts.slack.api.rest.feignBuilder
 import com.equalexperts.slack.api.rest.model.Timestamp
 import feign.Param
 import feign.RequestLine
+import org.slf4j.LoggerFactory
 import java.net.URI
 
 interface ConversationsSlackApi {
@@ -34,12 +35,44 @@ interface ConversationsSlackApi {
 
 
     companion object {
+        private val logger = LoggerFactory.getLogger(this::class.java.name)
+
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit) : ConversationsSlackApi {
             return feignBuilder()
                 .requestInterceptor{ it.query("token", token) }
                 .errorDecoder(SlackErrorDecoder())
                 .retryer(SlackRetrySupport(sleeper))
                 .target(ConversationsSlackApi::class.java, uri.toString())
+        }
+
+        fun listAll(conversationsSlackApi: ConversationsSlackApi): Set<Conversation> {
+
+            logger.info("Retrieving Channels")
+
+            val channels = mutableSetOf<Conversation>()
+
+            var moreChannelsToList: Boolean
+            var cursorValue = ""
+            do {
+                val channelList = conversationsSlackApi.list(cursorValue)
+                val nextCursor = channelList.response_metadata.next_cursor
+
+                logger.debug("Channels found, adding to list ${channelList.channels}")
+                channels += channelList.channels
+
+                if (!nextCursor.isBlank()) {
+                    logger.debug("Found new cursor token to retrieve more channels from, using cursor token $nextCursor")
+                    moreChannelsToList = true
+                    cursorValue = nextCursor
+
+                } else {
+                    logger.debug("No new cursor token, all channels found")
+                    moreChannelsToList = false
+                }
+
+            }  while (moreChannelsToList)
+            logger.info("${channels.size} channels found")
+            return channels
         }
     }
 }

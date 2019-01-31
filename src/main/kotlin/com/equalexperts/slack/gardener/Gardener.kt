@@ -1,7 +1,6 @@
 package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.api.auth.AuthSlackApi
-import com.equalexperts.slack.api.conversations.ConversationApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.gardener.ChannelState.*
 import com.equalexperts.slack.api.chat.ChatSlackApi
@@ -18,7 +17,7 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener(private val conversationApi: ConversationApi,
+class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                private val slackBotApi: ChatSlackApi,
                private val botUser: User,
                private val clock: Clock,
@@ -32,7 +31,7 @@ class Gardener(private val conversationApi: ConversationApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = conversationApi.list()
+            val channels = ConversationsSlackApi.listAll(conversationSlackApi)
             logger.info("${channels.size} channels found")
 
             val data = channels.parallelStream()
@@ -95,7 +94,7 @@ class Gardener(private val conversationApi: ConversationApi,
         var timestamp = Timestamp(timeLimit)
 
         do {
-            val history = conversationApi.history(channel, timestamp)
+            val history = conversationSlackApi.channelHistory(channel, timestamp)
             val messages = history.messages
 
             val noMessagesSinceThreshold = messages.isEmpty()
@@ -144,7 +143,7 @@ class Gardener(private val conversationApi: ConversationApi,
             return //warning hasn't been issued long enough ago
         }
 
-        conversationApi.archive(it.first)
+        conversationSlackApi.channelsArchive(it.first)
         logger.info("Archived ${it.first.name}")
     }
 
@@ -184,7 +183,7 @@ class Gardener(private val conversationApi: ConversationApi,
             val usersSlackApi = UsersSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
             val conversationsSlackApi = ConversationsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
-            val conversationApi = ConversationApi(conversationsSlackApi)
+
 
             val slackBotApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
@@ -196,7 +195,7 @@ class Gardener(private val conversationApi: ConversationApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(conversationApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            return Gardener(conversationsSlackApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
     }
 }
