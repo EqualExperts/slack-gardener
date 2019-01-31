@@ -13,7 +13,8 @@ data class User(val name: String,
            val is_restricted: Boolean,
            val is_ultra_restricted: Boolean,
            val is_bot: Boolean,
-           val is_app_user: Boolean) {
+           val is_app_user: Boolean
+) {
 
     class UsernameExpander : Expander<User>() {
         override fun expandParameter(value: User) = value.name
