@@ -104,7 +104,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
 
             val messageSentFromHumanBeingOrBotBeforeThreshold = !messages.none {
                 val humanMessage = it.type == "message" && it.subtype == null
-                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" &&  it.bot_id != botUser.profile.botId
+                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" &&  it.bot_id != botUser.profile.bot_id
                 humanMessage || nonGardenerBotMessage
             }
 
@@ -113,7 +113,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             }
 
             val lastGardenerMessage = messages.findLast {
-                it.bot_id == botUser.profile.botId && it.subtype == "bot_message"
+                it.bot_id == botUser.profile.bot_id && it.subtype == "bot_message"
             }
             lastWarning = lastGardenerMessage?.timestamp?.toZonedDateTime() ?: lastWarning
             timestamp = messages.last().timestamp
