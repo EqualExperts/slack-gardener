@@ -104,13 +104,13 @@ class GardenerTest {
         longIdlePeriodThreshold = ZonedDateTime.now(clock) - longIdlePeriod
         duringLongIdlePeriod = longIdlePeriodThreshold + Period.ofDays(1)
 
-        botMessageBeforeWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId.toString(), beforeWarningThreshold.toEpochSecond().toString())
-        botMessageAfterWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId.toString(), afterWarningThreshold.toEpochSecond().toString())
+        botMessageBeforeWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId, beforeWarningThreshold.toEpochSecond().toString())
+        botMessageAfterWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId, afterWarningThreshold.toEpochSecond().toString())
 
-        nonBotMessageDuringLongPeriodThreshold = Message("message", null, nonBotUser.name, nonBotUser.profile.botId.toString(), duringLongIdlePeriod.toEpochSecond().toString())
+        nonBotMessageDuringLongPeriodThreshold = Message("message", null, nonBotUser.name, nonBotUser.profile.botId, duringLongIdlePeriod.toEpochSecond().toString())
 
 
-        nonBotMessage = Message("message", null, nonBotUser.name, nonBotUser.profile.botId.toString(), afterWarningThreshold.toEpochSecond().toString())
+        nonBotMessage = Message("message", null, nonBotUser.name, nonBotUser.profile.botId, afterWarningThreshold.toEpochSecond().toString())
     }
 
     @Test
