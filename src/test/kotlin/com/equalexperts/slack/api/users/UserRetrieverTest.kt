@@ -77,7 +77,7 @@ internal class UserRetrieverTest {
                 is_bot=false,
                 is_app_user=false)
 
-                val emptyCursorToken = ""
+        val emptyCursorToken = ""
         val secondResponse = UserList(listOf(testUserTwo), ResponseMetadata(emptyCursorToken))
 
         whenever(mockUsersSlackApi.list(cursorToken)).thenReturn(secondResponse)
