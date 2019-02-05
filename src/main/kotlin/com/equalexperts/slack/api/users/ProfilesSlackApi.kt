@@ -11,10 +11,10 @@ import java.net.URI
 
 interface ProfilesSlackApi {
 
-    @RequestLine("GET /api/team.userProfile.get?visibility=all")
+    @RequestLine("GET /api/team.profile.get?visibility=all")
     fun teamProfile(): TeamProfile
 
-    @RequestLine("GET /api/users.userProfile.get?user={user}")
+    @RequestLine("GET /api/users.profile.get?user={user}")
     fun userProfile(@Param("user") userId: UserId): UserProfileWrapper
 
     companion object {

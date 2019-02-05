@@ -16,7 +16,7 @@ internal class ChannelRetrieverTest {
         val mockConversationsSlackApi : ConversationsSlackApi = mock()
 
         val testChannel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
-        val channelList = ConversationList(listOf(testChannel), ResponseMetadata(""))
+        val channelList = ConversationList.withEmptyCursorToken(testChannel)
         whenever(mockConversationsSlackApi.list()).thenReturn(channelList)
 
         val channels = ConversationsSlackApi.listAll(mockConversationsSlackApi)
@@ -33,13 +33,13 @@ internal class ChannelRetrieverTest {
         val testChannel = Conversation("TEST_ID", "CHANNEL_NAME_1", Instant.EPOCH.epochSecond, 1)
 
         val cursorToken = "CURSOR TOKEN"
-        val firstResponse = ConversationList(listOf(testChannel), ResponseMetadata(cursorToken))
+        val firstResponse = ConversationList.withCursorToken(testChannel, cursorToken)
 
         whenever(mockConversationsSlackApi.list()).thenReturn(firstResponse)
 
         val testChannelTwo = Conversation("TEST_ID_2", "CHANNEL_NAME_2", Instant.EPOCH.epochSecond, 1)
-        val emptyCursorToken = ""
-        val secondResponse = ConversationList(listOf(testChannelTwo), ResponseMetadata(emptyCursorToken))
+
+        val secondResponse = ConversationList.withEmptyCursorToken(testChannelTwo)
 
         whenever(mockConversationsSlackApi.list(cursorToken)).thenReturn(secondResponse)
 
