@@ -7,9 +7,6 @@ Use your best judgment, and feel free to propose changes to this document in a p
 
 #### Table Of Contents
 
-[What should I know before I get started?](#what-should-i-know-before-i-get-started)
-  * [Design Decisions](#design-decisions)
-
 [How Can I Contribute?](#how-can-i-contribute)
   * [Reporting Bugs](#reporting-bugs)
   * [Suggesting Enhancements](#suggesting-enhancements)
@@ -19,14 +16,6 @@ Use your best judgment, and feel free to propose changes to this document in a p
   * [Git Commit Messages](#git-commit-messages)
   * [Kotlin Styleguide](#kotlin-styleguide)
 
-
-## What should I know before I get started?
-
-### Design Decisions
-
-When we make a significant decision in how we maintain the project and what we can or cannot support, we will document it in the [docs/design-decisions](https://github.com/ee-slack-gardener/docs/design-decisions). 
-
-If you have a question around how we do things, check to see if it is documented there. If it is *not* documented there, please open a issue and ask your question.
 
 ## How Can I Contribute?
 
