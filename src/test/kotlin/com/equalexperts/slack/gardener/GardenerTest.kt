@@ -6,7 +6,6 @@ import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
-import com.equalexperts.slack.api.rest.model.ResponseMetadata
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserProfile
 import com.nhaarman.mockitokotlin2.*
@@ -32,10 +31,10 @@ class GardenerTest {
     private val warningMessageContent = "WARNING MESSAGE"
 
     private val botUser = User(name="TEST_BOT_USER",
-            profile=UserProfile("TEST_BOT_ID"),
+            profile= UserProfile.testBot(),
             id="id",
             team_id="team_id",
-            deleted=false,
+            is_deleted=false,
             is_admin=false,
             is_owner=false,
             is_primary_owner=false,
@@ -44,10 +43,10 @@ class GardenerTest {
             is_bot=true,
             is_app_user=false)
     private val nonBotUser = User("TEST_USER",
-            UserProfile("TEST_USER_ID"),
+            profile= UserProfile.testBot(),
             id="id",
             team_id="team_id",
-            deleted=false,
+            is_deleted=false,
             is_admin=false,
             is_owner=false,
             is_primary_owner=false,
@@ -80,13 +79,6 @@ class GardenerTest {
     private val longIdlePeriodChannel = Conversation("TEST_ID", longIdlePeriodChannelName, Instant.EPOCH.epochSecond, 1)
 
 
-    private fun getWhitelistedChannels() = ConversationList(listOf(whitelistedChannel), ResponseMetadata("") )
-
-    private fun getNonWhitelistedChannels() = ConversationList(listOf(nonWhitelistedChannel), ResponseMetadata("") )
-
-    private fun getLongIdlePeriodChannels() = ConversationList(listOf(longIdlePeriodChannel), ResponseMetadata("") )
-
-
     @BeforeEach
     fun setup() {
         mockConversationsApi = mock()
@@ -104,20 +96,20 @@ class GardenerTest {
         longIdlePeriodThreshold = ZonedDateTime.now(clock) - longIdlePeriod
         duringLongIdlePeriod = longIdlePeriodThreshold + Period.ofDays(1)
 
-        botMessageBeforeWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId, beforeWarningThreshold.toEpochSecond().toString())
-        botMessageAfterWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.botId, afterWarningThreshold.toEpochSecond().toString())
+        botMessageBeforeWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.bot_id, beforeWarningThreshold.toEpochSecond().toString())
+        botMessageAfterWarningThreshold = Message("BOT_MESSAGE", "bot_message", botUser.name, botUser.profile.bot_id, afterWarningThreshold.toEpochSecond().toString())
 
-        nonBotMessageDuringLongPeriodThreshold = Message("message", null, nonBotUser.name, nonBotUser.profile.botId, duringLongIdlePeriod.toEpochSecond().toString())
+        nonBotMessageDuringLongPeriodThreshold = Message("message", null, nonBotUser.name, nonBotUser.profile.bot_id, duringLongIdlePeriod.toEpochSecond().toString())
 
 
-        nonBotMessage = Message("message", null, nonBotUser.name, nonBotUser.profile.botId, afterWarningThreshold.toEpochSecond().toString())
+        nonBotMessage = Message("message", null, nonBotUser.name, nonBotUser.profile.bot_id, afterWarningThreshold.toEpochSecond().toString())
     }
 
     @Test
     fun shouldNotArchiveOrWarnWhitelistedChannels() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getWhitelistedChannels()
+        val channelList = ConversationList.withEmptyCursorToken(whitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
@@ -134,7 +126,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnLongIdlePeriodChannelsDuringLongIdlePeriod() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getLongIdlePeriodChannels()
+        val channelList = ConversationList.withEmptyCursorToken(longIdlePeriodChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessageDuringLongPeriodThreshold)
@@ -151,7 +143,7 @@ class GardenerTest {
     fun shouldArchiveWhenStaleAndAfterWarning() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getNonWhitelistedChannels()
+        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
@@ -167,7 +159,7 @@ class GardenerTest {
     fun shouldNotArchiveWhenStaleAndBeforeWarning() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getNonWhitelistedChannels()
+        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageBeforeWarningThreshold)
@@ -183,7 +175,7 @@ class GardenerTest {
     fun shouldWarnWhenStale() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getNonWhitelistedChannels()
+        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = emptyList<Message>()
@@ -199,7 +191,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnWhenActive() {
         val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
 
-        val channelList = getNonWhitelistedChannels()
+        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessage)
