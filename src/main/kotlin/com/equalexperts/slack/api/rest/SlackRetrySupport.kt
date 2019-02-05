@@ -15,7 +15,7 @@ class SlackRetrySupport(private val sleeper: (Long) -> Unit) : Retryer {
 
     override fun continueOrPropagate(e: RetryableException) {
         if (e is SlackRetryException) {
-            sleeper.invoke((e.secondsToWait + 1) * 1000L)
+            sleeper.invoke((e.secondsToWait + 1) * 1200L)
             return
         }
         throw e
