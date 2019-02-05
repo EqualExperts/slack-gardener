@@ -19,6 +19,28 @@ data class UserProfile(val bot_id: String?,
                        val image_1024: String?,
                        var fields: Map<String, UserProfileField>?
 ) {
+    fun hasProfilePicture(): Boolean{
+        val noImageUrlPresent = (!image_original.isNullOrBlank()
+                || !image_24.isNullOrEmpty()
+                || !image_32.isNullOrEmpty()
+                || !image_48.isNullOrEmpty()
+                || !image_72.isNullOrEmpty()
+                || !image_192.isNullOrEmpty()
+                || !image_512.isNullOrEmpty()
+                || !image_1024.isNullOrEmpty())
+
+        val missingOriginalAnd1024 = image_original.isNullOrBlank() && image_1024.isNullOrBlank()
+        val gravatarUrlIn24 = !image_24.isNullOrBlank() && image_24.contains("gravatar")
+        val gravatarUrlIn48 = !image_48.isNullOrBlank() && image_48.contains("gravatar")
+        val gravatarUrlIn72 = !image_72.isNullOrBlank() && image_72.contains("gravatar")
+        val gravatarUrlIn192 = !image_192.isNullOrBlank() && image_192.contains("gravatar")
+        val gravatarUrlIn512 = !image_512.isNullOrBlank() && image_512.contains("gravatar")
+
+
+        val stockImageBeingUsed = (missingOriginalAnd1024 && (gravatarUrlIn24 || gravatarUrlIn48 || gravatarUrlIn72 || gravatarUrlIn192 ||gravatarUrlIn512))
+        return stockImageBeingUsed
+
+    }
 
     companion object {
         fun testBot(): UserProfile = UserProfile("TEST_BOT_ID",
