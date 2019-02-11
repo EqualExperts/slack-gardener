@@ -2,11 +2,12 @@ package com.equalexperts.slack.api.users
 
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserList
-import com.equalexperts.slack.api.users.model.UserProfile
+import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.Test
 
 import org.junit.jupiter.api.Assertions.*
+
 
 internal class UserRetrieverTest {
 
@@ -15,7 +16,7 @@ internal class UserRetrieverTest {
         val mockUsersSlackApi : UsersSlackApi = mock()
 
         val testUser = User(name="TEST_BOT_USER",
-                profile=UserProfile.testBot(),
+                profile= UserProfilesForTesting.testBot(),
                 id="id",
                 team_id="team_id",
                 is_deleted=false,
@@ -42,7 +43,7 @@ internal class UserRetrieverTest {
         val mockUsersSlackApi : UsersSlackApi = mock()
 
         val testUser = User(name="TEST_BOT_USER",
-                profile=UserProfile.testBot(),
+                profile= UserProfilesForTesting.testBot(),
                 id="id",
                 team_id="team_id",
                 is_deleted=false,
@@ -61,7 +62,7 @@ internal class UserRetrieverTest {
         whenever(mockUsersSlackApi.list()).thenReturn(firstResponse)
 
         val testUserTwo = User("TEST_USER",
-                profile=UserProfile.testBot(),
+                profile= UserProfilesForTesting.testBot(),
                 id="id",
                 team_id="team_id",
                 is_deleted=false,

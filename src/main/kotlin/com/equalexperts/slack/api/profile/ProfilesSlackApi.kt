@@ -1,10 +1,11 @@
-package com.equalexperts.slack.api.users
+package com.equalexperts.slack.api.profile
 
+import com.equalexperts.slack.api.profile.model.TeamProfile
 import com.equalexperts.slack.api.rest.SlackRetrySupport
 import com.equalexperts.slack.api.rest.SlackRetrySupport.SlackErrorDecoder
 import com.equalexperts.slack.api.rest.feignBuilder
 import com.equalexperts.slack.api.users.model.UserId
-import com.equalexperts.slack.api.users.model.UserProfileWrapper
+import com.equalexperts.slack.api.profile.model.UserProfileWrapper
 import feign.Param
 import feign.RequestLine
 import java.net.URI
@@ -28,16 +29,4 @@ interface ProfilesSlackApi {
     }
 
 }
-
-data class TeamProfile(val profile: TeamProfileDetails)
-data class TeamProfileDetails(val fields: List<TeamProfileFieldMetadata>)
-data class TeamProfileFieldMetadata(val id: String,
-                                    val ordering: Int,
-                                    val label: String,
-                                    val hint: String,
-                                    val type: String,
-                                    val possible_values: List<String>?,
-                                    val options: List<String>?,
-                                    val is_hidden: Boolean
-                                    )
 

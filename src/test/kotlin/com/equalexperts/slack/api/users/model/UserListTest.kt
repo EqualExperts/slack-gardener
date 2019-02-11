@@ -1,5 +1,6 @@
 package com.equalexperts.slack.api.users.model
 
+import com.equalexperts.slack.profile.UserProfilesForTesting
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -8,7 +9,7 @@ internal class UserListTest {
     @Test
     fun `should create list with empty cursor`() {
         val testUser = User(name = "TEST_BOT_USER",
-                profile = UserProfile.testBot(),
+                profile = UserProfilesForTesting.testBot(),
                 id = "id",
                 team_id = "team_id",
                 is_deleted = false,
@@ -29,7 +30,7 @@ internal class UserListTest {
     @Test
     fun `should create list with cursor`() {
         val testUser = User(name = "TEST_BOT_USER",
-                profile = UserProfile.testBot(),
+                profile = UserProfilesForTesting.testBot(),
                 id = "id",
                 team_id = "team_id",
                 is_deleted = false,
