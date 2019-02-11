@@ -2,9 +2,9 @@ package com.equalexperts.slack.profile.rules
 
 import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
+import org.junit.jupiter.api.Assertions.assertFalse
+import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 
 internal class ProfileFieldRealNameRuleTest {
 

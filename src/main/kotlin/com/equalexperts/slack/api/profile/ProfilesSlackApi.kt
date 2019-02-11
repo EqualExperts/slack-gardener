@@ -1,11 +1,11 @@
 package com.equalexperts.slack.api.profile
 
 import com.equalexperts.slack.api.profile.model.TeamProfile
+import com.equalexperts.slack.api.profile.model.UserProfileWrapper
 import com.equalexperts.slack.api.rest.SlackRetrySupport
 import com.equalexperts.slack.api.rest.SlackRetrySupport.SlackErrorDecoder
 import com.equalexperts.slack.api.rest.feignBuilder
 import com.equalexperts.slack.api.users.model.UserId
-import com.equalexperts.slack.api.profile.model.UserProfileWrapper
 import feign.Param
 import feign.RequestLine
 import java.net.URI

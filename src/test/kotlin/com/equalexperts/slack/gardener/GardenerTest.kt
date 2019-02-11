@@ -1,9 +1,9 @@
 package com.equalexperts.slack.gardener
 
-import com.equalexperts.slack.api.conversations.model.ConversationHistory
-import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
+import com.equalexperts.slack.api.conversations.model.Conversation
+import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
 import com.equalexperts.slack.api.users.UsersForTesting
@@ -30,8 +30,8 @@ class GardenerTest {
 
     private val warningMessageContent = "WARNING MESSAGE"
 
-    private val botUser = UsersForTesting.testBot(profile=UserProfilesForTesting.testBot())
-    private val nonBotUser = UsersForTesting.testUser(profile= UserProfilesForTesting.testBot())
+    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBot())
+    private val nonBotUser = UsersForTesting.testUser(profile = UserProfilesForTesting.testBot())
 
     private val whitelistedChannelName = "WHITELISTED_CHANNEL_NAME"
     private val whitelistedChannels = setOf(whitelistedChannelName)

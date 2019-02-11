@@ -11,7 +11,7 @@ class ProfileFieldRealNameRule : ProfileFieldRule {
 
         logger.debug("Checking $FIELD_NAME field for ${user.name}")
 
-        val result = ! user.profile.real_name.isNullOrBlank()
+        val result = !user.profile.real_name.isNullOrBlank()
 
         logger.debug("Checked $FIELD_NAME field for ${user.name}: $result")
         return ProfileFieldRuleResult(FIELD_NAME, result)

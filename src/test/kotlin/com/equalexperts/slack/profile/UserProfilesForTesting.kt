@@ -2,7 +2,7 @@ package com.equalexperts.slack.profile
 
 import com.equalexperts.slack.api.profile.model.UserProfile
 
-object UserProfilesForTesting{
+object UserProfilesForTesting {
     fun testBot(): UserProfile = UserProfile("TEST_BOT_ID",
             "TEST_REAL_NAME",
             "TEST_REAL_NAME_NORMALISED",

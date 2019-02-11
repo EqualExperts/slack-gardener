@@ -1,13 +1,11 @@
 package com.equalexperts.slack.profile
 
-import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.profile.ProfilesSlackApi
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
 import com.equalexperts.slack.profile.rules.*
 import org.slf4j.LoggerFactory
-import java.net.URI
 
 class ProfileChecker(private val usersSlackApi: UsersSlackApi, private val userProfilesSlackApi: ProfilesSlackApi) {
 
@@ -21,9 +19,9 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi, private val userP
         val userProfileResults = mutableMapOf<User, ProfileCheckerResults>()
 
         val rules = listOf(ProfileFieldRealNameRule(),
-                                                ProfileFieldDisplayNameRule(),
-                                                ProfileFieldTitleRule(),
-                                                ProfileFieldHomeBaseRule(teamCustomProfileFields))
+                ProfileFieldDisplayNameRule(),
+                ProfileFieldTitleRule(),
+                ProfileFieldHomeBaseRule(teamCustomProfileFields))
 
         val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker(rules)
 
@@ -51,7 +49,7 @@ class ProfileRequiredFieldsChecker(private val rules: List<ProfileFieldRule>) {
     fun checkMissingFields(user: User): ProfileCheckerResults {
         val results = mutableMapOf<String, Boolean>()
 
-        for (rule in rules){
+        for (rule in rules) {
             val result = rule.checkProfile(user)
             results[result.field] = result.result
         }
