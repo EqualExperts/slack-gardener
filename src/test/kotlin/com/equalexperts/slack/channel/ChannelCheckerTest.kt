@@ -25,7 +25,7 @@ class ChannelCheckerTest {
     private val channelInfoObeyingHelpRule = Conversation("TEST_ID", "help-me", Instant.EPOCH.epochSecond, 1)
 
     private val user = User(name = "TEST_USER",
-            profile= UserProfilesForTesting.testBot(),
+            profile = UserProfilesForTesting.testBot(),
             id = "id",
             team_id = "team_id",
             is_deleted = false,
@@ -97,7 +97,6 @@ class ChannelCheckerTest {
 
         verify(mockChatSlackApi, never()).postMessage(channelInfoObeyingHelpRule, user, warningMessage)
     }
-
 
 
 }

@@ -10,7 +10,7 @@ class ProfileFieldTitleRule : ProfileFieldRule {
     override fun checkProfile(user: User): ProfileFieldRuleResult {
         logger.debug("Checking $FIELD_NAME field for ${user.name}")
 
-        val result = ! user.profile.title.isNullOrBlank()
+        val result = !user.profile.title.isNullOrBlank()
 
         logger.debug("Checked $FIELD_NAME field for ${user.name}: $result")
         return ProfileFieldRuleResult(FIELD_NAME, result)

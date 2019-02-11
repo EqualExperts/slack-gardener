@@ -13,7 +13,7 @@ class ProfileFieldHomeBaseRule(private val teamCustomProfileFields: TeamProfile)
 
         val homeBaseCustomField = teamCustomProfileFields.profile.fields.single { it.label.toLowerCase() == Companion.FIELD_NAME.toLowerCase() }
 
-        val result = user.profile.fields?.let{
+        val result = user.profile.fields?.let {
             val userProfileField = it[homeBaseCustomField.id]
             userProfileField?.let {
                 val fieldPresent = !it.value.isNullOrBlank()

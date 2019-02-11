@@ -1,13 +1,13 @@
 package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.api.auth.AuthSlackApi
-import com.equalexperts.slack.api.conversations.ConversationsSlackApi
-import com.equalexperts.slack.gardener.ChannelState.*
 import com.equalexperts.slack.api.chat.ChatSlackApi
+import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.rest.model.Timestamp
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
+import com.equalexperts.slack.gardener.ChannelState.*
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
@@ -79,7 +79,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
         return true
     }
 
-    private fun determineChannelState(channel: Conversation, botUser : User): ChannelState {
+    private fun determineChannelState(channel: Conversation, botUser: User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val timeLimit = ZonedDateTime.now(clock) - idlePeriod
 
@@ -104,7 +104,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
 
             val messageSentFromHumanBeingOrBotBeforeThreshold = !messages.none {
                 val humanMessage = it.type == "message" && it.subtype == null
-                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" &&  it.bot_id != botUser.profile.bot_id
+                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" && it.bot_id != botUser.profile.bot_id
                 humanMessage || nonGardenerBotMessage
             }
 
@@ -165,7 +165,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
     }
 
 
-
     companion object {
         fun build(slackUri: URI,
                   slackOauthAccessToken: String,
@@ -195,7 +194,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(conversationsSlackApi , slackBotApi, botUser,  clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            return Gardener(conversationsSlackApi, slackBotApi, botUser, clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
     }
 }

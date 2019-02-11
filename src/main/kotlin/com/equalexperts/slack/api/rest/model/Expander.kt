@@ -11,5 +11,5 @@ abstract class Expander<T : Any> : Param.Expander {
         return this.expandParameter(value as T)
     }
 
-    abstract fun expandParameter(value: T) : String
+    abstract fun expandParameter(value: T): String
 }

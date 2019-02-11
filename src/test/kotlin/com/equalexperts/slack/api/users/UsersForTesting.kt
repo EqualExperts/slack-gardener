@@ -1,7 +1,7 @@
 package com.equalexperts.slack.api.users
 
-import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.profile.model.UserProfile
+import com.equalexperts.slack.api.users.model.User
 
 object UsersForTesting {
     fun testBot(profile: UserProfile) = User(name = "TEST_BOT_USER",

@@ -10,4 +10,4 @@ data class TeamProfileFieldMetadata(val id: String,
                                     val possible_values: List<String>?,
                                     val options: List<String>?,
                                     val is_hidden: Boolean
-                                    )
+)

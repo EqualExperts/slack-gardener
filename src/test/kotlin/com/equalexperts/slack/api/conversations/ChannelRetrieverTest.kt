@@ -2,18 +2,19 @@ package com.equalexperts.slack.api.conversations
 
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.conversations.model.ConversationList
-import com.equalexperts.slack.api.rest.model.ResponseMetadata
-import com.nhaarman.mockitokotlin2.*
+import com.nhaarman.mockitokotlin2.atMost
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
+import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
-
-import org.junit.jupiter.api.Assertions.*
 import java.time.Instant
 
 internal class ChannelRetrieverTest {
 
     @Test
     fun `should retrieve channels`() {
-        val mockConversationsSlackApi : ConversationsSlackApi = mock()
+        val mockConversationsSlackApi: ConversationsSlackApi = mock()
 
         val testChannel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
         val channelList = ConversationList.withEmptyCursorToken(testChannel)
@@ -28,7 +29,7 @@ internal class ChannelRetrieverTest {
 
     @Test
     fun `should use cursor token to get next page of channels if non-blank`() {
-        val mockConversationsSlackApi : ConversationsSlackApi = mock()
+        val mockConversationsSlackApi: ConversationsSlackApi = mock()
 
         val testChannel = Conversation("TEST_ID", "CHANNEL_NAME_1", Instant.EPOCH.epochSecond, 1)
 

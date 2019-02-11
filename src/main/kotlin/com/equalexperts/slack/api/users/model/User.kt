@@ -1,8 +1,8 @@
 package com.equalexperts.slack.api.users.model
 
+import com.equalexperts.slack.api.profile.model.UserProfile
 import com.equalexperts.slack.api.rest.model.Expander
 import com.equalexperts.slack.api.rest.model.ResponseMetadata
-import com.equalexperts.slack.api.profile.model.UserProfile
 
 
 data class UserInfo(val user: User)
