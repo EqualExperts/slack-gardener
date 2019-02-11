@@ -80,8 +80,7 @@ pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" 
 
 ## Contribute
 
-Pull requests are always welcome, please ensure your branch compiles and the tests run, before you submit the PR.
-Please ensure the PR clearly describes the problem/feature your proposing and the solution.
+See [CONTRIBUTING.MD])(CONTRIBUTING.MD)
 
 ## Credits
 
