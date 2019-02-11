@@ -1,62 +1,34 @@
 package com.equalexperts.slack.profile
 
-import com.equalexperts.slack.api.users.TeamProfileFieldMetadata
+import com.equalexperts.slack.api.profile.model.TeamProfile
+import com.equalexperts.slack.api.profile.model.TeamProfileDetails
+import com.equalexperts.slack.api.profile.model.TeamProfileFieldMetadata
+import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.api.users.model.User
-import com.equalexperts.slack.api.users.model.UserProfile
-import com.equalexperts.slack.api.users.model.UserProfileField
+import com.equalexperts.slack.api.profile.model.UserProfileField
+import com.equalexperts.slack.profile.rules.*
+import com.fasterxml.jackson.databind.DeserializationFeature
+import com.fasterxml.jackson.databind.ObjectMapper
+import com.fasterxml.jackson.module.kotlin.readValue
+import com.fasterxml.jackson.module.kotlin.registerKotlinModule
+import com.nhaarman.mockitokotlin2.atMost
+import com.nhaarman.mockitokotlin2.mock
+import com.nhaarman.mockitokotlin2.verify
+import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Test
 
 internal class ProfileRequiredFieldsCheckerTest {
 
     @Test
-    fun `should return passing results for present fields`() {
-        val userProfile = UserProfile.testBot().copy(fields = hashMapOf("TEST_FIELD_ID" to UserProfileField("TEST_VALUE", "TEST_ALT")))
-        val testUser = User(name = "TEST_BOT_USER",
-                profile = userProfile,
-                id = "id",
-                team_id = "team_id",
-                is_deleted = false,
-                is_admin = false,
-                is_owner = false,
-                is_primary_owner = false,
-                is_restricted = false,
-                is_ultra_restricted = false,
-                is_bot = true,
-                is_app_user = false)
+    fun checkMissingFields() {
+        val rule = mock<ProfileFieldRule>()
+        val checker = ProfileRequiredFieldsChecker(listOf(rule))
+        val user = mock<User>()
 
-        val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker()
-
-        val results = profileRequiredFieldsChecker.checkProfile(
-                testUser,
-                listOf("real_name"),
-                listOf(TeamProfileFieldMetadata("TEST_FIELD_ID", 0, "TEST_LABEL", "TEST_HINT", "TEST_TYPE", null, null, false))
-        )
-        assertEquals(results, ProfileCheckerResults(mapOf("real_name" to true, "TEST_LABEL" to true)))
+        val result = ProfileFieldRuleResult("TEST_FIELD", false)
+        whenever(rule.checkProfile(user)).thenReturn(result)
+        checker.checkMissingFields(user)
+        verify(rule, atMost(1)).checkProfile(user)
     }
-
-    @Test
-    fun `should return failing results for missing fields`() {
-        val testUser = User(name = "TEST_BOT_USER",
-                profile = UserProfile.testBot().copy(real_name = null, fields = emptyMap()),
-                id = "id",
-                team_id = "team_id",
-                is_deleted = false,
-                is_admin = false,
-                is_owner = false,
-                is_primary_owner = false,
-                is_restricted = false,
-                is_ultra_restricted = false,
-                is_bot = true,
-                is_app_user = false)
-
-        val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker()
-
-        val results = profileRequiredFieldsChecker.checkProfile(
-                testUser,
-                listOf("real_name"),
-                listOf(TeamProfileFieldMetadata("TEST_FIELD_ID", 0, "TEST_LABEL", "TEST_HINT", "TEST_TYPE", null, null, false)))
-        assertEquals(results, ProfileCheckerResults(mapOf("real_name" to false, "TEST_LABEL" to false)))
-    }
-
 }

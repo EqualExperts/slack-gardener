@@ -1,6 +1,15 @@
 package com.equalexperts.slack.api.users.model
 
 import com.equalexperts.slack.api.rest.model.Expander
+import com.equalexperts.slack.api.rest.model.ResponseMetadata
+import com.equalexperts.slack.api.profile.model.UserProfile
+
+
+data class UserInfo(val user: User)
+
+data class UserId(val id: String) {
+    override fun toString() = id
+}
 
 data class User(val name: String,
                 val profile: UserProfile,
@@ -18,5 +27,14 @@ data class User(val name: String,
 
     class UsernameExpander : Expander<User>() {
         override fun expandParameter(value: User) = value.name
+    }
+
+}
+
+data class UserList(val members: List<User>,
+                    val response_metadata: ResponseMetadata) {
+    companion object {
+        fun withEmptyCursorToken(user: User) = UserList(listOf(user), ResponseMetadata(""))
+        fun withCursorToken(user: User, cursor_token: String) = UserList(listOf(user), ResponseMetadata(cursor_token))
     }
 }

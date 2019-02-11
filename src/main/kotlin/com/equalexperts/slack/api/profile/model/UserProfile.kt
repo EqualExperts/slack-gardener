@@ -1,5 +1,9 @@
-package com.equalexperts.slack.api.users.model
+package com.equalexperts.slack.api.profile.model
 
+
+data class UserProfileWrapper(
+        val profile: UserProfile
+)
 
 data class UserProfile(val bot_id: String?,
                        val real_name: String?,
@@ -19,26 +23,7 @@ data class UserProfile(val bot_id: String?,
                        val image_1024: String?,
                        var fields: Map<String, UserProfileField>?
 ) {
-    
-    companion object {
-        fun testBot(): UserProfile = UserProfile("TEST_BOT_ID",
-                "TEST_REAL_NAME",
-                "TEST_REAL_NAME_NORMALISED",
-                "TEST_DISPLAY_NAME",
-                "TEST_DISPLAY_NAME_NORMALISED",
-                "TEST_FIRST_NAME",
-                "TEST_LAST_NAME",
-                "TEST_TITLE",
-                "TEST_IMAGE_ORIGINAL_URL",
-                "TEST_IMAGE_24_URL",
-                "TEST_IMAGE_32_URL",
-                "TEST_IMAGE_48_URL",
-                "TEST_IMAGE_72_URL",
-                "TEST_IMAGE_192_URL",
-                "TEST_IMAGE_512_URL",
-                "TEST_IMAGE_1024_URL",
-                mapOf())
-
-    }
 
 }
+
+data class UserProfileField(val value: String, val alt: String)

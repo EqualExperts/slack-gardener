@@ -6,7 +6,7 @@ import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserInfo
-import com.equalexperts.slack.api.users.model.UserProfile
+import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -25,7 +25,7 @@ class ChannelCheckerTest {
     private val channelInfoObeyingHelpRule = Conversation("TEST_ID", "help-me", Instant.EPOCH.epochSecond, 1)
 
     private val user = User(name = "TEST_USER",
-            profile= UserProfile.testBot(),
+            profile= UserProfilesForTesting.testBot(),
             id = "id",
             team_id = "team_id",
             is_deleted = false,

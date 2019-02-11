@@ -6,8 +6,8 @@ import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
-import com.equalexperts.slack.api.users.model.User
-import com.equalexperts.slack.api.users.model.UserProfile
+import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,30 +30,8 @@ class GardenerTest {
 
     private val warningMessageContent = "WARNING MESSAGE"
 
-    private val botUser = User(name="TEST_BOT_USER",
-            profile= UserProfile.testBot(),
-            id="id",
-            team_id="team_id",
-            is_deleted=false,
-            is_admin=false,
-            is_owner=false,
-            is_primary_owner=false,
-            is_restricted=false,
-            is_ultra_restricted=false,
-            is_bot=true,
-            is_app_user=false)
-    private val nonBotUser = User("TEST_USER",
-            profile= UserProfile.testBot(),
-            id="id",
-            team_id="team_id",
-            is_deleted=false,
-            is_admin=false,
-            is_owner=false,
-            is_primary_owner=false,
-            is_restricted=false,
-            is_ultra_restricted=false,
-            is_bot=false,
-            is_app_user=false)
+    private val botUser = UsersForTesting.testBot(profile=UserProfilesForTesting.testBot())
+    private val nonBotUser = UsersForTesting.testUser(profile= UserProfilesForTesting.testBot())
 
     private val whitelistedChannelName = "WHITELISTED_CHANNEL_NAME"
     private val whitelistedChannels = setOf(whitelistedChannelName)

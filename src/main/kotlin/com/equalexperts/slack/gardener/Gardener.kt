@@ -117,7 +117,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             }
             lastWarning = lastGardenerMessage?.timestamp?.toZonedDateTime() ?: lastWarning
             timestamp = messages.last().timestamp
-        } while (history.hasMore)
+        } while (history.has_more)
 
         if (lastWarning != null) {
             return ChannelState.StaleAndWarned(lastWarning)
