@@ -85,6 +85,9 @@ cd ../../..
 - [JUnit 5](https://junit.org/junit5/)
 - [Feign](https://github.com/OpenFeign/feign)
 - [Pipenv](https://github.com/pypa/pipenv)
+- [Terraform](https://terraform.io)
+- [Terragrunt](https://github.com/gruntwork-io/terragrunt)
+- [AWS](https://aws.amazon.com/)
 
 ## Contribute
 
