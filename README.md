@@ -7,7 +7,7 @@ This has the benefit of driving your slack's conversations to common frequently 
 
 
 ## Requirements
-- Slack app will need to be created using (Slack Api Console)[https://api.slack.com/apps?new_app=1]
+- Slack app will need to be created using [Slack Api Console](https://api.slack.com/apps?new_app=1)
 - The slack app will need :
     - a bot user created
     - permissions granted for 
@@ -47,7 +47,7 @@ val warningMessage = """Hi <!channel>.
 
 Creating slack dependencies
 1. Create slack user (due to current limitations, users must archive channels rather than bots)
-2. Create slack app using (Slack Api Console)[https://api.slack.com/apps?new_app=1] 
+2. Create slack app using [Slack Api Console](https://api.slack.com/apps?new_app=1) 
 3. Grant slack app permissions (as indicated by requirements above)
 4. Add bot user to slack app
 
