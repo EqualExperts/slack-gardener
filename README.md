@@ -18,7 +18,7 @@ channels:write
 incoming-webhook
 bot
 ```
-- A slack user will need to be created (or an existing user used) to install the app to the workspace, as well as allow the app to archive channels, as currently slack only lets users have access to this method.
+- A slack user will need to be created (or an existing user used) to install the app to the workspace, as well as allow the app to archive channels, as slack currently only lets users have access to this method.
 
 Once the app is installed to the workspace, you will need to provide the gardener the below access tokens 
 
@@ -45,18 +45,19 @@ val warningMessage = """Hi <!channel>.
 ```
 
 
-Creating slack dependencies
+Create slack dependencies
 1. Create slack user (due to current limitations, users must archive channels rather than bots)
 2. Create slack app using [Slack Api Console](https://api.slack.com/apps?new_app=1) 
 3. Grant slack app permissions (as indicated by requirements above)
 4. Add bot user to slack app
 
-Creating aws dependencies
-1. Run the below commands to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time
+Create aws dependencies
+1. Run the below commands (reviewing as necessary) to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time, and you may see errors around creating the lambda as the lambda jar isn't present in the s3 bucket
 ```
 cd infra/environments/prod
 terragrunt plan-all
 terragrunt apply-all
+cd ../../..
 ```
 2. Change build.gradle bucketName references to allow gradle to upload the lambda jar to the correct place
 3. Upload lambda jar artifact (and hash) to s3 bucket by running
@@ -68,6 +69,13 @@ terragrunt apply-all
 ```
 pipenv run aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
 pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
+```
+6. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
+```
+cd infra/environments/prod
+terragrunt plan-all
+terragrunt apply-all
+cd ../../..
 ```
 
 
