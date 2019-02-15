@@ -4,10 +4,8 @@ import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationHistoriesForTesting
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
-import com.equalexperts.slack.api.rest.model.Timestamp
 import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
@@ -35,8 +33,6 @@ class GardenerTest {
     private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile())
     private val nonBotUser = UsersForTesting.testUser(profile = UserProfilesForTesting.testBotProfile())
 
-    private val whitelistedChannelName = "WHITELISTED_CHANNEL_NAME"
-    private val whitelistedChannels = setOf(whitelistedChannelName)
     private val longIdlePeriodChannelName = "CHECK_YEARLY_CHANNEL_NAME"
     private val longIdlePeriodChannels = setOf(longIdlePeriodChannelName)
 
@@ -55,7 +51,6 @@ class GardenerTest {
     private lateinit var duringLongIdlePeriod: ZonedDateTime
 
     private val nonWhitelistedChannel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
-    private val whitelistedChannel = Conversation("TEST_ID", whitelistedChannelName, Instant.EPOCH.epochSecond, 1)
     private val longIdlePeriodChannel = Conversation("TEST_ID", longIdlePeriodChannelName, Instant.EPOCH.epochSecond, 1)
 
 
@@ -86,25 +81,8 @@ class GardenerTest {
     }
 
     @Test
-    fun shouldNotArchiveOrWarnWhitelistedChannels() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
-
-        val channelList = ConversationList.withEmptyCursorToken(whitelistedChannel)
-        whenever(mockConversationsApi.list()).doReturn(channelList)
-
-        val channelMessages = listOf(botMessageAfterWarningThreshold)
-        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
-
-        gardener.process()
-
-        verify(mockConversationsApi, never()).channelsArchive(whitelistedChannel)
-        verify(mockChatSlackApi, never()).postMessage(whitelistedChannel, botUser, warningMessageContent)
-    }
-
-    @Test
     fun shouldNotArchiveOrWarnLongIdlePeriodChannelsDuringLongIdlePeriod() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
+        val gardener = getGardener(longIdlePeriodChannels)
 
         val channelList = ConversationList.withEmptyCursorToken(longIdlePeriodChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
@@ -121,7 +99,7 @@ class GardenerTest {
 
     @Test
     fun shouldArchiveWhenStaleAndAfterWarning() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
+        val gardener = getGardener(longIdlePeriodChannels)
 
         val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
@@ -137,7 +115,7 @@ class GardenerTest {
 
     @Test
     fun shouldNotArchiveWhenStaleAndBeforeWarning() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
+        val gardener = getGardener(longIdlePeriodChannels)
 
         val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
@@ -153,7 +131,7 @@ class GardenerTest {
 
     @Test
     fun shouldWarnWhenStale() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
+        val gardener = getGardener(longIdlePeriodChannels)
 
         val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
@@ -169,7 +147,7 @@ class GardenerTest {
 
     @Test
     fun shouldNotArchiveOrWarnWhenActive() {
-        val gardener = getGardener(whitelistedChannels, longIdlePeriodChannels)
+        val gardener = getGardener(longIdlePeriodChannels)
 
         val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
@@ -184,14 +162,13 @@ class GardenerTest {
         verify(mockChatSlackApi, never()).postMessage(nonWhitelistedChannel, botUser, warningMessageContent)
     }
 
-    private fun getGardener(whitelistedChannels: Set<String>, longIdlePeriodChannels: Set<String>): Gardener {
-        return Gardener(mockConversationsApi, mockChatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, whitelistedChannels, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
+    private fun getGardener(longIdlePeriodChannels: Set<String>): Gardener {
+        return Gardener(mockConversationsApi, mockChatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, longIdlePeriodChannels, longIdlePeriod, warningMessageContent)
     }
 
     private fun getNow(): Instant? {
         val localDateTime = LocalDateTime.parse("04:30 PM, Sat 4/4/1992", DateTimeFormatter.ofPattern("hh:mm a, EEE M/d/uuuu", Locale.ENGLISH))
         val zonedDateTime = localDateTime.atZone(ZoneId.of("Europe/London"))
-        val instant = zonedDateTime.toInstant()
-        return instant
+        return zonedDateTime.toInstant()
     }
 }

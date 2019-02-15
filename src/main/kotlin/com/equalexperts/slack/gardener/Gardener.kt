@@ -23,7 +23,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                private val clock: Clock,
                private val defaultIdlePeriod: Period,
                private val warningPeriod: Period,
-               private val channelWhiteList: Set<String>,
                private val longIdlePeriodChannels: Set<String>,
                private val longIdlePeriod: Period,
                private val warningMessage: String) {
@@ -35,7 +34,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             logger.info("${channels.size} channels found")
 
             val data = channels.parallelStream()
-                    .filter { this.isEligibleForGardening(it) }
                     .map { Pair(it, this.determineChannelState(it, botUser)) }
                     .peek { (it, state) ->
                         val staleMessage = when (state) {
@@ -69,14 +67,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
         }
 
         logger.info("done in ${nanoTime / 1_000_000} ms")
-    }
-
-    private fun isEligibleForGardening(channel: Conversation): Boolean {
-        if (channelWhiteList.contains(channel.name)) {
-            return false
-        }
-
-        return true
     }
 
     private fun determineChannelState(channel: Conversation, botUser: User): ChannelState {
@@ -174,7 +164,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                   idleMonths: Int,
                   warningWeeks: Int,
                   longIdleYears: Int,
-                  channelWhitelist: Set<String>,
                   longIdlePeriodChannels: Set<String>,
                   warningMessage: String): Gardener {
 
@@ -196,7 +185,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(conversationsSlackApi, slackBotApi, botUser, clock, defaultIdlePeriod, warningPeriod, channelWhitelist, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            return Gardener(conversationsSlackApi, slackBotApi, botUser, clock, defaultIdlePeriod, warningPeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
     }
 }
