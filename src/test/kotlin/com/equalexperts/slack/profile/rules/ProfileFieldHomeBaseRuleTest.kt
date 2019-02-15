@@ -14,7 +14,7 @@ internal class ProfileFieldHomeBaseRuleTest {
 
     @Test
     fun `should return true for home base custom field presence`() {
-        val userProfile = UserProfilesForTesting.testBot().copy(fields = hashMapOf("TEST_FIELD_ID" to UserProfileField("TEST_VALUE", "TEST_ALT")))
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(fields = hashMapOf("TEST_FIELD_ID" to UserProfileField("TEST_VALUE", "TEST_ALT")))
         val testUser = UsersForTesting.testBot(userProfile)
 
         val teamProfile = TeamProfile(TeamProfileDetails(listOf(TeamProfileFieldMetadata("TEST_FIELD_ID", 0, ProfileFieldHomeBaseRule.FIELD_NAME, "TEST_HINT", "TEST_TYPE", null, null, false))))
@@ -26,7 +26,7 @@ internal class ProfileFieldHomeBaseRuleTest {
 
     @Test
     fun `should return false for home base custom field absence`() {
-        val userProfile = UserProfilesForTesting.testBot().copy(fields = null)
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(fields = null)
         val testUser = UsersForTesting.testBot(userProfile)
 
         val teamProfile = TeamProfile(TeamProfileDetails(listOf(TeamProfileFieldMetadata("TEST_FIELD_ID", 0, ProfileFieldHomeBaseRule.FIELD_NAME, "TEST_HINT", "TEST_TYPE", null, null, false))))

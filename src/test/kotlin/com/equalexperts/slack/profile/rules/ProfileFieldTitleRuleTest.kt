@@ -10,7 +10,7 @@ internal class ProfileFieldTitleRuleTest {
 
     @Test
     fun `should return true for title field presence`() {
-        val userProfile = UserProfilesForTesting.testBot()
+        val userProfile = UserProfilesForTesting.testBotProfile()
         val testUser = UsersForTesting.testBot(userProfile)
 
         val rule = ProfileFieldTitleRule()
@@ -21,7 +21,7 @@ internal class ProfileFieldTitleRuleTest {
 
     @Test
     fun `should return false for title field absence`() {
-        val userProfile = UserProfilesForTesting.testBot().copy(title = null)
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(title = null)
         val testUser = UsersForTesting.testBot(userProfile)
 
         val rule = ProfileFieldTitleRule()

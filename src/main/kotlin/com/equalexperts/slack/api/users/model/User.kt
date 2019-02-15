@@ -29,12 +29,11 @@ data class User(val name: String,
         override fun expandParameter(value: User) = value.name
     }
 
+    class UserIdExpander : Expander<User>() {
+        override fun expandParameter(value: User) = value.id
+    }
+
 }
 
 data class UserList(val members: List<User>,
-                    val response_metadata: ResponseMetadata) {
-    companion object {
-        fun withEmptyCursorToken(user: User) = UserList(listOf(user), ResponseMetadata(""))
-        fun withCursorToken(user: User, cursor_token: String) = UserList(listOf(user), ResponseMetadata(cursor_token))
-    }
-}
+                    val response_metadata: ResponseMetadata)

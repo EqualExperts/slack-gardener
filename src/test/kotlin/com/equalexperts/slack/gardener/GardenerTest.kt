@@ -1,11 +1,13 @@
 package com.equalexperts.slack.gardener
 
 import com.equalexperts.slack.api.chat.ChatSlackApi
+import com.equalexperts.slack.api.conversations.ConversationHistoriesForTesting
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
+import com.equalexperts.slack.api.rest.model.Timestamp
 import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
@@ -30,8 +32,8 @@ class GardenerTest {
 
     private val warningMessageContent = "WARNING MESSAGE"
 
-    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBot())
-    private val nonBotUser = UsersForTesting.testUser(profile = UserProfilesForTesting.testBot())
+    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile())
+    private val nonBotUser = UsersForTesting.testUser(profile = UserProfilesForTesting.testBotProfile())
 
     private val whitelistedChannelName = "WHITELISTED_CHANNEL_NAME"
     private val whitelistedChannels = setOf(whitelistedChannelName)
@@ -91,8 +93,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 
@@ -108,8 +110,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessageDuringLongPeriodThreshold)
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 
@@ -125,8 +127,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 
@@ -141,8 +143,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageBeforeWarningThreshold)
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 
@@ -157,8 +159,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = emptyList<Message>()
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 
@@ -173,8 +175,8 @@ class GardenerTest {
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessage)
-        val history = ConversationHistory(false, channelMessages)
-        whenever(mockConversationsApi.channelHistory(any(), any())).doReturn(history)
+        val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
 
         gardener.process()
 

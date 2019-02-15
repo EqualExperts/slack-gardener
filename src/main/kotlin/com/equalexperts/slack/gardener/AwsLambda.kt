@@ -21,8 +21,8 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val request = GetParametersRequest()
         request.withNames("slack.gardener.oauth.access_token", "slack.gardener.bot.oauth.access_token").withDecryption = true
         val parameterResults = client.getParameters(request)
-        val slackOauthAccessToken = parameterResults.parameters.find { it -> it.name == "slack.gardener.oauth.access_token" }?.value!!
-        val slackBotOauthAccessToken = parameterResults.parameters.find { it -> it.name == "slack.gardener.bot.oauth.access_token" }?.value!!
+        val slackOauthAccessToken = parameterResults.parameters.find { it.name == "slack.gardener.oauth.access_token" }?.value!!
+        val slackBotOauthAccessToken = parameterResults.parameters.find { it.name == "slack.gardener.bot.oauth.access_token" }?.value!!
 
         val slackUri = URI("https://api.slack.com")
 
