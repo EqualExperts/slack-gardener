@@ -96,7 +96,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
             val botUser = usersSlackApi.getUserInfo(botUserId).user
 
             val clock = Clock.systemUTC()
-            val defaultWaitingPeriod = Period.ofDays(3)
+            val defaultWaitingPeriod = Period.ofDays(warningWaitDays)
             val threshold = ZonedDateTime.now(clock).truncatedTo(ChronoUnit.DAYS) - defaultWaitingPeriod
 
             return ProfileChecker(usersSlackApi, userProfilesSlackApi, conversationsSlackApi, chatSlackApi, rules, botUser, warningMessage, threshold)
