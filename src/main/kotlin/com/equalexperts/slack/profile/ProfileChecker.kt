@@ -75,7 +75,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     }
 
     companion object {
-        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String) : ProfileChecker {
+        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int) : ProfileChecker {
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
             val chatSlackApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)

@@ -37,10 +37,13 @@ class AwsLambda : RequestHandler<Any, Unit> {
                             |Home Base - So people know where you generally are located
                             |""".trimMargin().replace('\n', ' ')
 
+        val warningWaitDays = 3
+        
         val profileChecker = ProfileChecker.build(slackUri,
                 slackOauthAccessToken,
                 slackBotOauthAccessToken,
-                warningMessage)
+                warningMessage,
+                warningWaitDays)
 
 
         profileChecker.process()
