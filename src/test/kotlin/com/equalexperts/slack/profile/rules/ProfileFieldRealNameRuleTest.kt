@@ -10,7 +10,7 @@ internal class ProfileFieldRealNameRuleTest {
 
     @Test
     fun `should return true for real name field presence`() {
-        val userProfile = UserProfilesForTesting.testBot()
+        val userProfile = UserProfilesForTesting.testBotProfile()
         val testUser = UsersForTesting.testBot(userProfile)
 
         val rule = ProfileFieldRealNameRule()
@@ -21,7 +21,7 @@ internal class ProfileFieldRealNameRuleTest {
 
     @Test
     fun `should return false for real name field absence`() {
-        val userProfile = UserProfilesForTesting.testBot().copy(real_name = null)
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(real_name = null)
         val testUser = UsersForTesting.testBot(userProfile)
 
         val rule = ProfileFieldRealNameRule()

@@ -9,7 +9,7 @@ internal class UserListTest {
     @Test
     fun `should create list with empty cursor`() {
         val testUser = User(name = "TEST_BOT_USER",
-                profile = UserProfilesForTesting.testBot(),
+                profile = UserProfilesForTesting.testBotProfile(),
                 id = "id",
                 team_id = "team_id",
                 is_deleted = false,
@@ -21,7 +21,7 @@ internal class UserListTest {
                 is_bot = true,
                 is_app_user = false)
 
-        val userList = UserList.withEmptyCursorToken(testUser)
+        val userList = UserListsForTesting.withEmptyCursorToken(testUser)
 
 
         assertTrue(userList.response_metadata.next_cursor.isBlank())
@@ -30,7 +30,7 @@ internal class UserListTest {
     @Test
     fun `should create list with cursor`() {
         val testUser = User(name = "TEST_BOT_USER",
-                profile = UserProfilesForTesting.testBot(),
+                profile = UserProfilesForTesting.testBotProfile(),
                 id = "id",
                 team_id = "team_id",
                 is_deleted = false,
@@ -43,7 +43,7 @@ internal class UserListTest {
                 is_app_user = false)
 
         val cursor_token = "TOKEN"
-        val userList = UserList.withCursorToken(testUser, cursor_token)
+        val userList = UserListsForTesting.withCursorToken(testUser, cursor_token)
 
         assertEquals(userList.response_metadata.next_cursor, cursor_token)
     }

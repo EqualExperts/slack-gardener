@@ -7,18 +7,21 @@ import com.equalexperts.slack.api.conversations.model.ConversationMembers
 import com.equalexperts.slack.api.rest.SlackRetrySupport
 import com.equalexperts.slack.api.rest.SlackRetrySupport.SlackErrorDecoder
 import com.equalexperts.slack.api.rest.feignBuilder
+import com.equalexperts.slack.api.rest.model.Message
 import com.equalexperts.slack.api.rest.model.Timestamp
+import com.equalexperts.slack.api.users.model.User
 import feign.Param
 import feign.RequestLine
 import org.slf4j.LoggerFactory
 import java.net.URI
+import kotlin.reflect.KFunction1
 
 interface ConversationsSlackApi {
     @RequestLine("GET /api/conversations.list?exclude_archived=true&exclude_members=true&cursor={cursorValue}")
     fun list(@Param("cursorValue") cursorValue: String = ""): ConversationList
 
     @RequestLine("GET /api/conversations.members?channel={channel}&limit=1000&cursor={cursorValue}")
-    fun members(@Param("channel") channelId: String,
+    fun members(@Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation,
                 @Param("cursorValue") cursorValue: String = ""): ConversationMembers
 
     @RequestLine("GET /api/conversations.archive?channel={channel}")
@@ -32,6 +35,14 @@ interface ConversationsSlackApi {
             @Param("oldest") oldest: Timestamp
     ): ConversationHistory
 
+    @RequestLine("GET /api/conversations.history?channel={channel}&cursor={cursorValue}&count=200")
+    fun channelHistory(
+            @Param("channel") channel: String,
+            @Param("cursorValue") cursorValue: String = ""
+    ): ConversationHistory
+
+    @RequestLine("GET /api/conversations.open?users={user}")
+    fun conversationOpen(@Param("user", expander = User.UserIdExpander::class) user: User): OpenConversationResponse
 
     companion object {
         private val logger = LoggerFactory.getLogger(this::class.java.name)
@@ -73,5 +84,39 @@ interface ConversationsSlackApi {
             logger.info("${channels.size} channels found")
             return channels
         }
+
+        fun getFullConversationHistory(conversationsSlackApi: ConversationsSlackApi, conversationId: String): List<Message> {
+            logger.info("Retrieving Messages")
+
+            val messages = mutableListOf<Message>()
+
+            var moreMessagesToGet: Boolean
+            var cursorValue = ""
+            do {
+                val conversationHistory = conversationsSlackApi.channelHistory(conversationId, cursorValue)
+                val nextCursor = conversationHistory.response_metadata?.next_cursor
+
+                logger.debug("Messages found, adding to list ${conversationHistory.messages}")
+                messages += conversationHistory.messages
+
+                val nextCursorPresent = nextCursor?.let{ !it.isBlank() } ?: false
+                if (nextCursorPresent) {
+                    logger.debug("Found new cursor token to retrieve more messages from, using cursor token $nextCursor")
+                    moreMessagesToGet = true
+                    cursorValue = nextCursor!!
+
+                } else {
+                    logger.debug("No new cursor token, all messages found")
+                    moreMessagesToGet = false
+                }
+
+            } while (moreMessagesToGet)
+            logger.info("${messages.size} messages found")
+            return messages
+        }
     }
 }
+
+data class OpenConversationResponse(val channel: ChannelId)
+
+data class ChannelId(val id: String)

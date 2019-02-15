@@ -90,10 +90,12 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
 
         //TODO: we start at the oldest time and page forward. Paging backward instead will be faster when a channel has already been warned.
 
+
         var lastWarning: ZonedDateTime? = null
         var timestamp = Timestamp(timeLimit)
 
         do {
+            logger.debug("Searching for human message in channel ${channel.name} from $timestamp")
             val history = conversationSlackApi.channelHistory(channel, timestamp)
             val messages = history.messages
 

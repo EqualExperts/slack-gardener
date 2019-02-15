@@ -25,7 +25,7 @@ class ChannelCheckerTest {
     private val channelInfoObeyingHelpRule = Conversation("TEST_ID", "help-me", Instant.EPOCH.epochSecond, 1)
 
     private val user = User(name = "TEST_USER",
-            profile = UserProfilesForTesting.testBot(),
+            profile = UserProfilesForTesting.testBotProfile(),
             id = "id",
             team_id = "team_id",
             is_deleted = false,
@@ -59,7 +59,7 @@ class ChannelCheckerTest {
         val checker = ChannelChecker(mockConversationsApi, mockChatSlackApi, userInfo, whitelistedChannelNames, rules, warningMessage)
         checker.process()
 
-        verify(mockChatSlackApi, never()).postMessage(any(), any(), any())
+        verify(mockChatSlackApi, never()).postMessage(any<Conversation>(), any(), any())
     }
 
     @Test
@@ -71,7 +71,7 @@ class ChannelCheckerTest {
         val checker = ChannelChecker(mockConversationsApi, mockChatSlackApi, userInfo, whitelistedChannelNames, rules, warningMessage)
         checker.process()
 
-        verify(mockChatSlackApi, never()).postMessage(any(), any(), any())
+        verify(mockChatSlackApi, never()).postMessage(any<Conversation>(), any(), any())
     }
 
     @Test

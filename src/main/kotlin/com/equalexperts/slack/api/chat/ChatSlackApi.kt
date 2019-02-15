@@ -17,6 +17,13 @@ interface ChatSlackApi {
             @Param("text") text: String
     )
 
+    @RequestLine("GET /api/chat.postMessage?channel={channel}&username={user}&text={text}")
+    fun postMessage(
+            @Param("channel") channelId: String,
+            @Param("user", expander = User.UsernameExpander::class) user: User,
+            @Param("text") text: String
+    )
+
     companion object {
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): ChatSlackApi {
             return feignBuilder()

@@ -12,7 +12,7 @@ class ChannelMemberExportCsvFormat(private val conversationApi: ConversationsSla
     fun process() {
         val nanoTime = measureNanoTime {
             val eeAlumniChannel = ConversationsSlackApi.listAll(conversationApi).first { it.name == channelname }
-            val members = conversationApi.members(eeAlumniChannel.id)
+            val members = conversationApi.members(eeAlumniChannel)
 
             val users = members.members
                     .map { it -> UserId(it) }
