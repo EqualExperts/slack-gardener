@@ -29,12 +29,6 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val idleMonths = 3
         val warningWeeks = 1
         val longIdleYears = 1
-        val channelWhitelist = setOf("announcements",
-                "meta-slack",
-                "ee-alumni",
-                "feedback-to-ee",
-                "remembering_torben",
-                "ber-flynn")
         val longIdlePeriodChannels = setOf("sk-ee-trip")
         val warningMessage = """Hi <!channel>.
                             |This channel hasn't been used in a while, so I’d like to archive it.
@@ -49,7 +43,6 @@ class AwsLambda : RequestHandler<Any, Unit> {
                 idleMonths,
                 warningWeeks,
                 longIdleYears,
-                channelWhitelist,
                 longIdlePeriodChannels,
                 warningMessage)
 
