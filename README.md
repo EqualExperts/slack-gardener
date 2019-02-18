@@ -20,30 +20,13 @@ bot
 ```
 - A slack user will need to be created (or an existing user used) to install the app to the workspace, as well as allow the app to archive channels, as slack currently only lets users have access to this method.
 
-Once the app is installed to the workspace, you will need to provide the gardener the below access tokens 
+Once the app is installed to the workspace, you will need to provide the Slack Gardener the below oauth access tokens via their respective parameter keys 
 
 * OAuth Access Token - "slack.gardener.oauth.access_token"
 * Bot User OAuth Access Token - "slack.gardener.bot.oauth.access_token"
 
 
 ## AWS Lambda Installation
-
-Configure app
-1. Change configuration values as appropriate in src/main/kotlin/com/equalexperts/slack/gardener/AwsLambda.kt
-```
-val idleMonths = 3
-val warningWeeks = 1
-val longIdleYears = 1
-val channelWhitelist = setOf("announcements", "random")
-val longIdlePeriodChannels = setOf("sk-ee-trip")
-val warningMessage = """Hi <!channel>.
-                |This channel hasn't been used in a while, so I’d like to archive it.
-                |This will keep the list of channels smaller and help users find things more easily.
-                |If you _don't_ want this channel to be archived, just post a message and I'll leave it alone for a while.
-                |You can archive the channel now using the `/archive` command.
-                |If nobody posts in a few days I will come back and archive the channel for you.""".trimMargin().replace('\n', ' ')
-```
-
 
 Create slack dependencies
 1. Create slack user (due to current limitations, users must archive channels rather than bots)
@@ -69,6 +52,18 @@ cd ../../..
 ```
 pipenv run aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
 pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
+# Done via input json because the awscli v1 tries to auto-fetch any url, this apparently will be fixed in awscli v2 
+pipenv run aws ssm put-parameter --cli-input-json '{
+  "Name": "slack.gardener.uri",
+  "Value": "https://api.slack.com",
+  "Type": "String",
+  "Description": "url"
+}'
+pipenv run aws ssm put-parameter --name "slack.gardener.idle.months" --value "3" --type "String"
+pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.weeks" --value "1" --type "String"
+pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.years" --value "1" --type "String"
+pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.channels" --value "annual-conference" --type "String"
+pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
 ```
 6. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
 ```
@@ -77,7 +72,6 @@ terragrunt plan-all
 terragrunt apply-all
 cd ../../..
 ```
-
 
 ## Built with
 

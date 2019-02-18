@@ -23,7 +23,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                private val clock: Clock,
                private val defaultIdlePeriod: Period,
                private val warningPeriod: Period,
-               private val longIdlePeriodChannels: Set<String>,
+               private val longIdlePeriodChannels: Collection<String>,
                private val longIdlePeriod: Period,
                private val warningMessage: String) {
     private val logger = LoggerFactory.getLogger(this::class.java.name)
@@ -164,7 +164,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                   idleMonths: Int,
                   warningWeeks: Int,
                   longIdleYears: Int,
-                  longIdlePeriodChannels: Set<String>,
+                  longIdlePeriodChannels: Collection<String>,
                   warningMessage: String): Gardener {
 
 
