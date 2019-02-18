@@ -14,7 +14,6 @@ import feign.Param
 import feign.RequestLine
 import org.slf4j.LoggerFactory
 import java.net.URI
-import kotlin.reflect.KFunction1
 
 interface ConversationsSlackApi {
     @RequestLine("GET /api/conversations.list?exclude_archived=true&exclude_members=true&cursor={cursorValue}")
@@ -99,7 +98,7 @@ interface ConversationsSlackApi {
                 logger.debug("Messages found, adding to list ${conversationHistory.messages}")
                 messages += conversationHistory.messages
 
-                val nextCursorPresent = nextCursor?.let{ !it.isBlank() } ?: false
+                val nextCursorPresent = nextCursor?.let { !it.isBlank() } ?: false
                 if (nextCursorPresent) {
                     logger.debug("Found new cursor token to retrieve more messages from, using cursor token $nextCursor")
                     moreMessagesToGet = true

@@ -6,7 +6,7 @@ object UserProfilesRulesForTesting {
 
     fun testPassingRule(fieldName: String): ProfileFieldRule {
 
-        class TestRule: ProfileFieldRule {
+        class TestRule : ProfileFieldRule {
 
             override fun checkProfile(user: User): ProfileFieldRuleResult {
 
@@ -19,7 +19,7 @@ object UserProfilesRulesForTesting {
 
     fun testFailingRule(fieldName: String): ProfileFieldRule {
 
-        class TestRule: ProfileFieldRule {
+        class TestRule : ProfileFieldRule {
 
             override fun checkProfile(user: User): ProfileFieldRuleResult {
 

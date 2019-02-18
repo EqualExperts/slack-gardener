@@ -20,6 +20,7 @@ object UserProfilesForTesting {
             "TEST_IMAGE_512_URL",
             "TEST_IMAGE_1024_URL",
             mapOf())
+
     fun testUserProfile(): UserProfile = UserProfile(null,
             "TEST_REAL_NAME",
             "TEST_REAL_NAME_NORMALISED",
