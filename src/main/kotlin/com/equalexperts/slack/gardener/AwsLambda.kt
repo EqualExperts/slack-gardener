@@ -19,31 +19,50 @@ class AwsLambda : RequestHandler<Any, Unit> {
     fun process() {
         val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
         val request = GetParametersRequest()
-        request.withNames("slack.gardener.oauth.access_token", "slack.gardener.bot.oauth.access_token").withDecryption = true
+
+        val gardenerOauthAccessTokenParamName = "slack.gardener.oauth.access_token"
+        val gardenerBotOauthAccessTokenParamName = "slack.gardener.bot.oauth.access_token"
+
+        val gardenerUriParamName = "slack.gardener.uri"
+
+        val idleMonthsParamName = "slack.gardener.idle.months"
+        val longIdleYearsParamName = "slack.gardener.idle.long.years"
+        val longIdleChannelsParamName = "slack.gardener.idle.long.channels"
+
+        val warningWaitWeeksParamName = "slack.gardener.warning.wait.weeks"
+        val warningMessageParamName = "slack.gardener.warning.wait.message"
+
+        request.withNames(gardenerOauthAccessTokenParamName,
+                gardenerBotOauthAccessTokenParamName,
+                gardenerUriParamName,
+                idleMonthsParamName,
+                warningWaitWeeksParamName,
+                longIdleYearsParamName,
+                longIdleChannelsParamName,
+                warningMessageParamName).withDecryption = true
         val parameterResults = client.getParameters(request)
-        val slackOauthAccessToken = parameterResults.parameters.find { it.name == "slack.gardener.oauth.access_token" }?.value!!
-        val slackBotOauthAccessToken = parameterResults.parameters.find { it.name == "slack.gardener.bot.oauth.access_token" }?.value!!
 
-        val slackUri = URI("https://api.slack.com")
+        val slackOauthAccessToken = parameterResults.parameters.find { it.name == gardenerOauthAccessTokenParamName }?.value!!
+        val slackBotOauthAccessToken = parameterResults.parameters.find { it.name == gardenerBotOauthAccessTokenParamName }?.value!!
 
-        val idleMonths = 3
-        val warningWeeks = 1
-        val longIdleYears = 1
-        val longIdlePeriodChannels = setOf("sk-ee-trip")
-        val warningMessage = """Hi <!channel>.
-                            |This channel hasn't been used in a while, so I’d like to archive it.
-                            |This will keep the list of channels smaller and help users find things more easily.
-                            |If you _don't_ want this channel to be archived, just post a message and I'll leave it alone for a while.
-                            |You can archive the channel now using the `/archive` command.
-                            |If nobody posts in a few days I will come back and archive the channel for you.""".trimMargin().replace('\n', ' ')
+        val slackUriRaw = parameterResults.parameters.find { it.name == gardenerUriParamName }?.value!!
+        val slackUri = URI(slackUriRaw)
+
+        val idleMonths = parameterResults.parameters.find { it.name == idleMonthsParamName }?.value!!.toInt()
+        val longIdleYears = parameterResults.parameters.find { it.name == longIdleYearsParamName }?.value!!.toInt()
+        val longIdleChannels = parameterResults.parameters.find { it.name == longIdleChannelsParamName }?.value!!.split(",")
+
+        val warningWaitWeeks = parameterResults.parameters.find { it.name == warningWaitWeeksParamName }?.value!!.toInt()
+        val warningMessage = parameterResults.parameters.find { it.name == warningMessageParamName }?.value!!
+
 
         val gardener = Gardener.build(slackUri,
                 slackOauthAccessToken,
                 slackBotOauthAccessToken,
                 idleMonths,
-                warningWeeks,
+                warningWaitWeeks,
                 longIdleYears,
-                longIdlePeriodChannels,
+                longIdleChannels,
                 warningMessage)
 
         gardener.process()
