@@ -7,6 +7,7 @@ import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.conversations.model.ConversationList
 import com.equalexperts.slack.api.rest.model.Message
 import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.channel.ConversationListsForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.BeforeEach
