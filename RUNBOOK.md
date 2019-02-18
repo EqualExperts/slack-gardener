@@ -8,7 +8,7 @@
 
 * Service Contact Information:
 
-    * Slack channel: #meta-slack
+    * Slack channel: #ask-ee-slack
     * Issue escalation contact point: @adam 
 
 * Service Dashboards:
