@@ -1,5 +1,6 @@
 package com.equalexperts.slack.api.conversations.model
 
+import com.equalexperts.slack.channel.ConversationListsForTesting
 import org.junit.jupiter.api.Assertions.assertEquals
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -10,7 +11,7 @@ internal class ConversationListTest {
     fun `should create list with empty cursor`() {
         val testChannel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
 
-        val conversationList = ConversationList.withEmptyCursorToken(testChannel)
+        val conversationList = ConversationListsForTesting.withEmptyCursorToken(testChannel)
 
         assertTrue(conversationList.response_metadata.next_cursor.isBlank())
     }
@@ -21,7 +22,7 @@ internal class ConversationListTest {
 
         val cursor_token = "TOKEN"
 
-        val conversationList = ConversationList.withCursorToken(testChannel, cursor_token)
+        val conversationList = ConversationListsForTesting.withCursorToken(testChannel, cursor_token)
 
         assertEquals(conversationList.response_metadata.next_cursor, cursor_token)
     }

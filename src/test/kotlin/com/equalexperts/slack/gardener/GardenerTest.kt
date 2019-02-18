@@ -84,7 +84,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnLongIdlePeriodChannelsDuringLongIdlePeriod() {
         val gardener = getGardener(longIdlePeriodChannels)
 
-        val channelList = ConversationList.withEmptyCursorToken(longIdlePeriodChannel)
+        val channelList = ConversationListsForTesting.withEmptyCursorToken(longIdlePeriodChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessageDuringLongPeriodThreshold)
@@ -101,7 +101,7 @@ class GardenerTest {
     fun shouldArchiveWhenStaleAndAfterWarning() {
         val gardener = getGardener(longIdlePeriodChannels)
 
-        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
+        val channelList = ConversationListsForTesting.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageAfterWarningThreshold)
@@ -117,7 +117,7 @@ class GardenerTest {
     fun shouldNotArchiveWhenStaleAndBeforeWarning() {
         val gardener = getGardener(longIdlePeriodChannels)
 
-        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
+        val channelList = ConversationListsForTesting.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(botMessageBeforeWarningThreshold)
@@ -133,7 +133,7 @@ class GardenerTest {
     fun shouldWarnWhenStale() {
         val gardener = getGardener(longIdlePeriodChannels)
 
-        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
+        val channelList = ConversationListsForTesting.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = emptyList<Message>()
@@ -149,7 +149,7 @@ class GardenerTest {
     fun shouldNotArchiveOrWarnWhenActive() {
         val gardener = getGardener(longIdlePeriodChannels)
 
-        val channelList = ConversationList.withEmptyCursorToken(nonWhitelistedChannel)
+        val channelList = ConversationListsForTesting.withEmptyCursorToken(nonWhitelistedChannel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
         val channelMessages = listOf(nonBotMessage)

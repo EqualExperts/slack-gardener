@@ -23,10 +23,4 @@ class Conversation(val id: String, val name: String, created: Long, num_members:
 
 
 data class ConversationList(val channels: List<Conversation>,
-                            val response_metadata: ResponseMetadata) {
-    companion object {
-        fun withEmptyCursorToken(conversation: Conversation) = ConversationList(listOf(conversation), ResponseMetadata(""))
-        fun withCursorToken(conversation: Conversation, cursor_token: String) = ConversationList(listOf(conversation), ResponseMetadata(cursor_token))
-    }
-
-}
+                            val response_metadata: ResponseMetadata)
