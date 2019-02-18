@@ -5,7 +5,6 @@ import com.equalexperts.slack.api.conversations.ChannelId
 import com.equalexperts.slack.api.conversations.ConversationHistoriesForTesting
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.OpenConversationResponse
-import com.equalexperts.slack.api.conversations.model.ConversationHistory
 import com.equalexperts.slack.api.profile.ProfilesSlackApi
 import com.equalexperts.slack.api.profile.model.UserProfileWrapper
 import com.equalexperts.slack.api.rest.model.Message
@@ -14,7 +13,6 @@ import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
-import com.equalexperts.slack.api.users.model.UserList
 import com.equalexperts.slack.api.users.model.UserListsForTesting
 import com.equalexperts.slack.profile.rules.UserProfilesRulesForTesting
 import com.nhaarman.mockitokotlin2.*
@@ -25,7 +23,7 @@ import java.time.ZonedDateTime
 internal class ProfileCheckerTest {
 
 
-    private lateinit var  mockUserSlackApi: UsersSlackApi
+    private lateinit var mockUserSlackApi: UsersSlackApi
 
     private lateinit var mockProfilesSlackApi: ProfilesSlackApi
 
@@ -36,7 +34,7 @@ internal class ProfileCheckerTest {
     private lateinit var mockBotUser: User
 
     @BeforeEach
-    fun `setup`(){
+    fun `setup`() {
         mockUserSlackApi = mock()
         mockProfilesSlackApi = mock()
         mockConversationSlackApi = mock()

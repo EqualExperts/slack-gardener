@@ -1,6 +1,5 @@
-import jp.classmethod.aws.gradle.s3.AmazonS3FileUploadTask
-
 import com.amazonaws.services.s3.model.ObjectMetadata
+import jp.classmethod.aws.gradle.s3.AmazonS3FileUploadTask
 
 buildscript {
     ext {
@@ -102,7 +101,7 @@ task buildHashFile() {
     }
 }
 
-task uploadLambdaHash(type: AmazonS3FileUploadTask, dependsOn: buildHashFile){
+task uploadLambdaHash(type: AmazonS3FileUploadTask, dependsOn: buildHashFile) {
     file file("build/ee-slack-gardener-lambda.base64sha256")
     bucketName 'ee-slack-gardener-lambdas'
     key "ee-slack-gardener-lambda.jar.base64sha256"
@@ -118,7 +117,7 @@ task uploadLambda(type: AmazonS3FileUploadTask, dependsOn: build) {
     key "ee-slack-gardener-lambda.jar"
 }
 
-task upload(){
+task upload() {
     dependsOn uploadLambda
     dependsOn uploadLambdaHash
 }

@@ -44,7 +44,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
         }
 
         userProfileResults.entries.parallelStream()
-                .peek{ logger.info("${it.key.name} has values set: ${it.value.results}")}
+                .peek { logger.info("${it.key.name} has values set: ${it.value.results}") }
                 .filter { it.value.getNumberOfFailedFields() > 0 }
                 .map { Triple(it.key, it.value, conversationsSlackApi.conversationOpen(it.key).channel.id) }
                 .filter { haveWeMessagedThemRecently(it.third) }
@@ -75,7 +75,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     }
 
     companion object {
-        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int) : ProfileChecker {
+        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int): ProfileChecker {
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
             val chatSlackApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
@@ -88,9 +88,9 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
             val teamCustomProfileFields = userProfilesSlackApi.teamProfile()
 
             val rules = listOf(ProfileFieldRealNameRule(),
-                                                    ProfileFieldDisplayNameRule(),
-                                                    ProfileFieldTitleRule(),
-                                                    ProfileFieldHomeBaseRule(teamCustomProfileFields))
+                    ProfileFieldDisplayNameRule(),
+                    ProfileFieldTitleRule(),
+                    ProfileFieldHomeBaseRule(teamCustomProfileFields))
 
             val botUserId = authSlackApi.authenticate().id
             val botUser = usersSlackApi.getUserInfo(botUserId).user
