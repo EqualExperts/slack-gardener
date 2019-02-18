@@ -2,7 +2,7 @@
 
 ## Service Information
 
-* Service Owner: Equal Experts Slack Admins
+* Service Owner: Slack Working Group
 
 * Service Description: The slack gardener removes inactive channels in a slack instance. This helps improve discoverability of active channels, guiding slack users towards channels with active members. 
 
@@ -35,7 +35,15 @@
 
 * Configuration:
 
-    * "slack.gardener.oauth.access_token" and "slack.gardener.bot.oauth.access_token" must be both present in the AWS SSM Parameter store, as the lambda will request these at the start of execution to connect to the relevant slack api's
+    * The below configuration key's must be present in the AWS SSM Parameter store, details on the configuration can be found in the [README.md](README.md). The lambda will request these at the start of execution:
+        * slack.gardener.oauth.access_token
+        * slack.gardener.bot.oauth.access_token
+        * slack.gardener.uri
+        * slack.gardener.idle.months
+        * slack.gardener.idle.long.years
+        * slack.gardener.idle.long.channels
+        * slack.gardener.warning.wait.weeks
+        * slack.gardener.warning.wait.message
 
 * Other Information:
 
