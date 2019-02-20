@@ -18,7 +18,7 @@ import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
 class Gardener(private val conversationSlackApi: ConversationsSlackApi,
-               private val slackBotApi: ChatSlackApi,
+               private val chatSlackApi: ChatSlackApi,
                private val botUser: User,
                private val clock: Clock,
                private val defaultIdlePeriod: Period,
@@ -122,7 +122,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             return
         }
 
-        slackBotApi.postMessage(it.first, botUser, warningMessage)
+        chatSlackApi.postMessage(it.first, botUser, warningMessage)
         logger.info("Warned ${it.first.name}")
     }
 
@@ -175,7 +175,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             val conversationsSlackApi = ConversationsSlackApi.factory(slackUri, slackOauthAccessToken, Thread::sleep)
 
 
-            val slackBotApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
+            val chatSlackApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
             val botUserId = authSlackApi.authenticate().id
             val botUser = usersSlackApi.getUserInfo(botUserId).user
@@ -185,7 +185,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(conversationsSlackApi, slackBotApi, botUser, clock, defaultIdlePeriod, warningPeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            return Gardener(conversationsSlackApi, chatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
         }
     }
 }
