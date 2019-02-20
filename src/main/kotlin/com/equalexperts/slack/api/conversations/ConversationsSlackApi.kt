@@ -43,6 +43,12 @@ interface ConversationsSlackApi {
     @RequestLine("GET /api/conversations.open?users={user}")
     fun conversationOpen(@Param("user", expander = User.UserIdExpander::class) user: User): OpenConversationResponse
 
+    @RequestLine("GET /api/conversations.rename?channel={channel}&name={name}")
+    fun channelRename(
+            @Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation,
+            @Param("name") name: String
+    )
+
     companion object {
         private val logger = LoggerFactory.getLogger(this::class.java.name)
 
