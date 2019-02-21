@@ -1,15 +1,19 @@
-resource "aws_s3_bucket" "ee_slack_gardener_lambdas" {
-  bucket = "ee-slack-gardener-lambdas"
+resource "aws_s3_bucket" "lambda_artefacts" {
+  bucket = "${var.lambda_artefact_bucket_name}"
   acl    = "private"
 
   versioning {
     enabled = true
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
 }
 
 resource "aws_s3_bucket_public_access_block" "lambdas_s3_public_access_block" {
-  bucket = "${aws_s3_bucket.ee_slack_gardener_lambdas.id}"
+  bucket = "${aws_s3_bucket.lambda_artefacts.id}"
 
   block_public_acls   = true
   block_public_policy = true
@@ -18,7 +22,7 @@ resource "aws_s3_bucket_public_access_block" "lambdas_s3_public_access_block" {
 }
 
 resource "aws_s3_bucket_policy" "bucket-policy-lambdas" {
-  bucket = "${aws_s3_bucket.ee_slack_gardener_lambdas.id}"
+  bucket = "${aws_s3_bucket.lambda_artefacts.id}"
   policy =<<POLICY
 {
     "Version": "2012-10-17",
@@ -27,9 +31,9 @@ resource "aws_s3_bucket_policy" "bucket-policy-lambdas" {
         {
             "Sid": "Stmt1507196865806",
             "Effect": "Allow",
-            "Principal": {"AWS":"044357138720"},
+            "Principal": {"AWS":"${var.account_number}"},
             "Action": "s3:*",
-            "Resource": "arn:aws:s3:::ee-slack-gardener-lambdas"
+            "Resource": "arn:aws:s3:::${var.lambda_artefact_bucket_name}"
         }
     ]
 }
@@ -37,18 +41,22 @@ POLICY
 }
 
 
-resource "aws_s3_bucket" "ee_slack_gardener_logs" {
-  bucket = "ee-slack-gardener-logs"
+resource "aws_s3_bucket" "lambda_logs" {
+  bucket = "${var.lambda_logs_bucket_name}"
   acl    = "private"
 
   versioning {
     enabled = true
   }
 
+  lifecycle {
+    prevent_destroy = true
+  }
+
 }
 
 resource "aws_s3_bucket_public_access_block" "logs_s3_public_access_block" {
-  bucket = "${aws_s3_bucket.ee_slack_gardener_logs.id}"
+  bucket = "${aws_s3_bucket.lambda_logs.id}"
 
   block_public_acls   = true
   block_public_policy = true
@@ -57,7 +65,7 @@ resource "aws_s3_bucket_public_access_block" "logs_s3_public_access_block" {
 }
 
 resource "aws_s3_bucket_policy" "bucket-policy-logs" {
-  bucket = "${aws_s3_bucket.ee_slack_gardener_logs.id}"
+  bucket = "${aws_s3_bucket.lambda_logs.id}"
   policy =<<POLICY
 {
     "Version": "2012-10-17",
@@ -66,20 +74,20 @@ resource "aws_s3_bucket_policy" "bucket-policy-logs" {
         {
             "Sid": "Stmt1507196865806",
             "Effect": "Allow",
-            "Principal": {"AWS":"044357138720"},
+            "Principal": {"AWS":"${var.account_number}"},
             "Action": "s3:*",
-            "Resource": "arn:aws:s3:::ee-slack-gardener-logs"
+            "Resource": "arn:aws:s3:::${var.lambda_logs_bucket_name}"
         },
         {
           "Action": "s3:GetBucketAcl",
           "Effect": "Allow",
-          "Resource": "arn:aws:s3:::ee-slack-gardener-logs",
+          "Resource": "arn:aws:s3:::${var.lambda_logs_bucket_name}",
           "Principal": { "Service": "logs.eu-west-1.amazonaws.com" }
         },
         {
           "Action": "s3:PutObject" ,
           "Effect": "Allow",
-          "Resource": "arn:aws:s3:::ee-slack-gardener-logs/*",
+          "Resource": "arn:aws:s3:::${var.lambda_logs_bucket_name}/*",
           "Condition": { "StringEquals": { "s3:x-amz-acl": "bucket-owner-full-control" } },
           "Principal": { "Service": "logs.eu-west-1.amazonaws.com" }
         }
