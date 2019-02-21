@@ -1,10 +1,10 @@
-resource "aws_cloudwatch_log_group" "ee_slack_gardener_cw_log_group" {
-  name = "/aws/lambda/ee-slack-gardener"
+resource "aws_cloudwatch_log_group" "lambda_cw_log_group" {
+  name = "/aws/lambda/${var.lambda_name}"
 }
 
 
-resource "aws_cloudwatch_metric_alarm" "slack_gardener_error" {
-  alarm_name = "Slack Gardener"
+resource "aws_cloudwatch_metric_alarm" "lambda_error_alarm" {
+  alarm_name = "${var.lambda_display_name}"
   comparison_operator = "GreaterThanThreshold"
   evaluation_periods = "1"
   metric_name = "Errors"
@@ -12,17 +12,17 @@ resource "aws_cloudwatch_metric_alarm" "slack_gardener_error" {
   period = "86400"
   statistic = "Minimum"
   threshold = "0"
-  alarm_description = "The slack gardener lambda has failed to run in the last 24 hours"
+  alarm_description = "The ${var.lambda_name} lambda has failed to run in the last 24 hours"
   alarm_actions = [
-    "${aws_sns_topic.gardener_error_alarm.arn}"]
+    "${aws_sns_topic.lambda_error_alarm.arn}"]
 
   dimensions {
-    FunctionName = "ee-slack-gardener"
+    FunctionName = "${var.lambda_name}"
   }
 }
 
-resource "aws_sns_topic" "gardener_error_alarm" {
-  name = "EE_Slack_Gardener_Engineers"
+resource "aws_sns_topic" "lambda_error_alarm" {
+  name = "${var.sns_topic}"
   policy = <<EOF
     {
   "Version": "2008-10-17",
@@ -45,10 +45,10 @@ resource "aws_sns_topic" "gardener_error_alarm" {
         "SNS:Publish",
         "SNS:Receive"
       ],
-      "Resource": "arn:aws:sns:eu-west-1:044357138720:EE_Slack_Gardener_Engineers",
+      "Resource": "arn:aws:sns:eu-west-1:${var.account_number}:${var.sns_topic}",
       "Condition": {
         "StringEquals": {
-          "AWS:SourceOwner": "044357138720"
+          "AWS:SourceOwner": "${var.account_number}"
         }
       }
     }

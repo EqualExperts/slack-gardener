@@ -1,5 +1,5 @@
-resource "aws_cloudwatch_dashboard" "ee-slack-gardener-dashboard" {
-  dashboard_name = "ee-slack-gardener-dashboard"
+resource "aws_cloudwatch_dashboard" "lambda-dashboard" {
+  dashboard_name = "${var.lambda_name}-dashboard"
 
   dashboard_body = <<EOF
  {
@@ -11,7 +11,7 @@ resource "aws_cloudwatch_dashboard" "ee-slack-gardener-dashboard" {
             "width": 24,
             "height": 6,
             "properties": {
-                "query": "SOURCE '/aws/lambda/ee-slack-gardener' | fields @timestamp, @message\n| sort @timestamp desc",
+                "query": "SOURCE '/aws/lambda/${var.lambda_name}' | fields @timestamp, @message\n| sort @timestamp desc",
                 "region": "eu-west-1"
             }
         },
@@ -23,13 +23,13 @@ resource "aws_cloudwatch_dashboard" "ee-slack-gardener-dashboard" {
             "height": 6,
             "properties": {
                 "metrics": [
-                    [ "AWS/Lambda", "Invocations", "FunctionName", "ee-slack-gardener", { "period": 604800, "stat": "Sum", "label": "Lambda Invocations" } ],
+                    [ "AWS/Lambda", "Invocations", "FunctionName", "${var.lambda_name}", { "period": 604800, "stat": "Sum", "label": "Lambda Invocations" } ],
                     [ ".", "Errors", ".", ".", { "period": 604800, "stat": "Sum", "label": "Lambda Errors" } ],
                     [ ".", "Duration", ".", ".", { "period": 604800, "stat": "Sum", "label": "Lambda Duration" } ],
                     [ ".", "Throttles", ".", ".", { "period": 604800, "stat": "Sum", "label": "Lambda Throttles" } ],
-                    [ "AWS/Logs", "IncomingLogEvents", "LogGroupName", "/aws/lambda/ee-slack-gardener", { "period": 604800, "stat": "Sum", "label": "LogGroup IncomingLogEvents" } ],
+                    [ "AWS/Logs", "IncomingLogEvents", "LogGroupName", "/aws/lambda/${var.lambda_name}", { "period": 604800, "stat": "Sum", "label": "LogGroup IncomingLogEvents" } ],
                     [ ".", "IncomingBytes", ".", ".", { "period": 604800, "stat": "Sum", "label": "LogGroup IncomingBytes" } ],
-                    [ "AWS/SNS", "PublishSize", "TopicName", "EE_Slack_Gardener_Engineers", { "period": 604800, "stat": "Sum", "label": "SNS PublishSize" } ],
+                    [ "AWS/SNS", "PublishSize", "TopicName", "${var.sns_topic}", { "period": 604800, "stat": "Sum", "label": "SNS PublishSize" } ],
                     [ ".", "NumberOfNotificationsFailed", ".", ".", { "period": 604800, "stat": "Sum", "label": "SNS NotificationsFailed" } ],
                     [ ".", "NumberOfMessagesPublished", ".", ".", { "period": 604800, "stat": "Sum", "label": "SNS NumberOfMessagesPublished" } ],
                     [ ".", "NumberOfNotificationsDelivered", ".", ".", { "period": 604800, "stat": "Sum", "label": "SNS NotificationsDelivered" } ]
