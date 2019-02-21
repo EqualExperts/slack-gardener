@@ -8,7 +8,6 @@ terragrunt = {
   }
 }
 
-account_number = "044357138720"
 lambda_artefact_bucket_name = "ee-slack-gardener-lambdas"
 lambda_logs_bucket_name = "ee-slack-gardener-logs"
 lambda_name = "ee-slack-gardener"

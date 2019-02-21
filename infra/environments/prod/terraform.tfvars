@@ -32,4 +32,5 @@ terragrunt = {
   }
 }
 
+account_number = "044357138720"
 region = "eu-west-1"
