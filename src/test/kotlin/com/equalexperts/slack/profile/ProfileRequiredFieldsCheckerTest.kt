@@ -20,6 +20,6 @@ internal class ProfileRequiredFieldsCheckerTest {
         val result = ProfileFieldRuleResult("TEST_FIELD", false)
         whenever(rule.checkProfile(user)).thenReturn(result)
         checker.checkMissingFields(user)
-        verify(rule, atMost(1)).checkProfile(user)
+        verify(rule).checkProfile(user)
     }
 }

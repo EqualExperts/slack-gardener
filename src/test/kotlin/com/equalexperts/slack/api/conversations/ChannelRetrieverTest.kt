@@ -22,7 +22,7 @@ internal class ChannelRetrieverTest {
 
         val channels = ConversationsSlackApi.listAll(mockConversationsSlackApi)
 
-        verify(mockConversationsSlackApi, atMost(1)).list()
+        verify(mockConversationsSlackApi).list()
 
         assertEquals(setOf(testChannel), channels)
     }
@@ -46,8 +46,8 @@ internal class ChannelRetrieverTest {
 
         val channels = ConversationsSlackApi.listAll(mockConversationsSlackApi)
 
-        verify(mockConversationsSlackApi, atMost(1)).list()
-        verify(mockConversationsSlackApi, atMost(1)).list(cursorToken)
+        verify(mockConversationsSlackApi).list()
+        verify(mockConversationsSlackApi).list(cursorToken)
 
         assertEquals(setOf(testChannel, testChannelTwo), channels)
     }
