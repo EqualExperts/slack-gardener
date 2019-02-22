@@ -35,7 +35,7 @@ internal class UserRetrieverTest {
 
         val channels = UsersSlackApi.listAll(mockUsersSlackApi)
 
-        verify(mockUsersSlackApi, atMost(1)).list()
+        verify(mockUsersSlackApi).list()
 
         assertEquals(setOf(testUser), channels)
     }
@@ -82,8 +82,8 @@ internal class UserRetrieverTest {
 
         val channels = UsersSlackApi.listAll(mockUsersSlackApi)
 
-        verify(mockUsersSlackApi, atMost(1)).list()
-        verify(mockUsersSlackApi, atMost(1)).list(cursorToken)
+        verify(mockUsersSlackApi).list()
+        verify(mockUsersSlackApi).list(cursorToken)
 
         assertEquals(setOf(testUser, testUserTwo), channels)
     }

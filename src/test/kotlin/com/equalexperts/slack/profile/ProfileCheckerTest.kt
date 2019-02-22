@@ -93,8 +93,8 @@ internal class ProfileCheckerTest {
 
         checker.process()
 
-        verify(mockConversationSlackApi, atMost(1)).conversationOpen(user)
-        verify(mockChatSlackApi, atMost(1)).postMessage(channelId, mockBotUser, warningMessage)
+        verify(mockConversationSlackApi).conversationOpen(user)
+        verify(mockChatSlackApi).postMessage(channelId, mockBotUser, warningMessage)
     }
 
     @Test
@@ -125,7 +125,7 @@ internal class ProfileCheckerTest {
 
         checker.process()
 
-        verify(mockConversationSlackApi, atMost(1)).conversationOpen(user)
+        verify(mockConversationSlackApi).conversationOpen(user)
         verify(mockChatSlackApi, never()).postMessage(channelId, mockBotUser, warningMessage)
     }
 
@@ -157,8 +157,8 @@ internal class ProfileCheckerTest {
 
         checker.process()
 
-        verify(mockConversationSlackApi, atMost(1)).conversationOpen(user)
-        verify(mockChatSlackApi, atMost(1)).postMessage(channelId, mockBotUser, warningMessage)
+        verify(mockConversationSlackApi).conversationOpen(user)
+        verify(mockChatSlackApi).postMessage(channelId, mockBotUser, warningMessage)
     }
 
     @Test
