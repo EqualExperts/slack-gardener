@@ -1,0 +1,104 @@
+package com.equalexperts.slack.profile.rules
+
+import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.github.kittinunf.fuel.core.Client
+import com.github.kittinunf.fuel.core.FuelManager
+import com.github.kittinunf.fuel.core.Response
+import com.nhaarman.mockitokotlin2.any
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
+import org.junit.jupiter.api.Assertions.*
+import org.junit.jupiter.api.Test
+import java.net.URL
+
+
+internal class ProfilePictureRuleTest {
+
+    @Test
+    fun `should return true for user-uploaded picture`() {
+        val testUrl = "https://TEST_URL"
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
+        val testUser = UsersForTesting.testBot(userProfile)
+        val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
+
+        val inputStream = getResource("/empty.jpg")
+        val client = mock<Client> {
+            onGeneric { executeRequest(any()) } doReturn Response(
+                    statusCode = 200,
+                    responseMessage = "ok",
+                    dataStream = inputStream,
+                    url=URL(testUrl)
+            )
+        }
+        FuelManager.instance.client = client
+
+        val result = rule.checkProfile(testUser)
+        assertTrue(result.result)
+    }
+
+    @Test
+    fun `should return false for non user-uploaded picture`() {
+        val testUrl = "https://TEST_URL"
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
+        val testUser = UsersForTesting.testBot(userProfile)
+        val rule = ProfilePictureRule(setOf("d41d8cd98f00b204e9800998ecf8427e"))
+
+        val inputStream = getResource("/empty.jpg")
+        val client = mock<Client> {
+            onGeneric { executeRequest(any()) } doReturn Response(
+                    statusCode = 200,
+                    responseMessage = "ok",
+                    dataStream = inputStream,
+                    url=URL(testUrl)
+            )
+        }
+        FuelManager.instance.client = client
+
+        val result = rule.checkProfile(testUser)
+        assertFalse(result.result)
+    }
+
+
+    @Test
+    fun `should return false for missing picture`() {
+
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = null)
+        val testUser = UsersForTesting.testBot(userProfile)
+        val rule = ProfilePictureRule(setOf("TEST_HASH"))
+
+        val result = rule.checkProfile(testUser)
+        assertFalse(result.result)
+    }
+
+
+    @Test
+    fun `should return false for error picture`() {
+        val testUrl = "https://TEST_URL"
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
+        val testUser = UsersForTesting.testBot(userProfile)
+        val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
+
+        val inputStream = getResource("/empty.jpg")
+        val client = mock<Client> {
+            onGeneric { executeRequest(any()) } doReturn Response(
+                    statusCode = 404,
+                    responseMessage = "not found",
+                    dataStream = inputStream,
+                    url=URL(testUrl)
+            )
+        }
+        FuelManager.instance.client = client
+
+        val thrown = assertThrows(Exception::class.java,
+                { rule.checkProfile(testUser) },
+                "Expected rule.checkProfile(testUser) to throw, but it didn't")
+
+        val expectedMessageThrown = thrown.message!!.contains("Unable to retrieve Profile Picture for user TEST_BOT_USER - https://TEST_URL {com.github.kittinunf.fuel.core.HttpException: HTTP Exception 404 not found}")
+        assertTrue(expectedMessageThrown)
+    }
+
+
+    private fun getResource(resource: String) = javaClass.getResourceAsStream(resource)
+
+}

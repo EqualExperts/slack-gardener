@@ -18,33 +18,65 @@ class AwsLambda : RequestHandler<Any, Unit> {
     fun process() {
         val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
         val request = GetParametersRequest()
-        request.withNames("slack.profile.oauth.access_token", "slack.profile.bot.oauth.access_token").withDecryption = true
+
+        val profileOauthAccessTokenParamName = "slack.profile.oauth.access_token"
+        val profileBotOauthAccessTokenParamName = "slack.profile.bot.oauth.access_token"
+        val profileUriParamName = "slack.profile.uri"
+        val warningWaitDaysParamName = "slack.profile.warning.wait.days"
+        val warningMessageParamName = "slack.profile.warning.wait.message"
+
+        request.withNames(
+                profileOauthAccessTokenParamName,
+                profileBotOauthAccessTokenParamName,
+                profileUriParamName,
+                warningWaitDaysParamName,
+                warningMessageParamName).withDecryption = true
         val parameterResults = client.getParameters(request)
-        val slackOauthAccessToken = parameterResults.parameters.find { it.name == "slack.profile.oauth.access_token" }?.value!!
-        val slackBotOauthAccessToken = parameterResults.parameters.find { it.name == "slack.profile.bot.oauth.access_token" }?.value!!
 
-        val slackUri = URI("https://api.slack.com")
+        val slackOauthAccessToken = parameterResults.parameters.find { it.name == profileOauthAccessTokenParamName }?.value!!
+        val slackBotOauthAccessToken = parameterResults.parameters.find { it.name == profileBotOauthAccessTokenParamName }?.value!!
 
-        val warningMessage = """Hi <@%s>
-                            |It looks like you haven't set some basic profile fields that the EE Slack Usage Guide recommends
-                            |Please complete your slack profile, it helps people recognise you both in and outside slack.
-                            |Your Slack profile should have at least the following fields set:
-                            |Full Name - Your name, not your userid (e.g. "Slack Gardener" not "slackgardener")
-                            |Display Name - What you’d like people to refer to you in slack
-                            |Profile Photo - A picture that accurately represents you, so people can identify you
-                            |What I Do
-                            |EE Client (if applicable)
-                            |Home Base - So people know where you generally are located
-                            |""".trimMargin().replace('\n', ' ')
+        val slackUriRaw = parameterResults.parameters.find { it.name == profileUriParamName }?.value!!
+        val slackUri = URI(slackUriRaw)
 
-        val warningWaitDays = 3
-        
+        val warningWaitDays = parameterResults.parameters.find { it.name == warningWaitDaysParamName }?.value!!.toInt()
+        val warningMessage = parameterResults.parameters.find { it.name == warningMessageParamName }?.value!!
+
+
+        //Calculated using ProfileChecker.getDefaultMd5Hashes()
+        val knownDefaultPictureMd5Hashes = setOf(
+                "26cc91d812f0da60c876e85d57297da0",
+                "fe38d005d3a27996b5de82e32d722eb1",
+                "9e047fa43bbb0f5b38130859de6e86ab",
+                "9a9003f8ebc0533afca6649c6f5a577c",
+                "6464c1bb3b2a13e1ff33a90bec01bba0",
+                "a98ee59013dab5a54931d21f328d4be9",
+                "792dd7a0a57e525248aa1bf19f0c8fe3",
+                "a4d2ad061f6d9d6b095b7e32af8bb9c0",
+                "8a4f0a054770a968f4005fbd4a62261c",
+                "b9d047ec1808b212d01f7a46999f440c",
+                "3ebd18250f38e2078bf54133c408b94f",
+                "e07b34a65d70a0cbd87685a4305cc16b",
+                "496fffd0d34c7c9e3ed8945db90598ed",
+                "d015d23e1ff68a89059c415bf3153794",
+                "37a2cffb8704125edbd8a74fbb4004aa",
+                "975d1a4e88db34fa91aece790f480b45",
+                "fa45664e817efd1fd2c30f904887680e",
+                "b8eb58868fc9712f6ad87f48d4f791fd",
+                "faa43522398fc58472c21210c0a4fe90",
+                "64f3d05362c4afeb8cc6e25a6082703e",
+                "b1ed1856b88a98273a1b234643051cd2",
+                "e87ce31334dcf92eb39c4fd0bed05e65",
+                "a537cfd65e3f4b655637e78753bce530",
+                "93ac368757cb78b07703bf2ec75a006a",
+                "ab9d10bf2f9773efeb4a10d632a2a0bd")
+
         val profileChecker = ProfileChecker.build(slackUri,
                 slackOauthAccessToken,
                 slackBotOauthAccessToken,
                 warningMessage,
-                warningWaitDays)
-
+                warningWaitDays,
+                knownDefaultPictureMd5Hashes)
 
         profileChecker.process()
     }

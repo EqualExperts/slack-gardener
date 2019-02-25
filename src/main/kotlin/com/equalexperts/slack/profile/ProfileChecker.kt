@@ -8,6 +8,10 @@ import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
 import com.equalexperts.slack.profile.rules.*
+import com.github.kittinunf.fuel.core.FuelError
+import com.github.kittinunf.fuel.httpGet
+import com.github.kittinunf.result.Result
+import org.apache.commons.codec.digest.DigestUtils
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
@@ -26,6 +30,42 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
                      private val warningThreshold: ZonedDateTime) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
+
+    fun getDefaultMd5Hashes(): Set<String> {
+        val users = UsersSlackApi.listAll(usersSlackApi)
+                .filter { !it.is_bot }
+                .filter { !it.is_deleted }
+        val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
+                .filter { it.profile.bot_id.isNullOrBlank() }
+
+        val md5Hashes = mutableMapOf<String, Int>()
+        for (user in usersWithDetailedProfiles) {
+            user.profile.image_24?.let {
+                user.profile.image_24.httpGet().response { request, response, result ->
+                    when (result) {
+                        is Result.Failure<ByteArray, FuelError> -> {
+                            logger.info("Couldn't get image for $user.name")
+                        }
+                        is Result.Success<ByteArray, FuelError> -> {
+                            val md5sum = DigestUtils.md5Hex(response.dataStream)
+
+                            val containsKey = md5Hashes.containsKey(md5sum)
+                            if (containsKey) {
+                                md5Hashes[md5sum] = md5Hashes.getValue(md5sum) + 1
+                            } else {
+                                md5Hashes[md5sum] = 1
+                            }
+                            logger.info("md5 for $user.name is $md5sum")
+                        }
+                    }
+                }
+            } ?: logger.info("Couldn't get profile pic url for $user.name")
+        }
+
+        logger.info("$md5Hashes")
+        val numberOfRealAccountsWithDuplicatedPictures = 3
+        return md5Hashes.filter { it.value > numberOfRealAccountsWithDuplicatedPictures }.keys
+    }
 
     fun process() {
         val users = UsersSlackApi.listAll(usersSlackApi)
@@ -75,7 +115,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     }
 
     companion object {
-        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int): ProfileChecker {
+        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int, knownDefaultPictureMd5Hashes: Set<String>): ProfileChecker {
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
             val chatSlackApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
@@ -90,7 +130,8 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
             val rules = listOf(ProfileFieldRealNameRule(),
                     ProfileFieldDisplayNameRule(),
                     ProfileFieldTitleRule(),
-                    ProfileFieldHomeBaseRule(teamCustomProfileFields))
+                    ProfileFieldHomeBaseRule(teamCustomProfileFields),
+                    ProfilePictureRule(knownDefaultPictureMd5Hashes))
 
             val botUserId = authSlackApi.authenticate().id
             val botUser = usersSlackApi.getUserInfo(botUserId).user
