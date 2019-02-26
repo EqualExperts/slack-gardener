@@ -30,7 +30,7 @@ class ProfilePictureRule(private val knownDefaultPictureMd5Hashes: Set<String>) 
                 throw Exception("Unable to retrieve Profile Picture for user ${user.name} - $image_24 {$ex}")
             }
             is Result.Success<ByteArray, FuelError> -> {
-                val md5sum = DigestUtils.md5Hex(response.dataStream)
+                val md5sum = DigestUtils.md5Hex(response.data)
 
                 return md5sum !in knownDefaultPictureMd5Hashes
             }
