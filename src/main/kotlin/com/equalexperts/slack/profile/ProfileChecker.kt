@@ -96,7 +96,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
 
     private fun haveWeMessagedThemRecently(conversationId: String): Boolean {
         val channelHistory = conversationsSlackApi.channelHistory(conversationId)
-        if (channelHistory.messages.isEmpty()) return false
+        if (channelHistory.messages.isEmpty()) return true
 
         val lastMessage = channelHistory.messages.first()
 
