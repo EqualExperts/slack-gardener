@@ -116,7 +116,7 @@ internal class ProfileCheckerTest {
         whenever(mockConversationSlackApi.conversationOpen(user)).thenReturn(openConversationResponse)
 
         val yesterday = ZonedDateTime.now().minusDays(1)
-        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday))
+        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
         whenever(mockConversationSlackApi.channelHistory(channelId)).thenReturn(ConversationHistoriesForTesting.withEmptyCursorToken(messages))
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
@@ -148,7 +148,7 @@ internal class ProfileCheckerTest {
         whenever(mockConversationSlackApi.conversationOpen(user)).thenReturn(openConversationResponse)
 
         val yesterday = ZonedDateTime.now().minusDays(3)
-        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday))
+        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
         whenever(mockConversationSlackApi.channelHistory(channelId)).thenReturn(ConversationHistoriesForTesting.withEmptyCursorToken(messages))
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
