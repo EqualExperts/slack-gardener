@@ -42,7 +42,7 @@ internal class ProfilePictureRuleTest {
         val testUrl = "https://TEST_URL"
         val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
         val testUser = UsersForTesting.testBot(userProfile)
-        val rule = ProfilePictureRule(setOf("d41d8cd98f00b204e9800998ecf8427e"))
+        val rule = ProfilePictureRule(setOf("0e9c7b8f33e92621323f0a2f4892ff7c"))
 
         val inputStream = getResource("/empty.jpg")
         val client = mock<Client> {
