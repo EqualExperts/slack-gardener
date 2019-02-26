@@ -21,11 +21,10 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                private val chatSlackApi: ChatSlackApi,
                private val botUser: User,
                private val clock: Clock,
-               private val defaultIdlePeriod: Period,
+               private val channelStateCalculator: ChannelStateCalculator,
                private val warningPeriod: Period,
-               private val longIdlePeriodChannels: Collection<String>,
-               private val longIdlePeriod: Period,
                private val warningMessage: String) {
+
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun process() {
@@ -34,7 +33,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             logger.info("${channels.size} channels found")
 
             val data = channels.parallelStream()
-                    .map { Pair(it, this.determineChannelState(it, botUser)) }
+                    .map { Pair(it, channelStateCalculator.determineChannelState(it, botUser)) }
                     .peek { (it, state) ->
                         val staleMessage = when (state) {
                             Active -> "not stale"
@@ -69,53 +68,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
         logger.info("done in ${nanoTime / 1_000_000} ms")
     }
 
-    private fun determineChannelState(channel: Conversation, botUser: User): ChannelState {
-        val idlePeriod = determineIdlePeriod(channel)
-        val timeLimit = ZonedDateTime.now(clock) - idlePeriod
-
-        val channelCreatedAfterTimeLimitThreshold = channel.created >= timeLimit
-        if (channelCreatedAfterTimeLimitThreshold) {
-            return ChannelState.Active //new channels count as active
-        }
-
-        //TODO: we start at the oldest time and page forward. Paging backward instead will be faster when a channel has already been warned.
-
-
-        var lastWarning: ZonedDateTime? = null
-        var timestamp = Timestamp(timeLimit)
-
-        do {
-            logger.debug("Searching for human message in channel ${channel.name} from $timestamp")
-            val history = conversationSlackApi.channelHistory(channel, timestamp)
-            val messages = history.messages
-
-            val noMessagesSinceThreshold = messages.isEmpty()
-            if (noMessagesSinceThreshold) {
-                break
-            }
-
-            val messageSentFromHumanBeingOrBotBeforeThreshold = !messages.none {
-                val humanMessage = it.type == "message" && it.subtype == null
-                val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" && it.bot_id != botUser.profile.bot_id
-                humanMessage || nonGardenerBotMessage
-            }
-
-            if (messageSentFromHumanBeingOrBotBeforeThreshold) {
-                return ChannelState.Active //found a message typed by an actual human being or a non-gardener bot
-            }
-
-            val lastGardenerMessage = messages.findLast {
-                it.bot_id == botUser.profile.bot_id && it.subtype == "bot_message"
-            }
-            lastWarning = lastGardenerMessage?.timestamp?.toZonedDateTime() ?: lastWarning
-            timestamp = messages.last().timestamp
-        } while (history.has_more)
-
-        if (lastWarning != null) {
-            return ChannelState.StaleAndWarned(lastWarning)
-        }
-        return ChannelState.Stale
-    }
 
     private fun postWarning(it: Pair<Conversation, ChannelState>) {
         if (it.second != Stale) {
@@ -149,13 +101,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
         }
     }
 
-    private fun determineIdlePeriod(channel: Conversation): Period {
-        if (longIdlePeriodChannels.contains(channel.name)) {
-            return longIdlePeriod
-        }
-        return defaultIdlePeriod
-    }
-
 
     companion object {
         fun build(slackUri: URI,
@@ -166,7 +111,6 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                   longIdleYears: Int,
                   longIdlePeriodChannels: Collection<String>,
                   warningMessage: String): Gardener {
-
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
@@ -185,7 +129,9 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
             val warningPeriod = Period.ofWeeks(warningWeeks)
             val longIdlePeriod = Period.ofYears(longIdleYears)
 
-            return Gardener(conversationsSlackApi, chatSlackApi, botUser, clock, defaultIdlePeriod, warningPeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+            val channelStateCalculator = ChannelStateCalculator(conversationsSlackApi, clock, defaultIdlePeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
+
+            return Gardener(conversationsSlackApi, chatSlackApi, botUser, clock, channelStateCalculator, warningPeriod, warningMessage)
         }
     }
 }
