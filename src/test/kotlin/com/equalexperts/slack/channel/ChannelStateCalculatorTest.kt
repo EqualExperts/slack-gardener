@@ -33,8 +33,8 @@ class ChannelStateCalculatorTest {
 
     private val warningMessageContent = "WARNING MESSAGE"
 
-    private val gardenerUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile().copy(bot_id="GARDENER_BOT_ID")).copy(name="GARDENER", id="GARDENER_BOT_ID")
-    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile().copy(bot_id = "NON_GARDENER_BOT_ID")).copy(id="NON_GARDENER_BOT_ID")
+    private val gardenerUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile().copy(bot_id = "GARDENER_BOT_ID")).copy(name = "GARDENER", id = "GARDENER_BOT_ID")
+    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile().copy(bot_id = "NON_GARDENER_BOT_ID")).copy(id = "NON_GARDENER_BOT_ID")
     private val humanUser = UsersForTesting.testUser(profile = UserProfilesForTesting.testUserProfile())
 
     private val longIdlePeriodChannelName = "CHECK_YEARLY_CHANNEL_NAME"
@@ -58,7 +58,7 @@ class ChannelStateCalculatorTest {
     private val channel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
     private val longIdlePeriodChannel = Conversation("TEST_ID", longIdlePeriodChannelName, Instant.EPOCH.epochSecond, 1)
 
-    private lateinit var freshlyCreatedChannel : Conversation
+    private lateinit var freshlyCreatedChannel: Conversation
 
 
     @BeforeEach
@@ -70,7 +70,7 @@ class ChannelStateCalculatorTest {
         whenever(clock.instant()).thenReturn(getNow())
         whenever(clock.zone).thenReturn(ZoneOffset.UTC)
 
-        freshlyCreatedChannel = Conversation("TEST_ID", "CHANNEL_NAME", getNow().minus(defaultIdlePeriod.minusDays(2)).epochSecond , 1)
+        freshlyCreatedChannel = Conversation("TEST_ID", "CHANNEL_NAME", getNow().minus(defaultIdlePeriod.minusDays(2)).epochSecond, 1)
         warningThreshold = ZonedDateTime.now(clock) - warningPeriod
         afterWarningThreshold = warningThreshold - warningPeriod
         beforeWarningThreshold = warningThreshold + Period.ofDays(3)

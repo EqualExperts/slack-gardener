@@ -30,7 +30,7 @@ fun main() {
 
     val peopleToImport = emptyList<String>()
 
-    ChannelMemberImporter(conversationsSlackApi,usersSlackApi).process("uks", peopleToImport)
+    ChannelMemberImporter(conversationsSlackApi, usersSlackApi).process("uks", peopleToImport)
 }
 
 
@@ -42,10 +42,10 @@ class ChannelMemberImporter(private val conversationApi: ConversationsSlackApi, 
         logger.info("Finding users")
         val users = UsersSlackApi.listAll(userApi)
 
-        val channelId = ConversationsSlackApi.listAll(conversationApi).first{ it.name == channelName }.id
+        val channelId = ConversationsSlackApi.listAll(conversationApi).first { it.name == channelName }.id
 
         val userIds = users.filter { it.profile.email in userEmails }
-                .map { Pair(it,it.id) }
+                .map { Pair(it, it.id) }
         logger.info("User Ids for emails: $userIds")
         logger.info("Inviting users to channel")
 

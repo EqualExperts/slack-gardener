@@ -2,7 +2,6 @@ package com.equalexperts.slack.api.conversations
 
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.channel.ConversationListsForTesting
-import com.nhaarman.mockitokotlin2.atMost
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever

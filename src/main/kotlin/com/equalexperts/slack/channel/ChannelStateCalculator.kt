@@ -27,13 +27,13 @@ sealed class ChannelState {
 }
 
 
-class ChannelStateCalculator (
+class ChannelStateCalculator(
         private val conversationSlackApi: ConversationsSlackApi,
         private val clock: Clock,
         private val defaultIdlePeriod: Period,
         private val longIdlePeriodChannels: Collection<String>,
         private val longIdlePeriod: Period,
-        private val warningMessage: String){
+        private val warningMessage: String) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 

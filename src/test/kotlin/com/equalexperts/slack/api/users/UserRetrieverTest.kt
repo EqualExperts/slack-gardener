@@ -3,7 +3,6 @@ package com.equalexperts.slack.api.users
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserListsForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
-import com.nhaarman.mockitokotlin2.atMost
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever

@@ -4,7 +4,6 @@ import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.api.users.UsersSlackApi
-import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserListsForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.mock
@@ -23,7 +22,7 @@ internal class ChannelMemberInviterTest {
         val numberOfUsersToCreate = 31
         val users = (0..numberOfUsersToCreate).map {
             val profile = UserProfilesForTesting.testUserProfile().copy(email = "test$it@email.com")
-            UsersForTesting.testUser(profile = profile).copy(id="id_$it")
+            UsersForTesting.testUser(profile = profile).copy(id = "id_$it")
         }
 
         whenever(mockUsersApi.list()).thenReturn(UserListsForTesting.withEmptyCursorToken(users))
@@ -32,7 +31,7 @@ internal class ChannelMemberInviterTest {
         whenever(mockConversationApi.list()).thenReturn(ConversationListsForTesting.withEmptyCursorToken(conversation))
 
         val channelMemberImporter = ChannelMemberImporter(mockConversationApi, mockUsersApi)
-        val usersToInvite = (0..numberOfUsersToCreate).map { "test$it@email.com"}
+        val usersToInvite = (0..numberOfUsersToCreate).map { "test$it@email.com" }
 
         channelMemberImporter.process(conversation.name, usersToInvite)
 
