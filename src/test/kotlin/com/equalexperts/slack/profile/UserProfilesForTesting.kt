@@ -19,7 +19,8 @@ object UserProfilesForTesting {
             "TEST_IMAGE_192_URL",
             "TEST_IMAGE_512_URL",
             "TEST_IMAGE_1024_URL",
-            mapOf())
+            mapOf(),
+            "TEST_EMAIL@ADDRESS.COM")
 
     fun testUserProfile(): UserProfile = UserProfile(null,
             "TEST_REAL_NAME",
@@ -37,5 +38,6 @@ object UserProfilesForTesting {
             "TEST_IMAGE_192_URL",
             "TEST_IMAGE_512_URL",
             "TEST_IMAGE_1024_URL",
-            mapOf())
+            mapOf(),
+            "TEST_EMAIL@ADDRESS.COM")
 }

@@ -15,9 +15,9 @@ class ChannelMemberExportCsvFormat(private val conversationApi: ConversationsSla
             val members = conversationApi.members(eeAlumniChannel)
 
             val users = members.members
-                    .map { it -> UserId(it) }
-                    .map { it -> usersSlackApi.getUserInfo(it) }
-                    .map { it -> "${it.user.name}, ${it.user.is_restricted}, ${it.user.is_ultra_restricted} \n" }
+                    .map { UserId(it) }
+                    .map { usersSlackApi.getUserInfo(it) }
+                    .map { "${it.user.name}, ${it.user.is_restricted}, ${it.user.is_ultra_restricted} \n" }
 
 
             println("name, single, multi\n")
