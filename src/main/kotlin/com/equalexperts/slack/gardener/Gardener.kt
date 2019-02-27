@@ -4,10 +4,11 @@ import com.equalexperts.slack.api.auth.AuthSlackApi
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.rest.model.Timestamp
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
-import com.equalexperts.slack.gardener.ChannelState.*
+import com.equalexperts.slack.channel.ChannelState
+import com.equalexperts.slack.channel.ChannelState.*
+import com.equalexperts.slack.channel.ChannelStateCalculator
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
