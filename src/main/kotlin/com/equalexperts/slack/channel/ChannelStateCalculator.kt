@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener
+package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation

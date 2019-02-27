@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener
+package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.conversations.ConversationHistoriesForTesting
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
@@ -6,14 +6,12 @@ import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.rest.model.Message
 import com.equalexperts.slack.api.rest.model.MessagesForTesting
 import com.equalexperts.slack.api.users.UsersForTesting
-import com.equalexperts.slack.channel.ConversationListsForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.any
 import com.nhaarman.mockitokotlin2.doReturn
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.whenever
 import org.junit.jupiter.api.Assertions.assertEquals
-import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
 import org.junit.jupiter.api.TestInstance

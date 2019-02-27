@@ -3,8 +3,9 @@ package com.equalexperts.slack.gardener
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.rest.model.MessagesForTesting
 import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.channel.ChannelState
+import com.equalexperts.slack.channel.ChannelStateCalculator
 import com.equalexperts.slack.channel.ConversationListsForTesting
 import com.equalexperts.slack.profile.UserProfilesForTesting
 import com.nhaarman.mockitokotlin2.*
