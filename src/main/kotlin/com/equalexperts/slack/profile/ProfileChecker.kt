@@ -110,8 +110,9 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
 
     private fun addDetailedProfileToUser(user: User): User {
         val userProfile = userProfilesSlackApi.userProfile(UserId(user.id))
-        user.profile.fields = userProfile.profile.fields
-        return user
+        val newProfileFields = userProfile.profile.fields
+        val newUserProfile = user.profile.copy(fields = newProfileFields)
+        return user.copy(profile = newUserProfile)
     }
 
     companion object {

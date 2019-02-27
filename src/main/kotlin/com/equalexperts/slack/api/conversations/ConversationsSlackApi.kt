@@ -49,6 +49,10 @@ interface ConversationsSlackApi {
             @Param("name") name: String
     )
 
+    @RequestLine("GET /api/conversations.invite?channel={channel}&users={users}")
+    fun invite(@Param("channel") channel: String,
+               @Param("users") users: List<String>)
+
     companion object {
         private val logger = LoggerFactory.getLogger(this::class.java.name)
 
