@@ -28,7 +28,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 200,
                     responseMessage = "ok",
                     dataStream = inputStream,
-                    url=URL(testUrl)
+                    url = URL(testUrl)
             )
         }
         FuelManager.instance.client = client
@@ -50,7 +50,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 200,
                     responseMessage = "ok",
                     dataStream = inputStream,
-                    url=URL(testUrl)
+                    url = URL(testUrl)
             )
         }
         FuelManager.instance.client = client
@@ -85,7 +85,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 404,
                     responseMessage = "not found",
                     dataStream = inputStream,
-                    url=URL(testUrl)
+                    url = URL(testUrl)
             )
         }
         FuelManager.instance.client = client
