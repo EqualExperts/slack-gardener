@@ -22,7 +22,7 @@ data class UserProfile(val bot_id: String?,
                        val image_512: String?,
                        val image_1024: String?,
                        val fields: Map<String, UserProfileField>?,
-                       val email: String
+                       val email: String?
 )
 
 data class UserProfileField(val value: String, val alt: String)
