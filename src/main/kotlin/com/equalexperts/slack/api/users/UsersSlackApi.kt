@@ -14,7 +14,6 @@ import java.net.URI
 
 interface UsersSlackApi {
 
-
     @RequestLine("GET /api/users.info?user={user}")
     fun getUserInfo(@Param("user") userId: UserId): UserInfo
 
@@ -22,7 +21,6 @@ interface UsersSlackApi {
     fun list(@Param("cursorValue") cursorValue: String = ""): UserList
 
     companion object {
-        private val logger = LoggerFactory.getLogger(this::class.java.name)
 
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): UsersSlackApi {
             return feignBuilder()
@@ -31,35 +29,33 @@ interface UsersSlackApi {
                     .retryer(SlackRetrySupport(sleeper))
                     .target(UsersSlackApi::class.java, uri.toString())
         }
-
-
-        fun listAll(usersSlackApi: UsersSlackApi): Set<User> {
-            val users = mutableSetOf<User>()
-            var moreChannelsToList: Boolean
-            var cursorValue = ""
-            do {
-                val listResults = usersSlackApi.list(cursorValue)
-                val nextCursor = listResults.response_metadata.next_cursor
-
-                logger.debug("Users found, adding to list ${listResults.members}")
-                users += listResults.members
-
-                if (!nextCursor.isBlank()) {
-                    logger.debug("Found new cursor token to retrieve more users from, using cursor token $nextCursor")
-                    moreChannelsToList = true
-                    cursorValue = nextCursor
-
-                } else {
-                    logger.debug("No new cursor token, all users found")
-                    moreChannelsToList = false
-                }
-
-            } while (moreChannelsToList)
-            logger.info("${users.size} users found")
-            return users
-        }
     }
-
-
 }
 
+fun UsersSlackApi.listAll(): Set<User> {
+    val logger = LoggerFactory.getLogger(this::class.java.name)
+
+    val users = mutableSetOf<User>()
+    var moreChannelsToList: Boolean
+    var cursorValue = ""
+    do {
+        val listResults = list(cursorValue)
+        val nextCursor = listResults.response_metadata.next_cursor
+
+        logger.debug("Users found, adding to list ${listResults.members}")
+        users += listResults.members
+
+        if (!nextCursor.isBlank()) {
+            logger.debug("Found new cursor token to retrieve more users from, using cursor token $nextCursor")
+            moreChannelsToList = true
+            cursorValue = nextCursor
+
+        } else {
+            logger.debug("No new cursor token, all users found")
+            moreChannelsToList = false
+        }
+
+    } while (moreChannelsToList)
+    logger.info("${users.size} users found")
+    return users
+}

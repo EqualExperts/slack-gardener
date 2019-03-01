@@ -1,6 +1,7 @@
 package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
+import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.UserId
 import org.slf4j.LoggerFactory
@@ -11,7 +12,7 @@ class ChannelMemberExportCsvFormat(private val conversationApi: ConversationsSla
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val eeAlumniChannel = ConversationsSlackApi.listAll(conversationApi).first { it.name == channelname }
+            val eeAlumniChannel = conversationApi.listAll().first { it.name == channelname }
             val members = conversationApi.members(eeAlumniChannel)
 
             val users = members.members

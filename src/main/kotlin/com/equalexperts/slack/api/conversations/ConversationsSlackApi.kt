@@ -15,6 +15,70 @@ import feign.RequestLine
 import org.slf4j.LoggerFactory
 import java.net.URI
 
+fun ConversationsSlackApi.listAll(): Set<Conversation> {
+    val logger = LoggerFactory.getLogger(this::class.java.name)
+
+    logger.info("Retrieving Channels")
+
+    val channels = mutableSetOf<Conversation>()
+
+    var moreChannelsToList: Boolean
+    var cursorValue = ""
+    do {
+        val channelList = list(cursorValue)
+        val nextCursor = channelList.response_metadata.next_cursor
+
+        logger.debug("Channels found, adding to list ${channelList.channels}")
+        channels += channelList.channels
+
+        if (!nextCursor.isBlank()) {
+            logger.debug("Found new cursor token to retrieve more channels from, using cursor token $nextCursor")
+            moreChannelsToList = true
+            cursorValue = nextCursor
+
+        } else {
+            logger.debug("No new cursor token, all channels found")
+            moreChannelsToList = false
+        }
+
+    } while (moreChannelsToList)
+    logger.info("${channels.size} channels found")
+    return channels
+}
+
+
+fun ConversationsSlackApi.getFullConversationHistory(conversationId: String): List<Message> {
+    val logger = LoggerFactory.getLogger(this::class.java.name)
+
+    logger.info("Retrieving Messages")
+
+    val messages = mutableListOf<Message>()
+
+    var moreMessagesToGet: Boolean
+    var cursorValue = ""
+    do {
+        val conversationHistory = channelHistory(conversationId, cursorValue)
+        val nextCursor = conversationHistory.response_metadata?.next_cursor
+
+        logger.debug("Messages found, adding to list ${conversationHistory.messages}")
+        messages += conversationHistory.messages
+
+        val nextCursorPresent = nextCursor?.let { !it.isBlank() } ?: false
+        if (nextCursorPresent) {
+            logger.debug("Found new cursor token to retrieve more messages from, using cursor token $nextCursor")
+            moreMessagesToGet = true
+            cursorValue = nextCursor!!
+
+        } else {
+            logger.debug("No new cursor token, all messages found")
+            moreMessagesToGet = false
+        }
+
+    } while (moreMessagesToGet)
+    logger.info("${messages.size} messages found")
+    return messages
+}
+
 interface ConversationsSlackApi {
     @RequestLine("GET /api/conversations.list?exclude_archived=true&exclude_members=true&cursor={cursorValue}")
     fun list(@Param("cursorValue") cursorValue: String = ""): ConversationList
@@ -54,7 +118,6 @@ interface ConversationsSlackApi {
                @Param("users") users: List<String>)
 
     companion object {
-        private val logger = LoggerFactory.getLogger(this::class.java.name)
 
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): ConversationsSlackApi {
             return feignBuilder()
@@ -64,65 +127,6 @@ interface ConversationsSlackApi {
                     .target(ConversationsSlackApi::class.java, uri.toString())
         }
 
-        fun listAll(conversationsSlackApi: ConversationsSlackApi): Set<Conversation> {
-
-            logger.info("Retrieving Channels")
-
-            val channels = mutableSetOf<Conversation>()
-
-            var moreChannelsToList: Boolean
-            var cursorValue = ""
-            do {
-                val channelList = conversationsSlackApi.list(cursorValue)
-                val nextCursor = channelList.response_metadata.next_cursor
-
-                logger.debug("Channels found, adding to list ${channelList.channels}")
-                channels += channelList.channels
-
-                if (!nextCursor.isBlank()) {
-                    logger.debug("Found new cursor token to retrieve more channels from, using cursor token $nextCursor")
-                    moreChannelsToList = true
-                    cursorValue = nextCursor
-
-                } else {
-                    logger.debug("No new cursor token, all channels found")
-                    moreChannelsToList = false
-                }
-
-            } while (moreChannelsToList)
-            logger.info("${channels.size} channels found")
-            return channels
-        }
-
-        fun getFullConversationHistory(conversationsSlackApi: ConversationsSlackApi, conversationId: String): List<Message> {
-            logger.info("Retrieving Messages")
-
-            val messages = mutableListOf<Message>()
-
-            var moreMessagesToGet: Boolean
-            var cursorValue = ""
-            do {
-                val conversationHistory = conversationsSlackApi.channelHistory(conversationId, cursorValue)
-                val nextCursor = conversationHistory.response_metadata?.next_cursor
-
-                logger.debug("Messages found, adding to list ${conversationHistory.messages}")
-                messages += conversationHistory.messages
-
-                val nextCursorPresent = nextCursor?.let { !it.isBlank() } ?: false
-                if (nextCursorPresent) {
-                    logger.debug("Found new cursor token to retrieve more messages from, using cursor token $nextCursor")
-                    moreMessagesToGet = true
-                    cursorValue = nextCursor!!
-
-                } else {
-                    logger.debug("No new cursor token, all messages found")
-                    moreMessagesToGet = false
-                }
-
-            } while (moreMessagesToGet)
-            logger.info("${messages.size} messages found")
-            return messages
-        }
     }
 }
 

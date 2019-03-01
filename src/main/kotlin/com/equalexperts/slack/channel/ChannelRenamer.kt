@@ -5,6 +5,7 @@ import com.amazonaws.services.simplesystemsmanagement.model.GetParametersRequest
 import com.equalexperts.slack.api.auth.AuthSlackApi
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
+import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
@@ -56,7 +57,7 @@ class ChannelRenamer(private val conversationApi: ConversationsSlackApi,
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun process(channelsToRename: Map<String, String>) {
-        val channels = ConversationsSlackApi.listAll(conversationApi)
+        val channels = conversationApi.listAll()
 
         val channelsToBeRenamed = channels
                 .filter { channelsToRename.keys.contains(it.name) }
