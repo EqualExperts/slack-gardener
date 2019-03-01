@@ -1,9 +1,10 @@
-package com.equalexperts.slack.gardener
+package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.channel.ChannelChecker
 import com.equalexperts.slack.channel.ChannelState
 import com.equalexperts.slack.channel.ChannelStateCalculator
 import com.equalexperts.slack.channel.ConversationListsForTesting
@@ -18,7 +19,7 @@ import java.time.format.DateTimeFormatter
 import java.util.*
 
 @TestInstance(PER_CLASS)
-class GardenerTest {
+class ChannelCheckerTest {
 
     private lateinit var mockConversationsApi: ConversationsSlackApi
     private lateinit var mockChatSlackApi: ChatSlackApi
@@ -115,8 +116,8 @@ class GardenerTest {
         verify(mockChatSlackApi, never()).postMessage(channel, botUser, warningMessageContent)
     }
 
-    private fun getGardener(): Gardener {
-        return Gardener(mockConversationsApi, mockChatSlackApi, botUser, clock, mockChannelStateCalculator, warningPeriod, warningMessageContent)
+    private fun getGardener(): ChannelChecker {
+        return ChannelChecker(mockConversationsApi, mockChatSlackApi, botUser, clock, mockChannelStateCalculator, warningPeriod, warningMessageContent)
     }
 
     private fun getNow(): Instant? {

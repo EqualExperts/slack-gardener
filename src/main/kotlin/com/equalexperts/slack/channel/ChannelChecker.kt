@@ -1,4 +1,4 @@
-package com.equalexperts.slack.gardener
+package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.auth.AuthSlackApi
 import com.equalexperts.slack.api.chat.ChatSlackApi
@@ -7,9 +7,7 @@ import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
-import com.equalexperts.slack.channel.ChannelState
 import com.equalexperts.slack.channel.ChannelState.*
-import com.equalexperts.slack.channel.ChannelStateCalculator
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
@@ -19,13 +17,13 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class Gardener(private val conversationSlackApi: ConversationsSlackApi,
-               private val chatSlackApi: ChatSlackApi,
-               private val botUser: User,
-               private val clock: Clock,
-               private val channelStateCalculator: ChannelStateCalculator,
-               private val warningPeriod: Period,
-               private val warningMessage: String) {
+class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
+                     private val chatSlackApi: ChatSlackApi,
+                     private val botUser: User,
+                     private val clock: Clock,
+                     private val channelStateCalculator: ChannelStateCalculator,
+                     private val warningPeriod: Period,
+                     private val warningMessage: String) {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
@@ -112,7 +110,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
                   warningWeeks: Int,
                   longIdleYears: Int,
                   longIdlePeriodChannels: Collection<String>,
-                  warningMessage: String): Gardener {
+                  warningMessage: String): ChannelChecker {
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
@@ -133,7 +131,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
 
             val channelStateCalculator = ChannelStateCalculator(conversationsSlackApi, clock, defaultIdlePeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
 
-            return Gardener(conversationsSlackApi, chatSlackApi, botUser, clock, channelStateCalculator, warningPeriod, warningMessage)
+            return ChannelChecker(conversationsSlackApi, chatSlackApi, botUser, clock, channelStateCalculator, warningPeriod, warningMessage)
         }
     }
 }
