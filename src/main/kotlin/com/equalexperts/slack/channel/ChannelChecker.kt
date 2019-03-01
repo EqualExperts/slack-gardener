@@ -50,10 +50,10 @@ class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
             val emptyChannels = data.count { it.first.members == 0 }
 
 
-            logger.info("${data.size}\tchannels")
-            logger.info("$active\tactive channels")
-            logger.info("${stale + staleAndWarned}\tstale channels ($staleAndWarned warned)")
-            logger.info("$emptyChannels\tempty channels")
+            logger.info("${data.size} channels")
+            logger.info("$active active channels")
+            logger.info("${stale + staleAndWarned} stale channels ($staleAndWarned warned)")
+            logger.info("$emptyChannels empty channels")
 
 
             logger.info("Posting warnings:")
