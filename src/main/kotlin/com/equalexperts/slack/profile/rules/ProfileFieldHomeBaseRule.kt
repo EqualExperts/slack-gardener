@@ -11,12 +11,12 @@ class ProfileFieldHomeBaseRule(private val teamCustomProfileFields: TeamProfile)
     override fun checkProfile(user: User): ProfileFieldRuleResult {
         logger.debug("Checking $FIELD_NAME field for ${user.name}")
 
-        val homeBaseCustomField = teamCustomProfileFields.profile.fields.single { it.label.toLowerCase() == Companion.FIELD_NAME.toLowerCase() }
+        val homeBaseCustomField = teamCustomProfileFields.profile.fields.single { it.label.toLowerCase() == FIELD_NAME.toLowerCase() }
 
         val result = user.profile.fields?.let {
             val userProfileField = it[homeBaseCustomField.id]
             userProfileField?.let {
-                val fieldPresent = !it.value.isNullOrBlank()
+                val fieldPresent = !it.value.isBlank()
                 fieldPresent
             } ?: false
         } ?: false
