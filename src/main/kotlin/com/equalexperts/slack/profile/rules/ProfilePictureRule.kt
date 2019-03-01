@@ -22,7 +22,7 @@ class ProfilePictureRule(private val knownDefaultPictureMd5Hashes: Set<String>) 
     }
 
     private fun checkIfDefaultProfilePicture(user: User, image_24: String): Boolean {
-        val (request, response, result) = image_24.httpGet().response()
+        val (_, response, result) = image_24.httpGet().response()
 
         when (result) {
             is Result.Failure<ByteArray, FuelError> -> {

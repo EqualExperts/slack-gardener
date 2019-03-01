@@ -42,7 +42,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
         val md5Hashes = mutableMapOf<String, Int>()
         for (user in usersWithDetailedProfiles) {
             user.profile.image_24?.let {
-                user.profile.image_24.httpGet().response { request, response, result ->
+                user.profile.image_24.httpGet().response { _, response, result ->
                     when (result) {
                         is Result.Failure<ByteArray, FuelError> -> {
                             logger.info("Couldn't get image for $user.name")
