@@ -32,7 +32,7 @@ internal class UserRetrieverTest {
         val userList = UserListsForTesting.withEmptyCursorToken(testUser)
         whenever(mockUsersSlackApi.list()).thenReturn(userList)
 
-        val channels = UsersSlackApi.listAll(mockUsersSlackApi)
+        val channels = mockUsersSlackApi.listAll()
 
         verify(mockUsersSlackApi).list()
 
@@ -79,7 +79,7 @@ internal class UserRetrieverTest {
 
         whenever(mockUsersSlackApi.list(cursorToken)).thenReturn(secondResponse)
 
-        val channels = UsersSlackApi.listAll(mockUsersSlackApi)
+        val channels = mockUsersSlackApi.listAll()
 
         verify(mockUsersSlackApi).list()
         verify(mockUsersSlackApi).list(cursorToken)

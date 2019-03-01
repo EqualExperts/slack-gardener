@@ -3,6 +3,7 @@ package com.equalexperts.slack.gardener
 import com.equalexperts.slack.api.auth.AuthSlackApi
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
+import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
@@ -30,7 +31,7 @@ class Gardener(private val conversationSlackApi: ConversationsSlackApi,
 
     fun process() {
         val nanoTime = measureNanoTime {
-            val channels = ConversationsSlackApi.listAll(conversationSlackApi)
+            val channels = conversationSlackApi.listAll()
             logger.info("${channels.size} channels found")
 
             val data = channels.parallelStream()

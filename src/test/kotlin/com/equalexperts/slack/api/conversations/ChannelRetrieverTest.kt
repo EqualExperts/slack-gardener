@@ -19,7 +19,7 @@ internal class ChannelRetrieverTest {
         val channelList = ConversationListsForTesting.withEmptyCursorToken(testChannel)
         whenever(mockConversationsSlackApi.list()).thenReturn(channelList)
 
-        val channels = ConversationsSlackApi.listAll(mockConversationsSlackApi)
+        val channels = mockConversationsSlackApi.listAll()
 
         verify(mockConversationsSlackApi).list()
 
@@ -43,7 +43,7 @@ internal class ChannelRetrieverTest {
 
         whenever(mockConversationsSlackApi.list(cursorToken)).thenReturn(secondResponse)
 
-        val channels = ConversationsSlackApi.listAll(mockConversationsSlackApi)
+        val channels = mockConversationsSlackApi.listAll()
 
         verify(mockConversationsSlackApi).list()
         verify(mockConversationsSlackApi).list(cursorToken)

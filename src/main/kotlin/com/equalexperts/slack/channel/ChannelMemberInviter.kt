@@ -3,7 +3,10 @@ package com.equalexperts.slack.channel
 import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagementClientBuilder
 import com.amazonaws.services.simplesystemsmanagement.model.GetParametersRequest
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
+import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.users.UsersSlackApi
+import com.equalexperts.slack.api.users.listAll
+import com.equalexperts.slack.profile.AwsLambda
 import org.slf4j.LoggerFactory
 import java.net.URI
 
@@ -35,14 +38,15 @@ fun main() {
 
 
 class ChannelMemberImporter(private val conversationApi: ConversationsSlackApi, private val userApi: UsersSlackApi) {
+    //Needs bot/incoming-webhook oauth permissions
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun process(channelName: String, userEmails: List<String>) {
         logger.info("Finding users")
-        val users = UsersSlackApi.listAll(userApi)
+        val users = userApi.listAll()
 
-        val channelId = ConversationsSlackApi.listAll(conversationApi).first { it.name == channelName }.id
+        val channelId = conversationApi.listAll().first { it.name == channelName }.id
 
         val userIds = users.filter { it.profile.email in userEmails }
                 .map { Pair(it, it.id) }

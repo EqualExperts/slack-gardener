@@ -5,6 +5,7 @@ import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.profile.ProfilesSlackApi
 import com.equalexperts.slack.api.users.UsersSlackApi
+import com.equalexperts.slack.api.users.listAll
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
 import com.equalexperts.slack.profile.rules.*
@@ -32,7 +33,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun getDefaultMd5Hashes(): Set<String> {
-        val users = UsersSlackApi.listAll(usersSlackApi)
+        val users = usersSlackApi.listAll()
                 .filter { !it.is_bot }
                 .filter { !it.is_deleted }
         val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
@@ -68,7 +69,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     }
 
     fun process() {
-        val users = UsersSlackApi.listAll(usersSlackApi)
+        val users = usersSlackApi.listAll()
                 .filter { !it.is_bot }
                 .filter { !it.is_deleted }
         val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
