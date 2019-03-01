@@ -45,17 +45,17 @@ interface UsersSlackApi {
                 users += listResults.members
 
                 if (!nextCursor.isBlank()) {
-                    logger.debug("Found new cursor token to retrieve more channels from, using cursor token $nextCursor")
+                    logger.debug("Found new cursor token to retrieve more users from, using cursor token $nextCursor")
                     moreChannelsToList = true
                     cursorValue = nextCursor
 
                 } else {
-                    logger.debug("No new cursor token, all channels found")
+                    logger.debug("No new cursor token, all users found")
                     moreChannelsToList = false
                 }
 
             } while (moreChannelsToList)
-            logger.info("${users.size} channels found")
+            logger.info("${users.size} users found")
             return users
         }
     }

@@ -1,20 +1,36 @@
 # Slack Gardener
-A slack bot that will scan all public channels, warn each inactive channel, before then subsequently archiving them.
+The Slack Gardener provides two primary functions:
+ * scan all public channels, warn each inactive channel, before then subsequently archiving them.
+ * scan all user profiles, and inform them if they're missing certain key fields
+ 
+It also provides some coverage of openfeign api implementations on top of Slack's methods api 
 
 ## Motivation
-The Slack Gardener helps clean up your inactive channels, so people fresh to joining your slack can have their questions/answers/comments can be guided towards frequently used channels rather than inactive/stale channels.
-This has the benefit of driving your slack's conversations to common frequently used channels improving the visibility of conversations and surfacing information across your organisation.
+The Slack Gardener helps cultivate your slack instance, by pruning inactive channels and ensuring people's profiles are filled out.
+
+By pruning inactive channels, it allows people fresh to joining your slack that have questions/answers/comments to be guided towards frequently used channels rather than inactive/stale channels.
+This has the benefit improving the visibility of conversations and surfacing information across your organisation.
+
+By ensuring people's profiles are filled out, it can improve the ability of people to identify and find other people both within and outside of slack. 
 
 
 ## Requirements
 - Slack app will need to be created using [Slack Api Console](https://api.slack.com/apps?new_app=1)
 - The slack app will need :
     - a bot user created
-    - permissions granted for 
+    - if you want to use the channel pruning functionality permissions will need to be granted for 
 ```
 channels:history
 channels:read
 channels:write
+incoming-webhook
+bot
+```
+    - if you want to use the channel pruning functionality permissions will need to be granted for 
+```
+users:read
+users:read.email
+users.profile:read
 incoming-webhook
 bot
 ```
