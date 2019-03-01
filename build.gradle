@@ -85,7 +85,7 @@ dependencies {
 jar {
     manifest {
         attributes(
-                'Main-Class': 'com.equalexperts.slack.gardener.MainKt'
+                'Main-Class': 'com.equalexperts.slack.MainKt'
         )
     }
     from { configurations.compile.collect { it.isDirectory() ? it : zipTree(it) } }

@@ -6,7 +6,6 @@ import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.listAll
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.listAll
-import com.equalexperts.slack.profile.AwsLambda
 import org.slf4j.LoggerFactory
 import java.net.URI
 
