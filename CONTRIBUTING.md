@@ -8,14 +8,15 @@ Use your best judgment, and feel free to propose changes to this document in a p
 #### Table Of Contents
 
 [How Can I Contribute?](#how-can-i-contribute)
-  * [Reporting Bugs](#reporting-bugs)
-  * [Suggesting Enhancements](#suggesting-enhancements)
-  * [Pull Requests](#pull-requests)
+
+* [Reporting Bugs](#reporting-bugs)
+* [Suggesting Enhancements](#suggesting-enhancements)
+* [Pull Requests](#pull-requests)
 
 [Styleguides](#styleguides)
-  * [Git Commit Messages](#git-commit-messages)
-  * [Kotlin Styleguide](#kotlin-styleguide)
 
+* [Git Commit Messages](#git-commit-messages)
+* [Kotlin Styleguide](#kotlin-styleguide)
 
 ## How Can I Contribute?
 
@@ -48,7 +49,7 @@ Explain the problem and include additional details to help maintainers reproduce
 Provide more context by answering these questions:
 
 * **Did the problem start happening recently** (e.g. after updating to a new version of Slack Gardener) or was this always a problem?
-* If the problem started happening recently, **can you reproduce the problem in an older version of Slack Gardener?** What's the most recent version in which the problem doesn't happen? You can compile older git hashes of Slack Gardener from this repo, [Git Bisect](https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git) is useful for this. 
+* If the problem started happening recently, **can you reproduce the problem in an older version of Slack Gardener?** What's the most recent version in which the problem doesn't happen? You can compile older git hashes of Slack Gardener from this repo, [Git Bisect](https://git-scm.com/book/en/v2/Git-Tools-Debugging-with-Git) is useful for this.
 * **Can you reliably reproduce the issue?** If not, provide details about how often the problem happens and under which conditions it normally happens.
 
 Include details about your configuration and environment:
@@ -82,22 +83,24 @@ Enhancement suggestions are tracked as [GitHub issues](https://guides.github.com
 #### Local development
 
 Slack Gardener can be developed locally. Instructions on how to setup this up are:
-* Pull down the repo
-* Run the below on the command line to pull down the necessary dependencies and setup the idea files 
-```
-./gradlew clean build test idea
-```
-* Import into IntelliJ Idea, via normal import process
 
+* Pull down the repo
+* Run the below on the command line to pull down the necessary dependencies and setup the idea files
+
+  ```bash
+  ./gradlew clean build test idea
+  ```
+
+* Import into IntelliJ Idea, via normal import process
 
 ### Pull Requests
 
 The process described here has several goals:
 
-- Maintain and improve Slack Gardener's quality
-- Fix problems that are important to users
-- Engage the community in working toward the best possible Slack Gardener
-- Enable a sustainable system for Slack Gardener's maintainers to review contributions
+* Maintain and improve Slack Gardener's quality
+* Fix problems that are important to users
+* Engage the community in working toward the best possible Slack Gardener
+* Enable a sustainable system for Slack Gardener's maintainers to review contributions
 
 Please follow these steps to have your contribution considered by the maintainers:
 
@@ -119,7 +122,6 @@ While the prerequisites above must be satisfied prior to having your pull reques
 
 * Slack Gardener currently uses IntelliJ IDEA's default kotlin styleguide
 
-
 ### Documentation Styleguide
 
-* Use [Markdown](https://daringfireball.net/projects/markdown).
+* Use [Markdown](https://guides.github.com/features/mastering-markdown/#GitHub-flavored-markdown).
