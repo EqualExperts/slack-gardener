@@ -1,7 +1,7 @@
 ### Requirements for Contributing a Performance Improvement
 
 * Fill out the template below. Any pull request that does not include enough information to be reviewed in a timely manner may be closed at the maintainers' discretion.
-* The pull request must only fix an existing bug. To contribute other changes, you must use a different template. You can see all templates at https://github.com/EqualExperts/ee-slack-gardener/blob/master/.github/PULL_REQUEST_TEMPLATE
+* The pull request must only be related to performance improvement. To contribute other changes, you must use a different template. You can see all templates at https://github.com/EqualExperts/ee-slack-gardener/blob/master/.github/PULL_REQUEST_TEMPLATE
 * The pull request must update the test suite to demonstrate the changed functionality.
 
 ### Description of the Change
