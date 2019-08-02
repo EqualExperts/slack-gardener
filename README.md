@@ -5,7 +5,7 @@ The Slack Gardener provides two primary functions:
 * scan all public channels, warn each inactive channel, before then subsequently archiving them.
 * scan all user profiles, and inform them if they're missing certain key fields
 
-It also provides some coverage of openfeign api implementations on top of Slack's methods api
+It also provides some openfeign api implementations on top of Slack's methods api
 
 ## Motivation
 
@@ -31,7 +31,7 @@ By ensuring people's profiles are filled out, it can improve the ability of peop
     bot
     ```
 
-  * if you want to use the channel pruning functionality permissions will need to be granted for
+  * if you want to use the profile pruning functionality permissions will need to be granted for
 
     ```none
     users:read
