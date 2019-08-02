@@ -19,7 +19,7 @@ fun main() {
     val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
     val request = GetParametersRequest()
     request.withNames(gardenerOauthAccessTokenParamName,
-            gardenerBotOauthAccessTokenParamName
+        gardenerBotOauthAccessTokenParamName
     ).withDecryption = true
     val parameterResults = client.getParameters(request)
 
@@ -30,9 +30,9 @@ fun main() {
 
     val usersSlackApi = UsersSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
 
-    val peopleToImport = emptyList<String>()
+    val peopleToImport = listOf("test@example.com")
 
-    ChannelMemberImporter(conversationsSlackApi, usersSlackApi).process("uks", peopleToImport)
+    ChannelMemberImporter(conversationsSlackApi, usersSlackApi).process("announcements", peopleToImport)
 }
 
 
@@ -48,17 +48,15 @@ class ChannelMemberImporter(private val conversationApi: ConversationsSlackApi, 
         val channelId = conversationApi.listAll().first { it.name == channelName }.id
 
         val userIds = users.filter { it.profile.email in userEmails }
-                .map { Pair(it, it.id) }
+            .map { Pair(it, it.id) }
         logger.info("User Ids for emails: $userIds")
-        logger.info("Inviting users to channel")
+        logger.info("Inviting users to channel $channelName")
 
         userIds.map { it.second }
-                .chunked(30)
-                .map {
-                    logger.info("Inviting users to channel $it")
-
-                    conversationApi.invite(channelId, it)
-                }
+            .map {
+                logger.info("Inviting user ${it} to channel $channelName")
+                conversationApi.invite(channelId, listOf(it))
+            }
         logger.info("Invited users to channel")
 
     }

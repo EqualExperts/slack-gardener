@@ -15,7 +15,7 @@ import java.time.Instant
 internal class ChannelMemberInviterTest {
 
     @Test
-    fun `should invite emails to channel in 30 member batches`() {
+    fun `should invite emails to channel`() {
         val mockConversationApi = mock<ConversationsSlackApi>()
         val mockUsersApi = mock<UsersSlackApi>()
 
@@ -35,10 +35,9 @@ internal class ChannelMemberInviterTest {
 
         channelMemberImporter.process(conversation.name, usersToInvite)
 
-        val numberOfUsersThatCanBeInvitedAtOnce = 30
-        val userIds = users.map { it.id }.chunked(numberOfUsersThatCanBeInvitedAtOnce)
+        val userIds = users.map { it.id }
 
-        userIds.map { verify(mockConversationApi).invite(conversation.id, it) }
+        userIds.map { verify(mockConversationApi).invite(conversation.id, listOf(it)) }
 
     }
 }
