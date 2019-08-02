@@ -62,7 +62,7 @@ Create aws dependencies
 1. Run the below commands (reviewing as necessary) to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time, and you may see errors around creating the lambda as the lambda jar isn't present in the s3 bucket
 
     ```bash
-    cd infra/environments/prod
+    cd infra/environments/example
     terragrunt plan-all
     terragrunt apply-all
     cd ../../..
@@ -98,7 +98,7 @@ Create aws dependencies
 6. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
 
     ```bash
-    cd infra/environments/prod
+    cd infra/environments/example
     terragrunt plan-all
     terragrunt apply-all
     cd ../../..
