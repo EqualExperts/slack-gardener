@@ -1,6 +1,9 @@
 import com.amazonaws.services.s3.model.ObjectMetadata
 import jp.classmethod.aws.gradle.s3.AmazonS3FileUploadTask
 
+import java.security.DigestOutputStream
+import java.security.MessageDigest
+
 buildscript {
     ext {
         kotlinVersion = '1.3.+'
@@ -97,11 +100,18 @@ aws {
 }
 
 task buildHashFile() {
+    dependsOn(jar)
     def result = file("build/ee-slack-gardener-lambda.base64sha256")
     outputs.file result
     doLast {
-        println "./scripts/generate_lambda_file_hash.sh".execute().text.trim()
-        result.write("./scripts/generate_lambda_file_hash.sh".execute().text.trim(), 'UTF-8')
+        def input = jar.archiveFile.get().getAsFile().newInputStream()
+        def digest = MessageDigest.getInstance("SHA-256")
+        new DigestOutputStream(new NullOutputStream(), digest) << input
+        input.close()
+        def hash = digest.digest().encodeBase64().toString()
+        
+        println(hash)
+        result.text = hash
     }
 }
 
@@ -124,4 +134,9 @@ task uploadLambda(type: AmazonS3FileUploadTask, dependsOn: build) {
 task upload() {
     dependsOn uploadLambda
     dependsOn uploadLambdaHash
+}
+
+class NullOutputStream extends OutputStream {
+    @Override
+    void write(int b) {}
 }
