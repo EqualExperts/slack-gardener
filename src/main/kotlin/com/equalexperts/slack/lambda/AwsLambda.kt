@@ -2,6 +2,7 @@ package com.equalexperts.slack.lambda
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
+import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement
 import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagementClientBuilder
 import com.amazonaws.services.simplesystemsmanagement.model.GetParametersRequest
 import com.equalexperts.slack.channel.ChannelChecker
@@ -15,12 +16,31 @@ class AwsLambda : RequestHandler<Any, Unit> {
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     override fun handleRequest(input: Any?, context: Context?) {
-        runChannelChecker()
-//        runProfileChecker()
+        val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
+        val request = GetParametersRequest()
+
+        val gardenerChannelActivityCheckingParamName = "slack.gardener.channel.checking"
+        val gardenerProfileFieldCheckingParamName = "slack.gardener.profile.checking"
+
+        request.withNames(gardenerChannelActivityCheckingParamName,
+                            gardenerProfileFieldCheckingParamName).isWithDecryption = true
+        val parameterResults = client.getParameters(request)
+
+        logger.info("Gardener Functionality Parameters: ${parameterResults.parameters.map { Pair(it.name, it.value) }}")
+
+        val gardenerChannelActivityChecking = parameterResults.parameters.find { it.name == gardenerChannelActivityCheckingParamName }?.value!!
+        val gardenerProfileFieldChecking = parameterResults.parameters.find { it.name == gardenerChannelActivityCheckingParamName }?.value!!
+
+        if (gardenerChannelActivityChecking.toLowerCase() == "true"){
+            runChannelChecker(client)
+        }
+
+        if (gardenerProfileFieldChecking.toLowerCase() == "true"){
+            runProfileChecker(client)
+        }
     }
 
-    fun runChannelChecker() {
-        val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
+    fun runChannelChecker(client: AWSSimpleSystemsManagement) {
         val request = GetParametersRequest()
 
         val gardenerOauthAccessTokenParamName = "slack.gardener.oauth.access_token"
@@ -71,8 +91,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
         gardener.process()
     }
 
-    fun runProfileChecker(){
-        val client = AWSSimpleSystemsManagementClientBuilder.defaultClient()
+    fun runProfileChecker(client: AWSSimpleSystemsManagement) {
         val request = GetParametersRequest()
 
         val profileOauthAccessTokenParamName = "slack.profile.oauth.access_token"
