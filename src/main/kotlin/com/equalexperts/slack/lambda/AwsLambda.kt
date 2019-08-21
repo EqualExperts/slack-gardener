@@ -29,7 +29,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
         logger.info("Gardener Functionality Parameters: ${parameterResults.parameters.map { Pair(it.name, it.value) }}")
 
         val gardenerChannelActivityChecking = parameterResults.parameters.find { it.name == gardenerChannelActivityCheckingParamName }?.value!!
-        val gardenerProfileFieldChecking = parameterResults.parameters.find { it.name == gardenerChannelActivityCheckingParamName }?.value!!
+        val gardenerProfileFieldChecking = parameterResults.parameters.find { it.name == gardenerProfileFieldCheckingParamName }?.value!!
 
         if (gardenerChannelActivityChecking.toLowerCase() == "true"){
             runChannelChecker(client)
