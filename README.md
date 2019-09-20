@@ -1,11 +1,16 @@
 # Slack Gardener
 
-The Slack Gardener provides two primary functions:
+The Slack Gardener provides one primary function:
 
 * scan all public channels, warn each inactive channel, before then subsequently archiving them.
-* scan all user profiles, and inform them if they're missing certain key fields
 
-It also provides some openfeign api implementations on top of Slack's methods api
+It also has some extra things built in:
+* A way to bulk import a list of users by email into a channel (ChannelMemberInviter)
+* A way to export a list of names of channel members to a csv format (ChannelMemberExportToCsv)
+* A way to bulk rename channels (ChannelRenamer)
+* A set of openfeign implementations on top of a subset of the Slack APIs
+* A profile checking functionality that messages users that don’t have certain fields filled out such as a profile picture
+
 
 ## Motivation
 
