@@ -1,8 +1,8 @@
-# Slack Gardener
+# 👨‍🌾 Slack Gardener 👩‍🌾
 
-The Slack Gardener provides one primary function:
+This bot provides one primary function:
 
-* scan all public channels, warn each inactive channel, before then subsequently archiving them.
+* Scan all public channels, warn each inactive channel, before subsequently archiving them.
 
 It also has some extra things built in:
 
@@ -20,7 +20,7 @@ By ensuring people's profiles are filled out, it can improve the ability of peop
 
 ### Why automatically archive slack channels?
 
-**TLDR: By pruning inactive channels, it allows people fresh to joining your slack that have questions/answers/comments to be guided towards frequently used channels rather than inactive/stale channels. This has the benefit improving the visibility of conversations and surfacing information across your organisation.**
+**TL;DR By pruning inactive channels, it allows people fresh to joining your slack that have questions/answers/comments to be guided towards frequently used channels rather than inactive/stale channels. This has the benefit improving the visibility of conversations and surfacing information across your organisation.**
 
 We want to maximise the value of the network within Slack, this means we need to ensure conversations and information are easily surfaced, maximising the chance for people in the network to join in.
 However to ensure this is manageable for people in the network, we don’t want to have one large channel where everyone is a member and all conversation and information is sent, as this makes it impossible for people to be able to manageably consume information.
@@ -84,12 +84,18 @@ As we are programmatically judging a channel's fitness by a metric and not by th
 
 This removes conversations that have become inactive because it has either naturally finished it's purpose or failed to draw enough of a membership to actively participate, guiding users towards channels with active conversations and larger memberships.
 
-## Requirements
+## Install
 
-* Slack app will need to be created using [Slack Api Console](https://api.slack.com/apps?new_app=1)
-* The slack app will need :
-  * a bot user created
-  * if you want to use the channel pruning functionality permissions will need to be granted for
+### Create the app
+
+1. Go to [Slack Api Console](https://api.slack.com/apps?new_app=1)
+2. Create a new app and give it a name.
+3. Scroll down to **Display Information** and fill App name, description and avatar.
+
+### Give permissions
+
+1. Go to [**Permissions > Scopes**](https://api.slack.com/apps/ANRBX5WQN/oauth#scopes_section)
+2. If you want to use the *channel pruning* feature, then grant the following permissions:
 
     ```none
     channels:history
@@ -99,7 +105,7 @@ This removes conversations that have become inactive because it has either natur
     bot
     ```
 
-  * if you want to use the profile pruning functionality permissions will need to be granted for
+3. If you want to use the *profile pruning* feature, then grant the following permissions:
 
     ```none
     users:read
@@ -108,6 +114,12 @@ This removes conversations that have become inactive because it has either natur
     incoming-webhook
     bot
     ```
+
+---------
+
+YOU ARE HERE
+
+---------
 
 * A slack user will need to be created (or an existing user used) to install the app to the workspace, as well as allow the app to archive channels, as slack currently only lets users have access to this method.
 
