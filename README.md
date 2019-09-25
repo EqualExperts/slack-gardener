@@ -84,7 +84,7 @@ As we are programmatically judging a channel's fitness by a metric and not by th
 
 This removes conversations that have become inactive because it has either naturally finished it's purpose or failed to draw enough of a membership to actively participate, guiding users towards channels with active conversations and larger memberships.
 
-## Install
+## Install: Slack (part 1)
 
 ### Create the app
 
@@ -141,24 +141,39 @@ This removes conversations that have become inactive because it has either natur
 
 You will need these tokens in the next steps.
 
+## Install: AWS (part 2)
+
 ---------
 
 YOU ARE HERE
 
 ---------
 
-## AWS Lambda Installation
+### Get access to AWS
 
-Create slack dependencies
+1. Get an account to your organisation's **AWS Management Console**.
+2. [Login](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3Fstate%3DhashArgs%2523%26isauthcode%3Dtrue&client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fhomepage&forceMobileApp=0).
 
-1. Create slack user (due to current limitations, users must archive channels rather than bots)
-2. Create slack app using [Slack Api Console](https://api.slack.com/apps?new_app=1)
-3. Grant slack app permissions (as indicated by requirements above)
-4. Add bot user to slack app
+### `¯\_(ツ)_/¯`
 
-Create AWS dependencies
+1. ?????? 2nd step, get a user, and potentially an IAM role
+2. Navigate to [**Identity and Access Management (IAM)**](https://console.aws.amazon.com/iam/home?#/users)
 
-1. Run the below commands (reviewing as necessary) to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time, and you may see errors around creating the lambda as the lambda jar isn't present in the s3 bucket
+### Create an S3 Bucket
+
+1. Navigate to [S3](https://s3.console.aws.amazon.com/s3/home)
+2. Click **Create bucket**
+3. Give it a name (e.g. `slack-gardener`) and click **Create**
+
+4. Run the below commands (reviewing as necessary) to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time, and you may see errors around creating the lambda as the lambda jar isn't present in the s3 bucket
+5. Run this
+
+    ```bash
+    # install dependencies
+    brew install pipenv
+    brew install terragrunt
+    brew install gradle
+    ```
 
     ```bash
     cd infra/environments/example
@@ -167,17 +182,18 @@ Create AWS dependencies
     cd ../../..
     ```
 
-2. Change `build.gradle` bucketName references to allow `gradle` to upload the lambda jar to the correct place
-3. Upload lambda jar artefact (and hash) to S3 bucket by running
+6. Change `build.gradle` bucketName references to allow `gradle` to upload the lambda jar to the correct place
+7. Upload lambda jar artefact (and hash) to S3 bucket by running
 
     ```bash
     ./gradlew clean build test jar upload
     ```
 
-4. Create SNS topic subscriptions to send emails to correct groups within your organisation for when the lambda fails (this can't be easily automated using terraform due to the asynchronous nature of confirming email subscriptions)
-5. Store the slack app tokens in AWS Parameter Store
+8. Create SNS topic subscriptions to send emails to correct groups within your organisation for when the lambda fails (this can't be easily automated using terraform due to the asynchronous nature of confirming email subscriptions)
+9. Store the slack app tokens in AWS Parameter Store
 
     ```bash
+
     pipenv run aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
     pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
     # Done via input json because the awscli v1 tries to auto-fetch any url, this apparently will be fixed in awscli v2
@@ -194,7 +210,7 @@ Create AWS dependencies
     pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
     ```
 
-6. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
+10. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
 
     ```bash
     cd infra/environments/example
