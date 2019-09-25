@@ -1,6 +1,6 @@
 # 👨‍🌾 Slack Gardener 👩‍🌾
 
-This bot provides one primary function:
+This app provides one primary function:
 
 * Scan all public channels, warn each inactive channel, before subsequently archiving them.
 
@@ -14,7 +14,7 @@ It also has some extra things built in:
 
 ## Motivation
 
-The Slack Gardener helps cultivate your slack instance, by pruning inactive channels and ensuring people's profiles are filled out.
+The Slack Gardener helps cultivate your Slack instance, by pruning inactive channels and ensuring people's profiles are filled out.
 
 By ensuring people's profiles are filled out, it can improve the ability of people to identify and find other people both within and outside of slack.
 
@@ -89,12 +89,12 @@ This removes conversations that have become inactive because it has either natur
 ### Create the app
 
 1. Go to [Slack Api Console](https://api.slack.com/apps?new_app=1)
-2. Create a new app and give it a name.
-3. Scroll down to **Display Information** and fill App name, description and avatar.
+2. Create a new app and give it a name
+3. Scroll down to **Display Information** and fill App name, description and avatar
 
 ### Give permissions
 
-1. Go to [**Permissions > Scopes**](https://api.slack.com/apps/ANRBX5WQN/oauth#scopes_section)
+1. In the left sidebar, navigate to **Features > OAuth & Permissions > Scopes**
 2. If you want to use the *channel pruning* feature, then grant the following permissions:
 
     ```none
@@ -115,18 +115,37 @@ This removes conversations that have become inactive because it has either natur
     bot
     ```
 
+### Assign a bot user to the app
+
+> ℹ️ _This app needs a bot user to interact with users in a more conversational manner. You need to create one before installing the app. This is because Slack currently only lets (bot) users archive channels._
+
+1. In the left sidebar, navigate to **Features > Bot Users**
+2. Click **Add User**
+3. Choose a display name (e.g. `Slack Gardener`) and a username (e.g. `slack_gardener`)
+4. Leave **Always Show My Bot as Online** as `OFF`.
+
+### Install the app
+
+1. In the left sidebar, navigate to **Settings > Install App**
+2. Click **Install App to Workplace**
+3. Review the permissions you are granting to this app
+4. When asked **Where should Slack Gardener post?**, select a channel used by Slack admins or the maintaining this app
+
+> ℹ️ _This is usually an `#ask-slack`, a channel used by Slack admins to discuss Slack stuff or clarify doubts about Slack coming from anyone in your organisation. In practice this app will post to all the channels it needs._
+
+### Save your app tokens
+
+1. In the left sidebar, navigate to **Settings > Install App > OAuth Tokens for Your Team**
+2. Save your **OAuth Access Token**, something like `xoxp-*`
+3. Save your **Bot User OAuth Access Token**, something like `xoxb-*`
+
+You will need these tokens in the next steps.
+
 ---------
 
 YOU ARE HERE
 
 ---------
-
-* A slack user will need to be created (or an existing user used) to install the app to the workspace, as well as allow the app to archive channels, as slack currently only lets users have access to this method.
-
-Once the app is installed to the workspace, you will need to provide the Slack Gardener the below OAuth access tokens via their respective parameter keys
-
-* OAuth Access Token - `"slack.gardener.oauth.access_token"`
-* Bot User OAuth Access Token - `"slack.gardener.bot.oauth.access_token"`
 
 ## AWS Lambda Installation
 
