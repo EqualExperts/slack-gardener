@@ -1,88 +1,18 @@
 # 👨‍🌾 Slack Gardener 👩‍🌾
 
-This app provides one primary function:
+> _TL;DR Archiving inactive channels improves the visibility of conversations and makes it easier for new joiners to find channels that are relevant to them. Ensuring complete Slack profiles facilitates people finding each other, within and outside Slack._
+
+This app provides one **primary function**:
 
 * Scan all public channels, warn each inactive channel, before subsequently archiving them.
 
-It also has some extra things built in:
+It also includes some **extra features**:
 
+* A way to message Slack users that don't have specific fields filled out such as a profile picture
 * A way to bulk import a list of users by email into a channel (`ChannelMemberInviter`)
 * A way to export a list of names of channel members to a `csv` format (`ChannelMemberExportToCsv`)
 * A way to bulk rename channels (`ChannelRenamer`)
 * A set of `OpenFeign` implementations on top of a subset of the Slack APIs
-* A profile checking functionality that messages users that don’t have certain fields filled out such as a profile picture
-
-## Motivation
-
-The Slack Gardener helps cultivate your Slack instance, by pruning inactive channels and ensuring people's profiles are filled out.
-
-By ensuring people's profiles are filled out, it can improve the ability of people to identify and find other people both within and outside of slack.
-
-### Why automatically archive slack channels?
-
-**TL;DR By pruning inactive channels, it allows people fresh to joining your slack that have questions/answers/comments to be guided towards frequently used channels rather than inactive/stale channels. This has the benefit improving the visibility of conversations and surfacing information across your organisation.**
-
-We want to maximise the value of the network within Slack, this means we need to ensure conversations and information are easily surfaced, maximising the chance for people in the network to join in.
-However to ensure this is manageable for people in the network, we don’t want to have one large channel where everyone is a member and all conversation and information is sent, as this makes it impossible for people to be able to manageably consume information.
-
-Instead we want to adhere to a few principles:
-
-* Maximise the amount of information and conversations being surfaced to people
-* Increase the signal to noise ratio of the information and conversations
-* Respect the amount of information anyone can tolerate reading
-* Optimise for the whole of the global network rather than local optimisations for parts of the network
-
-This means that there need to be a few channels with reserved purposes with high signal to noise ratio to ensure high priority information is surfaced quickly and easily across the network.
-
-It also means that we should, as a guideline, favour broad topic channels over highly specific topic channels. Combined with the ability to join and leave any public channel, it allows people to opt into conversations and information, to the degree of which they are comfortable, whilst maximising the surfacing of conversations and information.
-
-To achieve our goal organically we need to be able to guide the experience of using slack, without negatively impacting it i.e. we need a way to judge the fitness of a channel so we can encourage the channels we want, and discourage the ones we don't, whilst not actively giving people a negative experience on slack.
-
-By looking at the lifecycle of a channel and what we know about the stages, we can find our measure of fitness:
-
-```none
-Channel creation
-
-    We don’t have enough information about a channel at this stage to judge if it’ll grow to be a high member count, broad topic, with an ongoing active conversation
-
-Active conversation
-
-    We have some information at this stage
-
-    We know that it’s serving its purpose, as people are using the channel for conversation and information surfacing
-
-    We don’t know if that purpose is short/long-lived
-
-    We don’t know if it’s around a specific topic or a broader topic
-
-    We don’t know anything around it’s signal-to-noise ratio, but if it’s higher noise then people will naturally leave over time.
-
-Inactive conversation
-
-    We have lots of information at this stage
-
-    It’s purpose may have ended
-
-    It’s purpose was short lived, or is incredibly long-lived with long periods of inactivity
-
-    More likely to be a specific topic than a broader topic (broad topics have a higher chance of ongoing active conversation)
-
-    People may have moved away from this channel due to low signal-to-noise ratio
-
-Channel archival
-
-    It has been purposely removed from the list of active channels, slack indicates that the conversation has become stale, it is still searchable, but not to be actively participated in
-
-Channel unarchived (go back to active conversation)
-
-    An active intervention by someone to revive the purpose of a channel.
-```
-
-The stage with the most amount of information to act on is inactivity, and this allows us the best chance to shape the use of slack.
-
-As we are programmatically judging a channel's fitness by a metric and not by the actual context of the channel, we want to ensure that anyone with the channel's context can stop the process entirely. So we automatically warn the channel for a period to allow humans with greater context of the channels purpose to stop the channel being archived, if no-one wants to stop the channel being archived, then we automatically archive it.
-
-This removes conversations that have become inactive because it has either naturally finished it's purpose or failed to draw enough of a membership to actively participate, guiding users towards channels with active conversations and larger memberships.
 
 ## Install: Slack (part 1)
 
@@ -218,6 +148,72 @@ YOU ARE HERE
     terragrunt apply-all
     cd ../../..
     ```
+
+## Motivation
+
+**TL;DR Archiving inactive channels improves the visibility of conversations and makes it easier for new joiners to find channels that are relevant to them. Ensuring complete Slack profiles facilitates people finding each other, within and outside Slack.**
+
+We want to maximise the value of the network within Slack, this means we need to ensure conversations and information are easily surfaced, maximising the chance for people in the network to join in.
+However to ensure this is manageable for people in the network, we don’t want to have one large channel where everyone is a member and all conversation and information is sent, as this makes it impossible for people to be able to manageably consume information.
+
+Instead we want to adhere to a few principles:
+
+* Maximise the amount of information and conversations being surfaced to people
+* Increase the signal to noise ratio of the information and conversations
+* Respect the amount of information anyone can tolerate reading
+* Optimise for the whole of the global network rather than local optimisations for parts of the network
+
+This means that there need to be a few channels with reserved purposes with high signal to noise ratio to ensure high priority information is surfaced quickly and easily across the network.
+
+It also means that we should, as a guideline, favour broad topic channels over highly specific topic channels. Combined with the ability to join and leave any public channel, it allows people to opt into conversations and information, to the degree of which they are comfortable, whilst maximising the surfacing of conversations and information.
+
+To achieve our goal organically we need to be able to guide the experience of using slack, without negatively impacting it i.e. we need a way to judge the fitness of a channel so we can encourage the channels we want, and discourage the ones we don't, whilst not actively giving people a negative experience on slack.
+
+By looking at the lifecycle of a channel and what we know about the stages, we can find our measure of fitness:
+
+```none
+Channel creation
+
+    We don’t have enough information about a channel at this stage to judge if it’ll grow to be a high member count, broad topic, with an ongoing active conversation
+
+Active conversation
+
+    We have some information at this stage
+
+    We know that it’s serving its purpose, as people are using the channel for conversation and information surfacing
+
+    We don’t know if that purpose is short/long-lived
+
+    We don’t know if it’s around a specific topic or a broader topic
+
+    We don’t know anything around it’s signal-to-noise ratio, but if it’s higher noise then people will naturally leave over time.
+
+Inactive conversation
+
+    We have lots of information at this stage
+
+    It’s purpose may have ended
+
+    It’s purpose was short lived, or is incredibly long-lived with long periods of inactivity
+
+    More likely to be a specific topic than a broader topic (broad topics have a higher chance of ongoing active conversation)
+
+    People may have moved away from this channel due to low signal-to-noise ratio
+
+Channel archival
+
+    It has been purposely removed from the list of active channels, slack indicates that the conversation has become stale, it is still searchable, but not to be actively participated in
+
+Channel unarchived (go back to active conversation)
+
+    An active intervention by someone to revive the purpose of a channel.
+```
+
+The stage with the most amount of information to act on is inactivity, and this allows us the best chance to shape the use of slack.
+
+As we are programmatically judging a channel's fitness by a metric and not by the actual context of the channel, we want to ensure that anyone with the channel's context can stop the process entirely. So we automatically warn the channel for a period to allow humans with greater context of the channels purpose to stop the channel being archived, if no-one wants to stop the channel being archived, then we automatically archive it.
+
+This removes conversations that have become inactive because it has either naturally finished it's purpose or failed to draw enough of a membership to actively participate, guiding users towards channels with active conversations and larger memberships.
 
 ## Built with
 
