@@ -2,27 +2,27 @@ resource "aws_cloudwatch_log_group" "lambda_cw_log_group" {
   name = "/aws/lambda/${var.lambda_name}"
 }
 
-
 resource "aws_cloudwatch_metric_alarm" "lambda_error_alarm" {
-  alarm_name = "${var.lambda_display_name}"
+  alarm_name          = var.lambda_display_name
   comparison_operator = "GreaterThanThreshold"
-  evaluation_periods = "1"
-  metric_name = "Errors"
-  namespace = "AWS/Lambda"
-  period = "86400"
-  statistic = "Minimum"
-  threshold = "0"
-  alarm_description = "The ${var.lambda_name} lambda has failed to run in the last 24 hours"
+  evaluation_periods  = "1"
+  metric_name         = "Errors"
+  namespace           = "AWS/Lambda"
+  period              = "86400"
+  statistic           = "Minimum"
+  threshold           = "0"
+  alarm_description   = "The ${var.lambda_name} lambda has failed to run in the last 24 hours"
   alarm_actions = [
-    "${aws_sns_topic.lambda_error_alarm.arn}"]
+    aws_sns_topic.lambda_error_alarm.arn,
+  ]
 
-  dimensions {
-    FunctionName = "${var.lambda_name}"
+  dimensions = {
+    FunctionName = var.lambda_name
   }
 }
 
 resource "aws_sns_topic" "lambda_error_alarm" {
-  name = "${var.sns_topic}"
+  name   = var.sns_topic
   policy = <<EOF
     {
   "Version": "2008-10-17",
@@ -55,5 +55,6 @@ resource "aws_sns_topic" "lambda_error_alarm" {
   ]
 }
 EOF
+
 }
 

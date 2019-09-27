@@ -42,5 +42,8 @@ resource "aws_cloudwatch_dashboard" "lambda-dashboard" {
         }
     ]
 }
- EOF
+ 
+EOF
+
 }
+
