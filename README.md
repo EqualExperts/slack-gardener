@@ -95,15 +95,25 @@ YOU ARE HERE
 2. Click **Create bucket**
 3. Give it a name (e.g. `slack-gardener`) and click **Create**
 
-4. Run the below commands (reviewing as necessary) to provision aws infrastructure, you may be prompted to create terraform s3 state buckets, if running for the first time, and you may see errors around creating the lambda as the lambda jar isn't present in the s3 bucket
-5. Run this
+### Prepare the script
+
+> ℹ️ _They will provision AWS infrastructure). You may be prompted to create terraform S3 state buckets, if running for the first time. You may see errors around creating the lambda as the lambda jar isn't present in the S3 bucket._
+
+1. Review the commands at `/`
+2. Install dependencies
 
     ```bash
-    # install dependencies
     brew install pipenv
     brew install terragrunt
     brew install gradle
     ```
+
+### Run the script
+
+1. Run these commands
+2. Run this
+
+
 
     ```bash
     cd infra/environments/example
@@ -112,15 +122,15 @@ YOU ARE HERE
     cd ../../..
     ```
 
-6. Change `build.gradle` bucketName references to allow `gradle` to upload the lambda jar to the correct place
-7. Upload lambda jar artefact (and hash) to S3 bucket by running
+3. Change `build.gradle` bucketName references to allow `gradle` to upload the lambda jar to the correct place
+4. Upload lambda jar artefact (and hash) to S3 bucket by running
 
     ```bash
     ./gradlew clean build test jar upload
     ```
 
-8. Create SNS topic subscriptions to send emails to correct groups within your organisation for when the lambda fails (this can't be easily automated using terraform due to the asynchronous nature of confirming email subscriptions)
-9. Store the slack app tokens in AWS Parameter Store
+5. Create SNS topic subscriptions to send emails to correct groups within your organisation for when the lambda fails (this can't be easily automated using terraform due to the asynchronous nature of confirming email subscriptions)
+6. Store the slack app tokens in AWS Parameter Store
 
     ```bash
 
@@ -140,7 +150,7 @@ YOU ARE HERE
     pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
     ```
 
-10. Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
+7.  Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
 
     ```bash
     cd infra/environments/example
