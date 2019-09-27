@@ -1,4 +1,6 @@
-# 👨‍🌾 Slack Gardener 👩‍🌾
+# Slack Gardener
+
+![avatar](/docs/avatar/Avatar-256.png) [--> source](/docs/avatar)
 
 > _TL;DR Archiving inactive channels improves the visibility of conversations and makes it easier for new joiners to find channels that are relevant to them. Ensuring complete Slack profiles facilitates people finding each other, within and outside Slack._
 
@@ -14,7 +16,7 @@ It also includes some **extra features**:
 * A way to bulk rename channels (`ChannelRenamer`)
 * A set of `OpenFeign` implementations on top of a subset of the Slack APIs
 
-## Install: Slack (part 1)
+## Installation - Part 1 (Slack)
 
 ### Create the app
 
@@ -71,71 +73,118 @@ It also includes some **extra features**:
 
 You will need these tokens in the next steps.
 
-## Install: AWS (part 2)
-
----------
-
-YOU ARE HERE
-
----------
+## Installation - Part 2 (AWS)
 
 ### Get access to AWS
 
 1. Get an account to your organisation's **AWS Management Console**.
 2. [Login](https://signin.aws.amazon.com/signin?redirect_uri=https%3A%2F%2Fconsole.aws.amazon.com%2Fconsole%2Fhome%3Fstate%3DhashArgs%2523%26isauthcode%3Dtrue&client_id=arn%3Aaws%3Aiam%3A%3A015428540659%3Auser%2Fhomepage&forceMobileApp=0).
 
-### `¯\_(ツ)_/¯`
-
-1. ?????? 2nd step, get a user, and potentially an IAM role
-2. Navigate to [**Identity and Access Management (IAM)**](https://console.aws.amazon.com/iam/home?#/users)
-
 ### Create an S3 Bucket
 
 1. Navigate to [S3](https://s3.console.aws.amazon.com/s3/home)
 2. Click **Create bucket**
-3. Give it a name (e.g. `slack-gardener`) and click **Create**
+3. Give it a name (e.g. `slack-gardener-bucket`) and click **Create**
 
-### Prepare the script
+### Create an SNS topic
 
-> ℹ️ _They will provision AWS infrastructure). You may be prompted to create terraform S3 state buckets, if running for the first time. You may see errors around creating the lambda as the lambda jar isn't present in the S3 bucket._
+1. [Create it](https://docs.aws.amazon.com/sns/latest/dg/welcome.html)
+2. _TODO: detail how_
+3. Save the name (e.g. `slack-gardener-sns`)
 
-1. Review the commands at `/`
-2. Install dependencies
+### Configure the provision scripts
+
+1. Duplicate the `/infra/environments/example/` folder and rename it (e.g. `live`)
+2. Open the new folder
+3. Edit `terragrunt.hcl` by replacing all placeholders:
+   * `INSERT_BUCKET_STATE_NAME` is the name of the AWS S3 Bucket you created above
+   * `INSERT_ACCOUNT_NUMBER` is the AWS account number used to create the S3 Bucket
+4. Edit `slack_lambda/terragrunt.hcl` by replacing all placeholders:
+   * `INSERT_BUCKET_ARTEFACT_NAME` is the name of the bucket for where the lambda zips will be stored (the module will create this)
+   * `INSERT_LOG_BUCKET_NAME` is the name of the bucket for where the lambda log backups will be stored (the module will create this)
+   * `INSERT_LAMBDA_NAME` is the desired name for the lambda  (e.g. `slack-gardener-lambda`)
+   * `INSERT_LAMBDA_DISPLAY_NAME` is the desired display name for the lambda (e.g. `Slack Gardener`)
+   * `INSERT_LAMBDA_DESCRIPTION` is the desired description for the lambda (e.g. `Slack Gardener Lambda warns and archives inactive slack channels`)
+   * `INSERT_SNS_TOPIC` is the name of the SNS topic create above (Amazon CloudWatch will send alerts about the lambda)
+
+### Configure the build scripts
+
+1. In the root of this repo, duplicate `build.example.gradle` and rename it to `build.gradle`
+2. Edit `build.gradle`
+   * Replace all occurrences of `INSERT_BUCKET_ARTEFACT_NAME` with the value used in the steps above
+
+### Install dependencies
+
+```bash
+brew install pipenv terraform terragrunt gradle
+```
+
+### Choose the right version of Java
+
+1. You need Java 8 to run the next step. Check your current version with `java -version`.
+   * If you have it, great, skip to the next step.
+   * If not, you might want to use [`jenv`](http://www.jenv.be/) to switch Java versions:
 
     ```bash
-    brew install pipenv
-    brew install terragrunt
-    brew install gradle
+    brew install jenv
+    # configure jenv
+    echo 'export PATH="$HOME/.jenv/bin:$PATH"' >> ~/.bash_profile
+    echo 'eval "$(jenv init -)"' >> ~/.bash_profile
+    jenv enable-plugin export
+    exec $SHELL -l
+    # restart bash to load new configs
+    source ~/.bash_profile
+    # install java and add it to jenv
+    brew cask install java8
+    jenv add $(/usr/libexec/java_home)
+    # list all java versions installed on your machine
+    ls -1 /Library/Java/JavaVirtualMachines
+    # add java 8 to jenv
+    jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home/
+    # set project version to 8
+    jenv local 1.8.0.202
     ```
 
-### Run the script
+### Provision infra
+
+> ℹ️ _These scripts will provision AWS infrastructure for you._
 
 1. Run these commands
-2. Run this
-
-
 
     ```bash
-    cd infra/environments/example
+    cd infra/environments/<name-of-your-folder>
     terragrunt plan-all
     terragrunt apply-all
-    cd ../../..
     ```
 
-3. Change `build.gradle` bucketName references to allow `gradle` to upload the lambda jar to the correct place
-4. Upload lambda jar artefact (and hash) to S3 bucket by running
+    > ℹ️ _Terraform creates everything async. Since we have some dependencies, if a child is faster than it's parent you get an error. Just run `plan-all` and `apply-all` again._
+
+2. When it complains about a missing lambda...
+
+    > ℹ️ _You may see errors around creating the lambda as the lambda jar isn't present in the S3 bucket._
+
+3. Build and upload lambda jar (artifact and hash) to AWS
 
     ```bash
     ./gradlew clean build test jar upload
     ```
 
-5. Create SNS topic subscriptions to send emails to correct groups within your organisation for when the lambda fails (this can't be easily automated using terraform due to the asynchronous nature of confirming email subscriptions)
-6. Store the slack app tokens in AWS Parameter Store
+4. Repeat steps 1 and 3 until it works (good luck ☘️😅)
+5. Send the Slack app tokens to AWS as parameter store
 
     ```bash
-
     pipenv run aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
     pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
+    ```
+
+6. Send other configurations to AWS as parameter store
+
+    ```bash
+    pipenv run aws ssm put-parameter --name "slack.gardener.idle.months" --value "3" --type "String"
+    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.weeks" --value "1" --type "String"
+    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.years" --value "1" --type "String"
+    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.channels" --value "annual-conference" --type "String"
+    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
     # Done via input json because the awscli v1 tries to auto-fetch any url, this apparently will be fixed in awscli v2
     pipenv run aws ssm put-parameter --cli-input-json '{
       "Name": "slack.gardener.uri",
@@ -143,21 +192,15 @@ YOU ARE HERE
       "Type": "String",
       "Description": "url"
     }'
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.months" --value "3" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.weeks" --value "1" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.years" --value "1" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.channels" --value "annual-conference" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
     ```
 
-7.  Run the below commands (reviewing as necessary) to ensure the lambda jar is present in the correct s3 bucket and the lambda gets created, this should pass with no errors.
+## Installation - Part 3
 
-    ```bash
-    cd infra/environments/example
-    terragrunt plan-all
-    terragrunt apply-all
-    cd ../../..
-    ```
+1. CELEBRATE! 🎉🥳🎊
+
+If you got to this point everything should be working. How can you be sure?
+
+1. _TODO: write steps to validate installation_
 
 ## Motivation
 
@@ -228,7 +271,7 @@ This removes conversations that have become inactive because it has either natur
 ## Built with
 
 * [Kotlin](https://kotlinlang.org/)
-* [JUnit 5](https://junit.org/junit5/)
+* [JUnit](https://junit.org/junit5/)
 * [Feign](https://github.com/OpenFeign/feign)
 * [Pipenv](https://github.com/pypa/pipenv)
 * [Terraform](https://terraform.io)
