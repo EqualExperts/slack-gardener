@@ -1,6 +1,6 @@
 # Configure security settings for Lambda
 resource "aws_iam_role" "lambda_iam_role" {
-  name               = "LambdaRole"
+  name               = "LambdaRole-${var.lambda_name}"
   assume_role_policy = <<POLICY
 {
   "Version": "2012-10-17",
@@ -30,4 +30,3 @@ resource "aws_iam_policy_attachment" "ssm_policy_attach" {
   roles      = [aws_iam_role.lambda_iam_role.id]
   policy_arn = "arn:aws:iam::aws:policy/AmazonSSMReadOnlyAccess"
 }
-
