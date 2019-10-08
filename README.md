@@ -194,6 +194,24 @@ brew install pipenv terraform terragrunt gradle
     }'
     ```
 
+7. Decide if you want the "archive inactive channels" feature, by running one of the commands below:
+
+    ```bash
+    # Enable
+    pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "true" --type "String"
+    # Disable
+    pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "false" --type "String"
+    ```
+
+8. Decide if you want the "enforce profile picture" feature, by running one of the commands below:
+
+    ```bash
+    # Enable
+    pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "true" --type "String"
+    # Disable
+    pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "false" --type "String"
+    ```
+
 ## Installation - Part 3
 
 1. CELEBRATE! 🎉🥳🎊
