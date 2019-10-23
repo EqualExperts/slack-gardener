@@ -51,6 +51,7 @@ class ChannelStateCalculator(
 
         val channelCreatedAfterTimeLimitThreshold = channel.created >= timeLimit
         if (channelCreatedAfterTimeLimitThreshold) {
+            logger.debug("Channel ${channel.name} created before threshold $timeLimit")
             return ChannelState.Active //new channels count as active
         }
 
@@ -61,12 +62,13 @@ class ChannelStateCalculator(
         var timestamp = Timestamp(timeLimit)
 
         do {
-            logger.debug("Searching for human message in channel ${channel.name} from $timestamp")
+            logger.debug("Searching for human message in channel ${channel.name} after threshold $timestamp")
             val history = conversationSlackApi.channelHistory(channel, timestamp)
             val messages = history.messages
 
             val noMessagesSinceThreshold = messages.isEmpty()
             if (noMessagesSinceThreshold) {
+                logger.debug("No messages since timestamp $timestamp in ${channel.name}")
                 break
             }
 
@@ -74,10 +76,23 @@ class ChannelStateCalculator(
                 val humanMessage = it.type == "message" && it.subtype == null
                 val nonGardenerBotMessage = it.type == "message" && it.subtype == "bot_message" && it.bot_id != botUser.profile.bot_id
                 val matchingMessageContent = it.type == "message" && it.subtype == "bot_message" && it.bot_id == botUser.profile.bot_id && it.text != warningMessage
+
+                if (humanMessage || nonGardenerBotMessage || matchingMessageContent){
+                    if (humanMessage){
+                        logger.debug("Found a message since $timestamp from a human being in ${channel.name}")
+                    }
+                    if (nonGardenerBotMessage){
+                        logger.debug("Found a message since $timestamp from a non-gardener bot in ${channel.name}")
+                    }
+                    if (matchingMessageContent){
+                        logger.debug("Found a message since $timestamp from the gardener bot but it wasn't the current warning message, in ${channel.name}")
+                    }
+                }
                 humanMessage || nonGardenerBotMessage || matchingMessageContent
             }
 
             if (messageSentFromHumanBeingOrBotBeforeThreshold) {
+                logger.debug("Found a message since $timestamp in ${channel.name} that is valid to mark channel as not stale")
                 return ChannelState.Active //found a message typed by an actual human being or a non-gardener bot
             }
 
@@ -89,8 +104,10 @@ class ChannelStateCalculator(
         } while (history.has_more)
 
         if (lastWarning != null) {
+            logger.debug("Channel ${channel.name} is stale and warned")
             return ChannelState.StaleAndWarned(lastWarning)
         }
+        logger.debug("Channel ${channel.name} is stale and not warned")
         return ChannelState.Stale
     }
 
