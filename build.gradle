@@ -117,7 +117,7 @@ task buildHashFile() {
 
 task uploadLambdaHash(type: AmazonS3FileUploadTask, dependsOn: buildHashFile) {
     file file("build/slack-gardener-lambda.base64sha256")
-    bucketName 'slack-gardener-artifact'
+    bucketName 'INSERT_BUCKET_ARTEFACT_NAME'
     key "slack-gardener-lambda.jar.base64sha256"
 
     def m = new ObjectMetadata()
@@ -127,7 +127,7 @@ task uploadLambdaHash(type: AmazonS3FileUploadTask, dependsOn: buildHashFile) {
 
 task uploadLambda(type: AmazonS3FileUploadTask, dependsOn: build) {
     file file("build/libs/slack-gardener-0.0.1-SNAPSHOT.jar")
-    bucketName 'slack-gardener-artifact'
+    bucketName 'INSERT_BUCKET_ARTEFACT_NAME'
     key "slack-gardener-lambda.jar"
 }
 
