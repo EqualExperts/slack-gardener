@@ -14,4 +14,3 @@ config.properties
 
 .DS_Store
 .terragrunt-cache
-/infra/environments/prod/
