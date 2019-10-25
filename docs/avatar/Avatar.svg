@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg width="180px" height="180px" viewBox="0 0 180 180" version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink">
+    <!-- Generator: Sketch 58 (84663) - https://sketch.com -->
+    <title>Untitled</title>
+    <desc>Created with Sketch.</desc>
+    <defs>
+        <path d="M24.4625166,16 C28.4743509,16 29.929139,16.4177153 31.3958057,17.2020972 C32.8624723,17.9864791 34.0135209,19.1375277 34.7979028,20.6041943 C35.5822847,22.070861 36,23.5256491 36,27.5374834 L36,48.4625166 C36,52.4743509 35.5822847,53.929139 34.7979028,55.3958057 C34.0135209,56.8624723 32.8624723,58.0135209 31.3958057,58.7979028 C29.929139,59.5822847 28.4743509,60 24.4625166,60 L11.5374834,60 C7.52564907,60 6.070861,59.5822847 4.60419433,58.7979028 C3.13752767,58.0135209 1.98647908,56.8624723 1.20209717,55.3958057 C0.41771525,53.929139 1.80555915e-16,52.4743509 -3.10752092e-16,48.4625166 L3.10752092e-16,27.5374834 C-1.80555915e-16,23.5256491 0.41771525,22.070861 1.20209717,20.6041943 C1.98647908,19.1375277 3.13752767,17.9864791 4.60419433,17.2020972 C6.070861,16.4177153 7.52564907,16 11.5374834,16 L24.4625166,16 Z M140.462517,16 C144.474351,16 145.929139,16.4177153 147.395806,17.2020972 C148.862472,17.9864791 150.013521,19.1375277 150.797903,20.6041943 C151.582285,22.070861 152,23.5256491 152,27.5374834 L152,48.4625166 C152,52.4743509 151.582285,53.929139 150.797903,55.3958057 C150.013521,56.8624723 148.862472,58.0135209 147.395806,58.7979028 C145.929139,59.5822847 144.474351,60 140.462517,60 L127.537483,60 C123.525649,60 122.070861,59.5822847 120.604194,58.7979028 C119.137528,58.0135209 117.986479,56.8624723 117.202097,55.3958057 C116.417715,53.929139 116,52.4743509 116,48.4625166 L116,27.5374834 C116,23.5256491 116.417715,22.070861 117.202097,20.6041943 C117.986479,19.1375277 119.137528,17.9864791 120.604194,17.2020972 C122.070861,16.4177153 123.525649,16 127.537483,16 L140.462517,16 Z" id="path-1"></path>
+        <path d="M50,13 C61.045695,13 70,21.954305 70,33 L70,36 L79,36 C79.5522847,36 80,36.4477153 80,37 L80,51 C80,51.5522847 79.5522847,52 79,52 L21,52 C20.4477153,52 20,51.5522847 20,51 L20,37 C20,36.4477153 20.4477153,36 21,36 L29.999,36 L30,33 C30,21.954305 38.954305,13 50,13 Z" id="path-3"></path>
+        <path d="M18,0 L112,0 C121.941125,-1.82615513e-15 130,8.0588745 130,18 L130,45.1482908 C130,49.6830734 129.22888,54.1848394 127.719613,58.4610955 L110.238555,107.990762 C107.698575,115.187372 100.896418,120 93.2647285,120 L36.7352715,120 C29.1035817,120 22.3014253,115.187372 19.7614455,107.990762 L2.28038666,58.4610955 C0.771119772,54.1848394 -2.07609314e-14,49.6830734 0,45.1482908 L0,18 C-1.21743675e-15,8.0588745 8.0588745,1.82615513e-15 18,0 Z" id="path-5"></path>
+    </defs>
+    <g id="Page-1" stroke="none" stroke-width="1" fill="none" fill-rule="evenodd">
+        <g id="Bottt/Head">
+            <g id="Sides/Square" transform="translate(0.000000, 66.000000)" fill-rule="evenodd" stroke-width="1">
+                <g id="Ears" transform="translate(14.000000, 0.000000)">
+                    <mask id="mask-2" fill="white">
+                        <use xlink:href="#path-1"></use>
+                    </mask>
+                    <use fill="#0076DE" xlink:href="#path-1"></use>
+                    <g id="Color/18-Grey/500" mask="url(#mask-2)" fill="#9E9E9E">
+                        <g transform="translate(-14.000000, 0.000000)">
+                            <rect x="0" y="0" width="180" height="76"></rect>
+                        </g>
+                    </g>
+                    <rect id="Shadow" fill-opacity="0.1" fill="#000000" mask="url(#mask-2)" x="-14" y="38" width="180" height="38"></rect>
+                </g>
+            </g>
+            <g id="Top/Bulb-01" transform="translate(41.000000, 0.000000)">
+                <mask id="mask-4" fill="white">
+                    <use xlink:href="#path-3"></use>
+                </mask>
+                <use id="Bulb-Mask" fill="#59C4FF" fill-rule="evenodd" xlink:href="#path-3"></use>
+                <g id="Color/14-Amber/A400" mask="url(#mask-4)" fill="#FFAB00" fill-rule="evenodd">
+                    <polygon points="0 3.3589293e-14 100 3.3589293e-14 100 52 0 52"></polygon>
+                </g>
+                <path d="M50,36 C52.209139,36 54,35.0279942 54,31.7142857 C54,28.4005772 52.209139,24 50,24 C47.790861,24 46,28.4005772 46,31.7142857 C46,35.0279942 47.790861,36 50,36 Z" id="Light" fill-opacity="0.6" fill="#FFFFFF" fill-rule="evenodd" mask="url(#mask-4)"></path>
+                <rect id="Highlight" fill-opacity="0.4" fill="#FFFFFF" fill-rule="evenodd" mask="url(#mask-4)" x="20" y="13" width="60" height="23"></rect>
+                <path d="M50,15.5 C54.9315485,15.5 59.3660426,17.6281427 62.4352098,21.0161556 M64.8733745,24.5107242 C65.5630474,25.8293043 66.0825179,27.2509729 66.4026217,28.7465657" id="Reflection" stroke="#FFFFFF" stroke-width="2" stroke-linecap="round" mask="url(#mask-4)"></path>
+            </g>
+            <g id="Face/Square-03" transform="translate(25.000000, 44.000000)">
+                <mask id="mask-6" fill="white">
+                    <use xlink:href="#path-5"></use>
+                </mask>
+                <use id="Shape" fill="#0076DE" fill-rule="evenodd" xlink:href="#path-5"></use>
+                <g id="Color/10-Green/A200" mask="url(#mask-6)" fill="#69F0AE" fill-rule="evenodd">
+                    <g transform="translate(-2.000000, -2.000000)">
+                        <polygon points="0 0 134 0 134 124 0 124"></polygon>
+                    </g>
+                </g>
+                <g id="Texture/-None" mask="url(#mask-6)">
+                    <g transform="translate(-1.000000, -1.000000)"></g>
+                </g>
+            </g>
+            <g id="Mouth/Grill-03" transform="translate(52.000000, 124.000000)" fill-rule="evenodd">
+                <rect id="Kiss-The-Robot-Beep-Boop" fill-opacity="0.2" fill="#000000" x="4" y="5" width="68" height="22" rx="5"></rect>
+                <path d="M10,9 L66,9 C67.1045695,9 68,9.8954305 68,11 L68,21 C68,22.1045695 67.1045695,23 66,23 L10,23 C8.8954305,23 8,22.1045695 8,21 L8,11 C8,9.8954305 8.8954305,9 10,9 Z" id="Kiss-The-Robot-Beep-Boop" fill="#FFFFFF"></path>
+                <rect id="Bender-Teeth" fill-opacity="0.1" fill="#000000" x="18" y="9" width="4" height="14"></rect>
+                <rect id="Bender-Teeth" fill-opacity="0.1" fill="#000000" x="42" y="9" width="4" height="14"></rect>
+                <rect id="Bender-Teeth" fill-opacity="0.1" fill="#000000" x="30" y="9" width="4" height="14"></rect>
+                <rect id="Bender-Teeth" fill-opacity="0.1" fill="#000000" x="54" y="9" width="4" height="14"></rect>
+            </g>
+            <g id="Eyes/Happy-😊" transform="translate(38.000000, 76.000000)" stroke="#000000" stroke-linecap="round" stroke-linejoin="round" stroke-width="4">
+                <path d="M18,19 L30,17" id="happy"></path>
+                <path d="M20,31 C20,27.686 22.9098333,25 27,25 C30.0901667,25 33,27.686 33,31" id="happy"></path>
+                <path d="M86,20 L74,17" id="happy"></path>
+                <path d="M84,31 C84,27.686 81.0901667,25 78,25 C73.9098333,25 71,27.686 71,31" id="happy"></path>
+            </g>
+        </g>
+    </g>
+</svg>
