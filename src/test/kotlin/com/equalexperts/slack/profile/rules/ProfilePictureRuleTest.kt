@@ -38,6 +38,29 @@ internal class ProfilePictureRuleTest {
     }
 
     @Test
+    fun `should return false for redirected default picture`() {
+        val testUrl = "https://TEST_URL"
+        val redirectedUrl = "https://DEFAULT_URL"
+        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
+        val testUser = UsersForTesting.testBot(userProfile)
+        val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
+
+        val inputStream = getResource("/empty.jpg")
+        val client = mock<Client> {
+            onGeneric { executeRequest(any()) } doReturn Response(
+                statusCode = 200,
+                responseMessage = "ok",
+                dataStream = inputStream,
+                url = URL(redirectedUrl)
+            )
+        }
+        FuelManager.instance.client = client
+
+        val result = rule.checkProfile(testUser)
+        assertFalse(result.result)
+    }
+
+    @Test
     fun `should return false for non user-uploaded picture`() {
         val testUrl = "https://TEST_URL"
         val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)

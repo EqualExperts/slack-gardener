@@ -32,7 +32,18 @@ class ProfilePictureRule(private val knownDefaultPictureMd5Hashes: Set<String>) 
             is Result.Success<ByteArray, FuelError> -> {
                 val md5sum = DigestUtils.md5Hex(response.data)
 
-                return md5sum !in knownDefaultPictureMd5Hashes
+                val nonDefaultProfilePicture = md5sum !in knownDefaultPictureMd5Hashes
+
+                // Slack has changed the way it's obtaining it's default pictures
+                // They moved away from a set of randomly generated pictures hosted on gravatar
+                // And are now providing a 'd' parameter in the url that redirects it to a default picture if the profile picture isn't set
+                // An example of the redirection url's are
+                // https://secure.gravatar.com/avatar/49cb64e44ebcdf3443de7966fb18c7bc.jpg?s=24&d=https%3A%2F%2Fa.slack-edge.com%2Fdf10d%2Fimg%2Favatars%2Fava_0014-24.png
+                // that redirects to https://i0.wp.com/a.slack-edge.com/df10d/img/avatars/ava_0014-24.png?ssl=1
+
+                val nonRedirectedUrl = image_24 == response.url.toString()
+
+                return nonDefaultProfilePicture && nonRedirectedUrl
             }
         }
     }
