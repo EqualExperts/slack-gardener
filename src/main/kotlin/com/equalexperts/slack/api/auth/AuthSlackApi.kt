@@ -15,7 +15,7 @@ interface AuthSlackApi {
     companion object {
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): AuthSlackApi {
             return feignBuilder()
-                    .requestInterceptor { it.query("token", token) }
+                    .requestInterceptor { it.header("Authorization", "Bearer $token") }
                     .errorDecoder(SlackRetrySupport.SlackErrorDecoder())
                     .retryer(SlackRetrySupport(sleeper))
                     .target(AuthSlackApi::class.java, uri.toString())

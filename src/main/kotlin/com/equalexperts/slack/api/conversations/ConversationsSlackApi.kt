@@ -122,7 +122,7 @@ interface ConversationsSlackApi {
 
         fun factory(uri: URI, token: String, sleeper: (Long) -> Unit): ConversationsSlackApi {
             return feignBuilder()
-                    .requestInterceptor { it.query("token", token) }
+                    .requestInterceptor { it.header("Authorization", "Bearer $token") }
                     .errorDecoder(SlackErrorDecoder())
                     .retryer(SlackRetrySupport(sleeper))
                     .target(ConversationsSlackApi::class.java, uri.toString())
