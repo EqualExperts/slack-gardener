@@ -35,7 +35,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     fun getDefaultMd5Hashes(): Set<String> {
         val users = usersSlackApi.listAll()
                 .filter { !it.is_bot }
-                .filter { !it.is_deleted }
+                .filter { !it.deleted }
         val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
                 .filter { it.profile.bot_id.isNullOrBlank() }
 
@@ -71,9 +71,10 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     fun process() {
         val users = usersSlackApi.listAll()
                 .filter { !it.is_bot }
-                .filter { !it.is_deleted }
+                .filter { !it.deleted }
+
         val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
-                .filter { it.profile.bot_id.isNullOrBlank() }
+                                                        .filter { it.profile.bot_id.isNullOrBlank() }
 
         val userProfileResults = mutableMapOf<User, ProfileCheckerResults>()
 
