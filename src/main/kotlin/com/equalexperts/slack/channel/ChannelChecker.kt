@@ -17,7 +17,8 @@ import java.time.temporal.ChronoUnit.DAYS
 import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
-class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
+class ChannelChecker(private val dryRun: Boolean,
+                     private val conversationSlackApi: ConversationsSlackApi,
                      private val chatSlackApi: ChatSlackApi,
                      private val botUser: User,
                      private val clock: Clock,
@@ -55,14 +56,12 @@ class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
             logger.info("${stale + staleAndWarned} stale channels ($staleAndWarned warned)")
             logger.info("$emptyChannels empty channels")
 
-
             logger.info("Posting warnings:")
             data.parallelStream().forEach { postWarning(it) }
 
 
             logger.info("Archiving:")
             data.parallelStream().forEach { archive(it) }
-
         }
 
         logger.info("done in ${nanoTime / 1_000_000} ms")
@@ -74,21 +73,30 @@ class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
             return
         }
 
-        chatSlackApi.postMessage(it.first, botUser, warningMessage)
-        logger.info("Warned ${it.first.name}")
+        if (!dryRun){
+            chatSlackApi.postMessage(it.first, botUser, warningMessage)
+            logger.info("Warned ${it.first.name}")
+        }else{
+            logger.info("Would have posted warning to : ${it.first.name}")
+        }
     }
 
     private fun archive(it: Pair<Conversation, ChannelState>) {
         if (it.second !is StaleAndWarned) {
             return //not stale, or no warning issued yet
         }
+
         val warningThreshold = ZonedDateTime.now(clock) - warningPeriod
         if ((it.second as StaleAndWarned).oldestWarning >= warningThreshold) {
             return //warning hasn't been issued long enough ago
         }
 
-        conversationSlackApi.channelsArchive(it.first)
-        logger.info("Archived ${it.first.name}")
+        if (!dryRun){
+            conversationSlackApi.channelsArchive(it.first)
+            logger.info("Archived ${it.first.name}")
+        }else{
+            logger.info("Would have archived: ${it.first.name}")
+        }
     }
 
     //a-la moment.js
@@ -103,7 +111,8 @@ class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
 
 
     companion object {
-        fun build(slackUri: URI,
+        fun build(dryRun: Boolean,
+                  slackUri: URI,
                   slackOauthAccessToken: String,
                   slackBotOauthAccessToken: String,
                   idleMonths: Int,
@@ -131,7 +140,7 @@ class ChannelChecker(private val conversationSlackApi: ConversationsSlackApi,
 
             val channelStateCalculator = ChannelStateCalculator(conversationsSlackApi, clock, defaultIdlePeriod, longIdlePeriodChannels, longIdlePeriod, warningMessage)
 
-            return ChannelChecker(conversationsSlackApi, chatSlackApi, botUser, clock, channelStateCalculator, warningPeriod, warningMessage)
+            return ChannelChecker(dryRun, conversationsSlackApi, chatSlackApi, botUser, clock, channelStateCalculator, warningPeriod, warningMessage)
         }
     }
 }

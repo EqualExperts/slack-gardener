@@ -54,12 +54,14 @@ class AwsLambda : RequestHandler<Any, Unit> {
 
         val gardenerUriParamName = "slack.gardener.uri"
 
-        val idleMonthsParamName = "slack.gardener.channel.idle.months"
-        val longIdleYearsParamName = "slack.gardener.channel.idle.long.years"
-        val longIdleChannelsParamName = "slack.gardener.channel.idle.long.channels"
+        val idleMonthsParamName = "slack.gardener.idle.months"
+        val longIdleYearsParamName = "slack.gardener.idle.long.years"
+        val longIdleChannelsParamName = "slack.gardener.idle.long.channels"
 
-        val warningWaitWeeksParamName = "slack.gardener.channel.warning.wait.weeks"
-        val warningMessageParamName = "slack.gardener.channel.warning.wait.message"
+        val warningWaitWeeksParamName = "slack.gardener.warning.wait.weeks"
+        val warningMessageParamName = "slack.gardener.warning.wait.message"
+
+        val dryRunParamName = "slack.channel.dryrun"
 
         request.withNames(gardenerOauthAccessTokenParamName,
             gardenerBotOauthAccessTokenParamName,
@@ -68,7 +70,8 @@ class AwsLambda : RequestHandler<Any, Unit> {
             warningWaitWeeksParamName,
             longIdleYearsParamName,
             longIdleChannelsParamName,
-            warningMessageParamName).withDecryption = true
+            warningMessageParamName,
+            dryRunParamName).withDecryption = true
         val parameterResults = client.getParameters(request)
 
         if (parameterResults.invalidParameters.isNotEmpty()) {
@@ -88,8 +91,11 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val warningWaitWeeks = parameterResults.parameters.find { it.name == warningWaitWeeksParamName }?.value!!.toInt()
         val warningMessage = parameterResults.parameters.find { it.name == warningMessageParamName }?.value!!
 
+        val dryRun = parameterResults.parameters.find { it.name == dryRunParamName }?.value!!.toBoolean()
 
-        val gardener = ChannelChecker.build(slackUri,
+
+        val gardener = ChannelChecker.build(dryRun,
+            slackUri,
             slackOauthAccessToken,
             slackBotOauthAccessToken,
             idleMonths,

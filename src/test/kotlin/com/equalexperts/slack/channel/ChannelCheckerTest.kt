@@ -38,6 +38,8 @@ class ChannelCheckerTest {
 
     private val channel = Conversation("TEST_ID", "CHANNEL_NAME", Instant.EPOCH.epochSecond, 1)
 
+    private var dryRun: Boolean = false
+
     @BeforeEach
     fun setup() {
         mockConversationsApi = mock()
@@ -117,7 +119,7 @@ class ChannelCheckerTest {
     }
 
     private fun getGardener(): ChannelChecker {
-        return ChannelChecker(mockConversationsApi, mockChatSlackApi, botUser, clock, mockChannelStateCalculator, warningPeriod, warningMessageContent)
+        return ChannelChecker(dryRun, mockConversationsApi, mockChatSlackApi, botUser, clock, mockChannelStateCalculator, warningPeriod, warningMessageContent)
     }
 
     private fun getNow(): Instant? {

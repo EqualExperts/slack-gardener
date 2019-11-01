@@ -194,13 +194,18 @@ brew install pipenv terraform terragrunt gradle
     }'
     ```
 
-7. Decide if you want the "archive inactive channels" feature, by running one of the commands below:
+7. Decide if you want the "archive inactive channels" feature and if it
+   should be in dry run mode, by running the relevant commands below:
 
     ```bash
     # Enable
     pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "true" --type "String"
     # Disable
     pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "false" --type "String"
+    # Dry Run On
+    pipenv run aws ssm put-parameter --name "slack.channel.dryrun" --value "true" --type "String"
+    # Dry Run Off
+    pipenv run aws ssm put-parameter --name "slack.channel.dryrun" --value "false" --type "String"
     ```
 
 8. Decide if you want the "enforce profile picture" feature and if it
