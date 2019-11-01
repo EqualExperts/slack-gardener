@@ -47,7 +47,8 @@ class ChannelStateCalculator(
 
     fun determineChannelState(channel: Conversation, botUser: User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
-        val timeLimit = ZonedDateTime.now(clock) - idlePeriod
+        val now = ZonedDateTime.now(clock)
+        val timeLimit = now - idlePeriod
 
         val channelCreatedAfterTimeLimitThreshold = channel.created >= timeLimit
         if (channelCreatedAfterTimeLimitThreshold) {
@@ -55,20 +56,18 @@ class ChannelStateCalculator(
             return ChannelState.Active //new channels count as active
         }
 
-        //TODO: we start at the oldest time and page forward. Paging backward instead will be faster when a channel has already been warned.
-
-
         var lastWarning: ZonedDateTime? = null
-        var timestamp = Timestamp(timeLimit)
+        var thresholdTimestamp = Timestamp(timeLimit)
+        val nowTimestamp = Timestamp(now)
 
         do {
-            logger.debug("Searching for human message in channel ${channel.name} after threshold $timestamp")
-            val history = conversationSlackApi.channelHistory(channel, timestamp)
+            logger.debug("Searching for human message in channel ${channel.name} from now $nowTimestamp to $thresholdTimestamp ")
+            val history = conversationSlackApi.channelHistory(channel, thresholdTimestamp, nowTimestamp)
             val messages = history.messages
 
             val noMessagesSinceThreshold = messages.isEmpty()
             if (noMessagesSinceThreshold) {
-                logger.debug("No messages since timestamp $timestamp in ${channel.name}")
+                logger.debug("No messages since timestamp $thresholdTimestamp in ${channel.name}")
                 break
             }
 
@@ -79,20 +78,20 @@ class ChannelStateCalculator(
 
                 if (humanMessage || nonGardenerBotMessage || matchingMessageContent){
                     if (humanMessage){
-                        logger.debug("Found a message since $timestamp from a human being in ${channel.name}")
+                        logger.debug("Found a message on ${it.timestamp} since $thresholdTimestamp from a human being in ${channel.name}")
                     }
                     if (nonGardenerBotMessage){
-                        logger.debug("Found a message since $timestamp from a non-gardener bot in ${channel.name}")
+                        logger.debug("Found a message on ${it.timestamp} since $thresholdTimestamp from a non-gardener bot in ${channel.name}")
                     }
                     if (matchingMessageContent){
-                        logger.debug("Found a message since $timestamp from the gardener bot but it wasn't the current warning message, in ${channel.name}")
+                        logger.debug("Found a message on ${it.timestamp} since $thresholdTimestamp from the gardener bot but it wasn't the current warning message, in ${channel.name}")
                     }
                 }
                 humanMessage || nonGardenerBotMessage || matchingMessageContent
             }
 
             if (messageSentFromHumanBeingOrBotBeforeThreshold) {
-                logger.debug("Found a message since $timestamp in ${channel.name} that is valid to mark channel as not stale")
+                logger.debug("Found a message since $thresholdTimestamp in ${channel.name} that is valid to mark channel as not stale")
                 return ChannelState.Active //found a message typed by an actual human being or a non-gardener bot
             }
 
@@ -100,7 +99,7 @@ class ChannelStateCalculator(
                 it.bot_id == botUser.profile.bot_id && it.subtype == "bot_message"
             }
             lastWarning = lastGardenerMessage?.timestamp?.toZonedDateTime() ?: lastWarning
-            timestamp = messages.last().timestamp
+            thresholdTimestamp = messages.last().timestamp
         } while (history.has_more)
 
         if (lastWarning != null) {

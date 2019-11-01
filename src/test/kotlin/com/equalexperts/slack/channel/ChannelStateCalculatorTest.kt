@@ -97,7 +97,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(humanMessageDuringLongPeriodThreshold)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(longIdlePeriodChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)
@@ -113,7 +113,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(humanMessageDuringLongPeriodThreshold)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(longIdlePeriodChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)
@@ -129,7 +129,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(gardenerMessageAfterWarningThreshold)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(channel, gardenerUser)
         assertEquals(ChannelState.StaleAndWarned(afterWarningThreshold)::class, state::class)
@@ -144,7 +144,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = emptyList<Message>()
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(channel, gardenerUser)
         assertEquals(ChannelState.Stale, state)
@@ -159,7 +159,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(botMessage)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
@@ -171,7 +171,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(humanMessage)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
@@ -183,7 +183,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(gardenerNonWarningMessage)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
@@ -195,7 +195,7 @@ class ChannelStateCalculatorTest {
 
         val channelMessages = listOf(humanMessage)
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
-        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any())).doReturn(history)
+        whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
         val state = gardener.determineChannelState(freshlyCreatedChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)

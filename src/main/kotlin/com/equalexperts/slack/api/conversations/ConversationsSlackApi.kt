@@ -92,10 +92,11 @@ interface ConversationsSlackApi {
             @Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation
     )
 
-    @RequestLine("GET /api/conversations.history?channel={channel}&oldest={oldest}&count=1000")
+    @RequestLine("GET /api/conversations.history?channel={channel}&oldest={oldest}&latest={latest}&inclusive=true")
     fun channelHistory(
-            @Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation,
-            @Param("oldest") oldest: Timestamp
+        @Param("channel", expander = Conversation.ChannelIdExpander::class) channel: Conversation,
+        @Param("oldest") oldest: Timestamp,
+        @Param("latest") latest: Timestamp
     ): ConversationHistory
 
     @RequestLine("GET /api/conversations.history?channel={channel}&cursor={cursorValue}&count=200")
