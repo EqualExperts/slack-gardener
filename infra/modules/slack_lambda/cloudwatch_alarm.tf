@@ -10,6 +10,7 @@ resource "aws_cloudwatch_metric_alarm" "lambda_error_alarm" {
   namespace           = "AWS/Lambda"
   period              = "86400"
   statistic           = "Minimum"
+  datapoints_to_alarm = 1
   threshold           = "0"
   alarm_description   = "The ${var.lambda_name} lambda has failed to run in the last 24 hours"
   alarm_actions = [
