@@ -109,13 +109,15 @@ class AwsLambda : RequestHandler<Any, Unit> {
         val profileUriParamName = "slack.gardener.uri"
         val warningWaitDaysParamName = "slack.profile.warning.wait.days"
         val warningMessageParamName = "slack.profile.warning.wait.message"
+        val dryRunParamName = "slack.profile.dryrun"
 
         request.withNames(
             gardenerOauthAccessTokenParamName,
             gardenerBotOauthAccessTokenParamName,
             profileUriParamName,
             warningWaitDaysParamName,
-            warningMessageParamName).withDecryption = true
+            warningMessageParamName,
+            dryRunParamName).withDecryption = true
         val parameterResults = client.getParameters(request)
 
         if (parameterResults.invalidParameters.isNotEmpty()) {
@@ -130,6 +132,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
 
         val warningWaitDays = parameterResults.parameters.find { it.name == warningWaitDaysParamName }?.value!!.toInt()
         val warningMessage = parameterResults.parameters.find { it.name == warningMessageParamName }?.value!!
+        val dryRun = parameterResults.parameters.find { it.name == dryRunParamName }?.value!!.toBoolean()
 
 
         //Calculated using ProfileChecker.getDefaultMd5Hashes()
@@ -160,7 +163,7 @@ class AwsLambda : RequestHandler<Any, Unit> {
             "93ac368757cb78b07703bf2ec75a006a",
             "ab9d10bf2f9773efeb4a10d632a2a0bd")
 
-        val profileChecker = ProfileChecker.build(slackUri,
+        val profileChecker = ProfileChecker.build(dryRun, slackUri,
             slackOauthAccessToken,
             slackBotOauthAccessToken,
             warningMessage,

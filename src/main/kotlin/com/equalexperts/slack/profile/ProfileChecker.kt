@@ -21,7 +21,8 @@ import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
 import java.util.stream.Collectors
 
-class ProfileChecker(private val usersSlackApi: UsersSlackApi,
+class ProfileChecker(private val dryRun: Boolean,
+                     private val usersSlackApi: UsersSlackApi,
                      private val userProfilesSlackApi: ProfilesSlackApi,
                      private val conversationsSlackApi: ConversationsSlackApi,
                      private val chatSlackApi: ChatSlackApi,
@@ -81,17 +82,25 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
         val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker(rules)
 
         for (user in usersWithDetailedProfiles) {
+            if (user.name == "slackbot"){
+                continue
+            }
             val results = profileRequiredFieldsChecker.checkMissingFields(user)
             userProfileResults[user] = results
         }
 
-        userProfileResults.entries.parallelStream()
+        val results = userProfileResults.entries.parallelStream()
                 .peek { logger.info("${it.key.name} has values set: ${it.value.results}") }
                 .filter { it.value.getNumberOfFailedFields() > 0 }
-                .map { Triple(it.key, it.value, conversationsSlackApi.conversationOpen(it.key).channel.id) }
-                .filter { haveWeMessagedThemRecently(it.third) }
-                .map { sendMessage(it.first, it.second, it.third) }
                 .collect(Collectors.toList())
+
+        if (!dryRun){
+            results.parallelStream()
+                 .map { Triple(it.key, it.value, conversationsSlackApi.conversationOpen(it.key).channel.id) }
+                 .filter { haveWeMessagedThemRecently(it.third) }
+                 .map { sendMessage(it.first, it.second, it.third) }
+                 .collect(Collectors.toList())
+         }
 
         logger.info("$userProfileResults")
     }
@@ -118,7 +127,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
     }
 
     companion object {
-        fun build(slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int, knownDefaultPictureMd5Hashes: Set<String>): ProfileChecker {
+        fun build(dryRun: Boolean, slackUri: URI, slackOauthAccessToken: String, slackBotOauthAccessToken: String, warningMessage: String, warningWaitDays: Int, knownDefaultPictureMd5Hashes: Set<String>): ProfileChecker {
 
             val authSlackApi = AuthSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
             val chatSlackApi = ChatSlackApi.factory(slackUri, slackBotOauthAccessToken, Thread::sleep)
@@ -133,7 +142,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
             val rules = listOf(ProfileFieldRealNameRule(),
                     ProfileFieldDisplayNameRule(),
                     ProfileFieldTitleRule(),
-                    ProfileFieldHomeBaseRule(teamCustomProfileFields),
+//                    ProfileFieldHomeBaseRule(teamCustomProfileFields),
                     ProfilePictureRule(knownDefaultPictureMd5Hashes))
 
             val botUserId = authSlackApi.authenticate().id
@@ -143,7 +152,7 @@ class ProfileChecker(private val usersSlackApi: UsersSlackApi,
             val defaultWaitingPeriod = Period.ofDays(warningWaitDays)
             val threshold = ZonedDateTime.now(clock).truncatedTo(ChronoUnit.DAYS) - defaultWaitingPeriod
 
-            return ProfileChecker(usersSlackApi, userProfilesSlackApi, conversationsSlackApi, chatSlackApi, rules, botUser, warningMessage, threshold)
+            return ProfileChecker(dryRun, usersSlackApi, userProfilesSlackApi, conversationsSlackApi, chatSlackApi, rules, botUser, warningMessage, threshold)
         }
     }
 
@@ -155,6 +164,7 @@ class ProfileRequiredFieldsChecker(private val rules: List<ProfileFieldRule>) {
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun checkMissingFields(user: User): ProfileCheckerResults {
+        logger.info("Checking missing fields for $user.name")
         val results = mutableMapOf<String, Boolean>()
 
         for (rule in rules) {

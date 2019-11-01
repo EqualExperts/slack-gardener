@@ -22,7 +22,6 @@ import java.time.ZonedDateTime
 
 internal class ProfileCheckerTest {
 
-
     private lateinit var mockUserSlackApi: UsersSlackApi
 
     private lateinit var mockProfilesSlackApi: ProfilesSlackApi
@@ -32,6 +31,8 @@ internal class ProfileCheckerTest {
     private lateinit var mockChatSlackApi: ChatSlackApi
 
     private lateinit var mockBotUser: User
+
+    private var dryRun: Boolean = false
 
     @BeforeEach
     fun `setup`() {
@@ -58,7 +59,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testPassingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 
@@ -89,7 +90,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 
@@ -121,7 +122,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 
@@ -153,7 +154,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 
@@ -181,7 +182,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testPassingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 
@@ -194,7 +195,7 @@ internal class ProfileCheckerTest {
         val threshold = ZonedDateTime.now()
 
         val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile).copy(is_deleted = true)
+        val user = UsersForTesting.testUser(profile).copy(deleted = true)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -209,7 +210,7 @@ internal class ProfileCheckerTest {
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
         val warningMessage = "WARNING_MESSAGE"
-        val checker = ProfileChecker(mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
+        val checker = ProfileChecker(dryRun, mockUserSlackApi, mockProfilesSlackApi, mockConversationSlackApi, mockChatSlackApi, rules, mockBotUser, warningMessage, threshold)
 
         checker.process()
 

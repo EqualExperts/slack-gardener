@@ -203,13 +203,18 @@ brew install pipenv terraform terragrunt gradle
     pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "false" --type "String"
     ```
 
-8. Decide if you want the "enforce profile picture" feature, by running one of the commands below:
+8. Decide if you want the "enforce profile picture" feature and if it
+   should be in dry run mode, by running the relevant commands below:
 
     ```bash
     # Enable
     pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "true" --type "String"
     # Disable
     pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "false" --type "String"
+    # Dry Run On
+    pipenv run aws ssm put-parameter --name "slack.profile.dryrun" --value "true" --type "String"
+    # Dry Run Off
+    pipenv run aws ssm put-parameter --name "slack.profile.dryrun" --value "false" --type "String"
     ```
 
 ## Installation - Part 3
