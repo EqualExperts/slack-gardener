@@ -1,6 +1,11 @@
 package com.equalexperts.slack.api.profile.model
 
 data class TeamProfile(val profile: TeamProfileDetails)
+
+fun TeamProfile.getFieldMetadata(fieldName: String): TeamProfileFieldMetadata {
+    return profile.fields.single { it.label.toLowerCase() == fieldName.toLowerCase() }
+}
+
 data class TeamProfileDetails(val fields: List<TeamProfileFieldMetadata>)
 data class TeamProfileFieldMetadata(val id: String,
                                     val ordering: Int,

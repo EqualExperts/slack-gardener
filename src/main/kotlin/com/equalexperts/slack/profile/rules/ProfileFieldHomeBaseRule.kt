@@ -1,6 +1,7 @@
 package com.equalexperts.slack.profile.rules
 
 import com.equalexperts.slack.api.profile.model.TeamProfile
+import com.equalexperts.slack.api.profile.model.getFieldMetadata
 import com.equalexperts.slack.api.users.model.User
 import org.slf4j.LoggerFactory
 
@@ -11,7 +12,7 @@ class ProfileFieldHomeBaseRule(private val teamCustomProfileFields: TeamProfile)
     override fun checkProfile(user: User): ProfileFieldRuleResult {
         logger.debug("Checking $FIELD_NAME field for ${user.name}")
 
-        val homeBaseCustomField = teamCustomProfileFields.profile.fields.single { it.label.toLowerCase() == FIELD_NAME.toLowerCase() }
+        val homeBaseCustomField = teamCustomProfileFields.getFieldMetadata(FIELD_NAME)
 
         val result = user.profile.fields?.let {
             val userProfileField = it[homeBaseCustomField.id]
