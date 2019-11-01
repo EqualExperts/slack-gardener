@@ -78,7 +78,7 @@ dependencies {
     compile 'com.github.kittinunf.fuel:fuel-jackson:1.12.1'
     compile 'org.apache.commons:commons-lang3:3.0'
 
-
+    test.useJUnitPlatform()
     testCompile "com.nhaarman.mockitokotlin2:mockito-kotlin:2.1.0"
     testCompile "org.junit.jupiter:junit-jupiter-api:${jUnitVersion}"
     testCompile "org.junit.jupiter:junit-jupiter-params:${jUnitVersion}"
