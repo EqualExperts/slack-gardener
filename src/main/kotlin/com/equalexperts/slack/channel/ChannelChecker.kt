@@ -8,6 +8,10 @@ import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.channel.ChannelState.*
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.coroutineScope
+import kotlinx.coroutines.runBlocking
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
@@ -28,40 +32,42 @@ class ChannelChecker(private val dryRun: Boolean,
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
+
+    suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
+        map { async { f(it) } }.awaitAll()
+    }
+
     fun process() {
         val nanoTime = measureNanoTime {
             val channels = conversationSlackApi.listAll()
             logger.info("${channels.size} channels found")
-
-            val data = channels.parallelStream()
-                    .map { Pair(it, channelStateCalculator.determineChannelState(it, botUser)) }
-                    .peek { (it, state) ->
-                        val staleMessage = when (state) {
-                            Active -> "not stale"
-                            Stale -> "stale"
-                            is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
-                        }
-                        logger.info("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
+            runBlocking {
+                val data = channels.pmap{
+                    val state = channelStateCalculator.determineChannelState(it, botUser)
+                    val staleMessage = when (state) {
+                        Active -> "not stale"
+                        Stale -> "stale"
+                        is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
                     }
-                    .collect(Collectors.toList())
+                    logger.info("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
+                    val channelState = Pair(it, state)
+                    postWarning(channelState)
+                    archive(channelState)
+                    channelState
+                }
 
-            val active = data.count { it.second == Active }
-            val stale = data.count { it.second == Stale }
-            val staleAndWarned = data.count { it.second is StaleAndWarned }
-            val emptyChannels = data.count { it.first.members == 0 }
-
-
-            logger.info("${data.size} channels")
-            logger.info("$active active channels")
-            logger.info("${stale + staleAndWarned} stale channels ($staleAndWarned warned)")
-            logger.info("$emptyChannels empty channels")
-
-            logger.info("Posting warnings:")
-            data.parallelStream().forEach { postWarning(it) }
+                val active = data.count { it.second == Active }
+                val stale = data.count { it.second == Stale }
+                val staleAndWarned = data.count { it.second is StaleAndWarned }
+                val emptyChannels = data.count { it.first.members == 0 }
 
 
-            logger.info("Archiving:")
-            data.parallelStream().forEach { archive(it) }
+                logger.info("${data.size} channels")
+                logger.info("$active active channels")
+                logger.info("${stale + staleAndWarned} stale channels ($staleAndWarned warned)")
+                logger.info("$emptyChannels empty channels")
+            }
+
         }
 
         logger.info("done in ${nanoTime / 1_000_000} ms")
@@ -73,10 +79,10 @@ class ChannelChecker(private val dryRun: Boolean,
             return
         }
 
-        if (!dryRun){
+        if (!dryRun) {
             chatSlackApi.postMessage(it.first, botUser, warningMessage)
             logger.info("Warned ${it.first.name}")
-        }else{
+        } else {
             logger.info("Would have posted warning to : ${it.first.name}")
         }
     }
@@ -91,10 +97,10 @@ class ChannelChecker(private val dryRun: Boolean,
             return //warning hasn't been issued long enough ago
         }
 
-        if (!dryRun){
+        if (!dryRun) {
             conversationSlackApi.channelsArchive(it.first)
             logger.info("Archived ${it.first.name}")
-        }else{
+        } else {
             logger.info("Would have archived: ${it.first.name}")
         }
     }
@@ -144,3 +150,4 @@ class ChannelChecker(private val dryRun: Boolean,
         }
     }
 }
+
