@@ -10,8 +10,6 @@ class ProfileFieldHomeBaseRule(private val teamCustomProfileFields: TeamProfile)
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     override fun checkProfile(user: User): ProfileFieldRuleResult {
-        logger.debug("Checking $FIELD_NAME field for ${user.name}")
-
         val homeBaseCustomField = teamCustomProfileFields.getFieldMetadata(FIELD_NAME)
 
         val result = user.profile.fields?.let {

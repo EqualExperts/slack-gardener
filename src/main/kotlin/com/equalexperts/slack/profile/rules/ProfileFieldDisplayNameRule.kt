@@ -8,9 +8,6 @@ class ProfileFieldDisplayNameRule : ProfileFieldRule {
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     override fun checkProfile(user: User): ProfileFieldRuleResult {
-
-        logger.debug("Checking $FIELD_NAME field for ${user.name}")
-
         val result = !user.profile.display_name.isNullOrBlank()
 
         logger.debug("Checked $FIELD_NAME field for ${user.name}: $result")

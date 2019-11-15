@@ -13,8 +13,6 @@ class ProfilePictureRule(private val knownDefaultPictureMd5Hashes: Set<String>) 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     override fun checkProfile(user: User): ProfileFieldRuleResult {
-        logger.debug("Checking $FIELD_NAME field for ${user.name}")
-
         val result = user.profile.image_24?.let { checkIfDefaultProfilePicture(user, user.profile.image_24) } ?: false
 
         logger.debug("Checked $FIELD_NAME field for ${user.name}: $result")
