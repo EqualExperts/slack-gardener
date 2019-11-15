@@ -52,8 +52,8 @@ class ChannelStateCalculator(
 
         val channelCreatedAfterTimeLimitThreshold = channel.created >= timeLimit
         if (channelCreatedAfterTimeLimitThreshold) {
-            logger.debug("Channel ${channel.name} created before threshold $timeLimit")
-            return ChannelState.Active //new channels count as active
+            logger.debug("Channel ${channel.name} created before threshold $timeLimit, marking channel as active. Current Members Count ${channel.members}")
+            return ChannelState.Active
         }
 
         var lastWarning: ZonedDateTime? = null
@@ -91,7 +91,7 @@ class ChannelStateCalculator(
             }
 
             if (messageSentFromHumanBeingOrBotBeforeThreshold) {
-                logger.debug("Found a message since $thresholdTimestamp in ${channel.name} that is valid to mark channel as not stale")
+                logger.debug("Found a message since $thresholdTimestamp in ${channel.name} that is valid to mark channel as active.  Members Count ${channel.members}")
                 return ChannelState.Active //found a message typed by an actual human being or a non-gardener bot
             }
 
@@ -103,7 +103,7 @@ class ChannelStateCalculator(
         } while (history.has_more)
 
         if (lastWarning != null) {
-            logger.debug("Channel ${channel.name} is stale and warned")
+            logger.debug("Channel ${channel.name} is stale and warned ${lastWarning}")
             return ChannelState.StaleAndWarned(lastWarning)
         }
         logger.debug("Channel ${channel.name} is stale and not warned")
