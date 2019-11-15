@@ -9,7 +9,7 @@ resource "aws_lambda_function" "lambda" {
   role          = aws_iam_role.lambda_iam_role.arn
   handler       = var.lambda_entrypoint
   runtime       = "java8"
-  timeout       = 300
+  timeout       = 900
   memory_size   = 512
 }
 
