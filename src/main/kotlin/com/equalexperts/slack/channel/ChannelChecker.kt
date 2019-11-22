@@ -8,17 +8,16 @@ import com.equalexperts.slack.api.conversations.model.Conversation
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.channel.ChannelState.*
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
-import kotlinx.coroutines.coroutineScope
+import com.equalexperts.slack.pmap
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.slf4j.LoggerFactory
 import java.net.URI
 import java.time.Clock
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit.DAYS
-import java.util.stream.Collectors
 import kotlin.system.measureNanoTime
 
 class ChannelChecker(private val dryRun: Boolean,
@@ -33,26 +32,13 @@ class ChannelChecker(private val dryRun: Boolean,
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
 
-    suspend fun <A, B> Iterable<A>.pmap(f: suspend (A) -> B): List<B> = coroutineScope {
-        map { async { f(it) } }.awaitAll()
-    }
-
     fun process() {
         val nanoTime = measureNanoTime {
             val channels = conversationSlackApi.listAll()
             logger.info("${channels.size} channels found")
             runBlocking {
-                val data = channels.pmap{
-                    val state = channelStateCalculator.determineChannelState(it, botUser)
-                    val staleMessage = when (state) {
-                        Active -> "not stale"
-                        Stale -> "stale"
-                        is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
-                    }
-                    logger.info("\t${it.name}(id: ${it.id}, created ${it.created}, $staleMessage, ${it.members} members)")
-                    val channelState = Pair(it, state)
-                    postWarning(channelState)
-                    archive(channelState)
+                val data = channels.pmap {
+                    val channelState = processChannel(it)
                     channelState
                 }
 
@@ -71,6 +57,20 @@ class ChannelChecker(private val dryRun: Boolean,
         }
 
         logger.info("done in ${nanoTime / 1_000_000} ms")
+    }
+
+    private suspend fun processChannel(channel: Conversation): Pair<Conversation, ChannelState> = withContext(Dispatchers.Default) {
+        val state = channelStateCalculator.determineChannelState(channel, botUser)
+        val staleMessage = when (state) {
+            Active -> "not stale"
+            Stale -> "stale"
+            is StaleAndWarned -> "stale and warned ${state.oldestWarning.fromNow()}"
+        }
+        logger.info("\t${channel.name}(id: ${channel.id}, created ${channel.created}, $staleMessage, ${channel.members} members)")
+        val channelState = Pair(channel, state)
+        postWarning(channelState)
+        archive(channelState)
+        channelState
     }
 
 
