@@ -39,7 +39,7 @@ internal class ProfilePictureRuleTest {
 
     @Test
     fun `should return false for redirected default picture`() {
-        val testUrl = "https://TEST_URL"
+        val testUrl = "https://secure.gravatar.com/TEST_URL"
         val redirectedUrl = "https://DEFAULT_URL"
         val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
         val testUser = UsersForTesting.testBot(userProfile)
@@ -62,7 +62,7 @@ internal class ProfilePictureRuleTest {
 
     @Test
     fun `should return false for non user-uploaded picture`() {
-        val testUrl = "https://TEST_URL"
+        val testUrl = "https://secure.gravatar.com/TEST_URL"
         val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
         val testUser = UsersForTesting.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("0e9c7b8f33e92621323f0a2f4892ff7c"))
@@ -97,7 +97,7 @@ internal class ProfilePictureRuleTest {
 
     @Test
     fun `should return false for error picture`() {
-        val testUrl = "https://TEST_URL"
+        val testUrl = "https://secure.gravatar.com/TEST_URL"
         val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
         val testUser = UsersForTesting.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
@@ -117,7 +117,7 @@ internal class ProfilePictureRuleTest {
                 { rule.checkProfile(testUser) },
                 "Expected rule.checkProfile(testUser) to throw, but it didn't")
 
-        val expectedMessageThrown = thrown.message!!.contains("Unable to retrieve Profile Picture for user TEST_BOT_USER - https://TEST_URL {com.github.kittinunf.fuel.core.HttpException: HTTP Exception 404 not found}")
+        val expectedMessageThrown = thrown.message!!.contains("Unable to retrieve Profile Picture for user TEST_BOT_USER - https://secure.gravatar.com/TEST_URL {com.github.kittinunf.fuel.core.HttpException: HTTP Exception 404 not found}")
         assertTrue(expectedMessageThrown)
     }
 
