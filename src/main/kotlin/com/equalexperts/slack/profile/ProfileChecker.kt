@@ -8,10 +8,14 @@ import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.listAll
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
+import com.equalexperts.slack.pmap
 import com.equalexperts.slack.profile.rules.*
 import com.github.kittinunf.fuel.core.FuelError
 import com.github.kittinunf.fuel.httpGet
 import com.github.kittinunf.result.Result
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.runBlocking
+import kotlinx.coroutines.withContext
 import org.apache.commons.codec.digest.DigestUtils
 import org.slf4j.LoggerFactory
 import java.net.URI
@@ -19,7 +23,7 @@ import java.time.Clock
 import java.time.Period
 import java.time.ZonedDateTime
 import java.time.temporal.ChronoUnit
-import java.util.stream.Collectors
+import kotlin.system.measureNanoTime
 
 class ProfileChecker(private val dryRun: Boolean,
                      private val usersSlackApi: UsersSlackApi,
@@ -35,10 +39,10 @@ class ProfileChecker(private val dryRun: Boolean,
 
     fun getDefaultMd5Hashes(): Set<String> {
         val users = usersSlackApi.listAll()
-                .filter { !it.is_bot }
-                .filter { !it.deleted }
+            .filter { !it.is_bot }
+            .filter { !it.deleted }
         val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
-                .filter { it.profile.bot_id.isNullOrBlank() }
+            .filter { it.profile.bot_id.isNullOrBlank() }
 
         val md5Hashes = mutableMapOf<String, Int>()
         for (user in usersWithDetailedProfiles) {
@@ -70,42 +74,39 @@ class ProfileChecker(private val dryRun: Boolean,
     }
 
     fun process() {
-        val users = usersSlackApi.listAll()
+        val nanoTime = measureNanoTime {
+            val users = usersSlackApi.listAll()
                 .filter { !it.is_bot }
                 .filter { !it.deleted }
+                .filter { it.name != "slackbot" }
+                //Add profiles concurrently to respect api rate limits,
+                //if we do this in parallel it hits the rate limits really soon
+                .map { addDetailedProfileToUser(it) }
 
-        val usersWithDetailedProfiles = users.map { user -> addDetailedProfileToUser(user) }
-                                                        .filter { it.profile.bot_id.isNullOrBlank() }
+            logger.info("${users.size} active users found")
 
-        val userProfileResults = mutableMapOf<User, ProfileCheckerResults>()
-
-        val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker(rules)
-
-        for (user in usersWithDetailedProfiles) {
-            if (user.name == "slackbot"){
-                continue
+            val profileRequiredFieldsChecker = ProfileRequiredFieldsChecker(rules)
+            runBlocking {
+                //Process the profiles in parallel, as we now have all the data we need to make our decisions and can avoid the rate limits
+                users.pmap { processUser(it, profileRequiredFieldsChecker) }
             }
-            val results = profileRequiredFieldsChecker.checkMissingFields(user)
-            userProfileResults[user] = results
         }
-
-        val results = userProfileResults.entries.parallelStream()
-                .peek { logger.info("${it.key.name} has values set: ${it.value.results}") }
-                .filter { it.value.getNumberOfFailedFields() > 0 }
-                .collect(Collectors.toList())
-
-        if (!dryRun){
-            results.parallelStream()
-                 .map { Triple(it.key, it.value, conversationsSlackApi.conversationOpen(it.key).channel.id) }
-                 .filter { haveWeMessagedThemRecently(it.third) }
-                 .map { sendMessage(it.first, it.second, it.third) }
-                 .collect(Collectors.toList())
-         }
-
-        logger.info("$userProfileResults")
+        logger.info("done in ${nanoTime / 1_000_000} ms")
     }
 
-    private fun haveWeMessagedThemRecently(conversationId: String): Boolean {
+    private suspend fun processUser(user: User, profileRequiredFieldsChecker: ProfileRequiredFieldsChecker) = withContext(Dispatchers.Default) {
+        val results = profileRequiredFieldsChecker.checkMissingFields(user)
+        if (results.getNumberOfFailedFields() > 0) {
+            val conversation = conversationsSlackApi.conversationOpen(user).channel.id
+            if (lastMessageIsAfterWarningFrequencyThreshold(conversation)) {
+                sendMessage(user, results, conversation)
+            } else {
+                logger.info("We've already message ${user.name} recently due to $results ")
+            }
+        }
+    }
+
+    private fun lastMessageIsAfterWarningFrequencyThreshold(conversationId: String): Boolean {
         val channelHistory = conversationsSlackApi.channelHistory(conversationId)
         if (channelHistory.messages.isEmpty()) return true
 
@@ -115,8 +116,12 @@ class ProfileChecker(private val dryRun: Boolean,
     }
 
     private fun sendMessage(user: User, results: ProfileCheckerResults, conversationId: String) {
-        logger.info("Sending Message to ${user.name} with $results using conversation $conversationId}")
-        chatSlackApi.postMessage(conversationId, botUser, warningMessage)
+        if (dryRun) {
+            logger.info("DRY RUN: Would have messaged ${user.name} with $results using conversation $conversationId")
+        } else {
+            logger.info("Sending Message to ${user.name} with $results using conversation $conversationId")
+            chatSlackApi.postMessage(conversationId, botUser, warningMessage)
+        }
     }
 
     private fun addDetailedProfileToUser(user: User): User {
@@ -140,10 +145,10 @@ class ProfileChecker(private val dryRun: Boolean,
             val teamCustomProfileFields = userProfilesSlackApi.teamProfile()
 
             val rules = listOf(ProfileFieldRealNameRule(),
-                    ProfileFieldDisplayNameRule(),
-                    ProfileFieldTitleRule(),
-//                    ProfileFieldHomeBaseRule(teamCustomProfileFields),
-                    ProfilePictureRule(knownDefaultPictureMd5Hashes))
+                ProfileFieldDisplayNameRule(),
+                ProfileFieldTitleRule(),
+                ProfileFieldHomeBaseRule(teamCustomProfileFields),
+                ProfilePictureRule(knownDefaultPictureMd5Hashes))
 
             val botUserId = authSlackApi.authenticate().id
             val botUser = usersSlackApi.getUserInfo(botUserId).user
@@ -164,7 +169,6 @@ class ProfileRequiredFieldsChecker(private val rules: List<ProfileFieldRule>) {
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
     fun checkMissingFields(user: User): ProfileCheckerResults {
-        logger.info("Checking missing fields for $user.name")
         val results = mutableMapOf<String, Boolean>()
 
         for (rule in rules) {
