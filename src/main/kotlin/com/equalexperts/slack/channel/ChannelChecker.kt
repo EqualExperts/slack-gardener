@@ -79,11 +79,11 @@ class ChannelChecker(private val dryRun: Boolean,
             return
         }
 
-        if (!dryRun) {
+        if (dryRun) {
+            logger.info("DRY RUN: Would have posted warning to : ${it.first.name}")
+        } else {
             chatSlackApi.postMessage(it.first, botUser, warningMessage)
             logger.info("Warned ${it.first.name}")
-        } else {
-            logger.info("Would have posted warning to : ${it.first.name}")
         }
     }
 
@@ -97,11 +97,11 @@ class ChannelChecker(private val dryRun: Boolean,
             return //warning hasn't been issued long enough ago
         }
 
-        if (!dryRun) {
+        if (dryRun) {
+            logger.info("DRY RUN: Would have archived: ${it.first.name}")
+        } else {
             conversationSlackApi.channelsArchive(it.first)
             logger.info("Archived ${it.first.name}")
-        } else {
-            logger.info("Would have archived: ${it.first.name}")
         }
     }
 
