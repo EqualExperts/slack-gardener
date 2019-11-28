@@ -1,4 +1,4 @@
-package com.equalexperts.slack.lambda
+package com.equalexperts.slack.aws.lambda
 
 import com.amazonaws.services.lambda.runtime.Context
 import com.amazonaws.services.lambda.runtime.RequestHandler
@@ -6,7 +6,7 @@ import com.amazonaws.services.simplesystemsmanagement.AWSSimpleSystemsManagement
 import com.equalexperts.slack.aws.AWSExecutionEnvironment
 import org.slf4j.LoggerFactory
 
-class AwsLambda : RequestHandler<Any, Unit> {
+class Entrypoint : RequestHandler<Any, Unit> {
 
     private val logger = LoggerFactory.getLogger(this::class.java.name)
 
