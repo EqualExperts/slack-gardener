@@ -12,6 +12,6 @@ inputs = {
     lambda_name = "INSERT_LAMBDA_NAME"
     lambda_display_name = "INSERT_LAMBDA_DISPLAY_NAME"
     lambda_description = "INSERT_LAMBDA_DESCRIPTION"
-    lambda_entrypoint = "com.equalexperts.slack.aws.lambda.EntryPoint"
+    lambda_entrypoint = "com.equalexperts.slack.aws.lambda.Entrypoint"
     sns_topic = "INSERT_SNS_TOPIC"
 }
