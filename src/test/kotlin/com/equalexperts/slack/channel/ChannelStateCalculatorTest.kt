@@ -99,7 +99,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(longIdlePeriodChannel, gardenerUser)
+        val state = gardener.calculate(longIdlePeriodChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)
 
     }
@@ -115,7 +115,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(longIdlePeriodChannel, gardenerUser)
+        val state = gardener.calculate(longIdlePeriodChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)
 
     }
@@ -131,7 +131,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(channel, gardenerUser)
+        val state = gardener.calculate(channel, gardenerUser)
         assertEquals(ChannelState.StaleAndWarned(afterWarningThreshold)::class, state::class)
     }
 
@@ -146,7 +146,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(channel, gardenerUser)
+        val state = gardener.calculate(channel, gardenerUser)
         assertEquals(ChannelState.Stale, state)
     }
 
@@ -161,7 +161,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(channel, gardenerUser)
+        val state = gardener.calculate(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
     }
 
@@ -173,7 +173,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(channel, gardenerUser)
+        val state = gardener.calculate(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
     }
 
@@ -185,7 +185,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(channel, gardenerUser)
+        val state = gardener.calculate(channel, gardenerUser)
         assertEquals(ChannelState.Active, state)
     }
 
@@ -197,7 +197,7 @@ class ChannelStateCalculatorTest {
         val history = ConversationHistoriesForTesting.withEmptyCursorToken(channelMessages)
         whenever(mockConversationsApi.channelHistory(any<Conversation>(), any(), any())).doReturn(history)
 
-        val state = gardener.determineChannelState(freshlyCreatedChannel, gardenerUser)
+        val state = gardener.calculate(freshlyCreatedChannel, gardenerUser)
         assertEquals(ChannelState.Active, state)
     }
 

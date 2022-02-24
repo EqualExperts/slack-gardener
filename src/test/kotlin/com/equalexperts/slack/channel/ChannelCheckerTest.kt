@@ -3,10 +3,6 @@ package com.equalexperts.slack.channel
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.channel.ChannelChecker
-import com.equalexperts.slack.channel.ChannelState
-import com.equalexperts.slack.channel.ChannelStateCalculator
-import com.equalexperts.slack.channel.ConversationListsForTesting
 import com.equalexperts.slack.api.users.SlackTestUsers
 import com.equalexperts.slack.profile.SlackTestProfiles
 import com.nhaarman.mockitokotlin2.*
@@ -65,7 +61,7 @@ class ChannelCheckerTest {
         val channelList = ConversationListsForTesting.withEmptyCursorToken(channel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
-        whenever(mockChannelStateCalculator.determineChannelState(channel, botUser)).thenReturn(ChannelState.StaleAndWarned(beforeWarningThreshold))
+        whenever(mockChannelStateCalculator.calculate(channel, botUser)).thenReturn(ChannelState.StaleAndWarned(beforeWarningThreshold))
 
         gardener.process()
 
@@ -80,7 +76,7 @@ class ChannelCheckerTest {
         val channelList = ConversationListsForTesting.withEmptyCursorToken(channel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
-        whenever(mockChannelStateCalculator.determineChannelState(channel, botUser)).thenReturn(ChannelState.StaleAndWarned(afterWarningThreshold))
+        whenever(mockChannelStateCalculator.calculate(channel, botUser)).thenReturn(ChannelState.StaleAndWarned(afterWarningThreshold))
 
         gardener.process()
 
@@ -95,7 +91,7 @@ class ChannelCheckerTest {
         val channelList = ConversationListsForTesting.withEmptyCursorToken(channel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
-        whenever(mockChannelStateCalculator.determineChannelState(channel, botUser)).thenReturn(ChannelState.Stale)
+        whenever(mockChannelStateCalculator.calculate(channel, botUser)).thenReturn(ChannelState.Stale)
 
         gardener.process()
 
@@ -110,7 +106,7 @@ class ChannelCheckerTest {
         val channelList = ConversationListsForTesting.withEmptyCursorToken(channel)
         whenever(mockConversationsApi.list()).doReturn(channelList)
 
-        whenever(mockChannelStateCalculator.determineChannelState(channel, botUser)).thenReturn(ChannelState.Active)
+        whenever(mockChannelStateCalculator.calculate(channel, botUser)).thenReturn(ChannelState.Active)
 
         gardener.process()
 

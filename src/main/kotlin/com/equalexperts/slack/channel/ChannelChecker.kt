@@ -36,6 +36,7 @@ class ChannelChecker(private val dryRun: Boolean,
         val nanoTime = measureNanoTime {
             val channels = conversationSlackApi.listAll()
             logger.info("${channels.size} channels found")
+            // Do this all in parallel to go as fast as the slack API rate limits allow us
             runBlocking {
                 val data = channels.pmap {
                     val channelState = processChannel(it)
@@ -60,7 +61,7 @@ class ChannelChecker(private val dryRun: Boolean,
     }
 
     private suspend fun processChannel(channel: Conversation): Pair<Conversation, ChannelState> = withContext(Dispatchers.Default) {
-        val state = channelStateCalculator.determineChannelState(channel, botUser)
+        val state = channelStateCalculator.calculate(channel, botUser)
         val staleMessage = when (state) {
             Active -> "not stale"
             Stale -> "stale"

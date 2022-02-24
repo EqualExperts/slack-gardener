@@ -45,7 +45,7 @@ class ChannelStateCalculator(
     }
 
 
-    fun determineChannelState(channel: Conversation, botUser: User): ChannelState {
+    fun calculate(channel: Conversation, botUser: User): ChannelState {
         val idlePeriod = determineIdlePeriod(channel)
         val now = ZonedDateTime.now(clock)
         val timeLimit = now - idlePeriod
