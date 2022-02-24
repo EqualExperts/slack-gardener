@@ -220,6 +220,38 @@ class ChannelStateCalculatorTest {
         assertEquals(ChannelState.Active, state)
     }
 
+    @Test
+    fun `calculator pages back in history when no valid messages in current page but more messages are available`() {
+        val gardener = getChannelStateCalculator(longIdlePeriodChannels)
+
+        val user = SlackTestUsers.humanUser()
+
+        val firstMessageTimeSent = testTime.afterIdleThreshold()
+
+        val firstMessages = listOf(
+            SlackTestMessages.joinerMessage(user.name, firstMessageTimeSent),
+            SlackTestMessages.leaverMessage(user.name, firstMessageTimeSent)
+        )
+        val firstHistoryPage = ConversationHistoriesForTesting.withCursorToken(firstMessages, "CURSOR_TOKEN")
+
+        val secondMessageTimeSent = testTime.afterIdleThreshold()
+        val secondMessage = SlackTestMessages.userMessage(
+            user.name,
+            user.profile.bot_id,
+            secondMessageTimeSent,
+            "TEST_MESSAGE"
+        )
+        val secondHistoryPage = ConversationHistoriesForTesting.withEmptyCursorToken(listOf(secondMessage))
+
+        whenever(mockConversationsApi.channelHistory(any(), any(), any())).doReturn(
+            firstHistoryPage,
+            secondHistoryPage
+        )
+        // TODO assert that we actually page
+        val state = gardener.calculate(channel, SlackTestUsers.gardenerUser())
+        assertEquals(ChannelState.Active, state)
+    }
+
 
     private fun getChannelStateCalculator(longIdlePeriodChannels: Set<String>): ChannelStateCalculator {
         return ChannelStateCalculator(
