@@ -1,7 +1,7 @@
 package com.equalexperts.slack.profile.rules
 
-import com.equalexperts.slack.api.users.UsersForTesting
-import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.equalexperts.slack.api.users.SlackTestUsers
+import com.equalexperts.slack.profile.SlackTestProfiles
 import com.github.kittinunf.fuel.core.Client
 import com.github.kittinunf.fuel.core.FuelManager
 import com.github.kittinunf.fuel.core.Response
@@ -18,8 +18,8 @@ internal class ProfilePictureRuleTest {
     @Test
     fun `should return true for user-uploaded picture`() {
         val testUrl = "https://TEST_URL"
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(image_24 = testUrl)
+        val testUser = SlackTestUsers.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
 
         val inputStream = getResource("/empty.jpg")
@@ -41,8 +41,8 @@ internal class ProfilePictureRuleTest {
     fun `should return false for redirected default picture`() {
         val testUrl = "https://secure.gravatar.com/TEST_URL"
         val redirectedUrl = "https://DEFAULT_URL"
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(image_24 = testUrl)
+        val testUser = SlackTestUsers.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
 
         val inputStream = getResource("/empty.jpg")
@@ -63,8 +63,8 @@ internal class ProfilePictureRuleTest {
     @Test
     fun `should return false for non user-uploaded picture`() {
         val testUrl = "https://secure.gravatar.com/TEST_URL"
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(image_24 = testUrl)
+        val testUser = SlackTestUsers.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("0e9c7b8f33e92621323f0a2f4892ff7c"))
 
         val inputStream = getResource("/empty.jpg")
@@ -86,8 +86,8 @@ internal class ProfilePictureRuleTest {
     @Test
     fun `should return false for missing picture`() {
 
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = null)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(image_24 = null)
+        val testUser = SlackTestUsers.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("TEST_HASH"))
 
         val result = rule.checkProfile(testUser)
@@ -98,8 +98,8 @@ internal class ProfilePictureRuleTest {
     @Test
     fun `should return false for error picture`() {
         val testUrl = "https://secure.gravatar.com/TEST_URL"
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(image_24 = testUrl)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(image_24 = testUrl)
+        val testUser = SlackTestUsers.testBot(userProfile)
         val rule = ProfilePictureRule(setOf("TEST_DEFAULT_HASH"))
 
         val inputStream = getResource("/empty.jpg")

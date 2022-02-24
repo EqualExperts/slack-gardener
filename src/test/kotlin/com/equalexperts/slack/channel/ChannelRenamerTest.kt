@@ -3,8 +3,8 @@ package com.equalexperts.slack.channel
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.users.UsersForTesting
-import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.equalexperts.slack.api.users.SlackTestUsers
+import com.equalexperts.slack.profile.SlackTestProfiles
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -17,7 +17,7 @@ internal class ChannelRenamerTest {
         val mockConversationApi = mock<ConversationsSlackApi>()
         val mockChatSlackApi = mock<ChatSlackApi>()
 
-        val mockBotUser = UsersForTesting.testBot(UserProfilesForTesting.testBotProfile())
+        val mockBotUser = SlackTestUsers.testBot(SlackTestProfiles.botProfile())
 
         val channelsToRename = mapOf(("rename_me" to "new_name"))
 

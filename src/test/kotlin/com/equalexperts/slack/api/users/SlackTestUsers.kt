@@ -2,8 +2,9 @@ package com.equalexperts.slack.api.users
 
 import com.equalexperts.slack.api.profile.model.UserProfile
 import com.equalexperts.slack.api.users.model.User
+import com.equalexperts.slack.profile.SlackTestProfiles
 
-object UsersForTesting {
+object SlackTestUsers {
     fun testBot(profile: UserProfile) = User(name = "TEST_BOT_USER",
             profile = profile,
             id = "id",
@@ -29,4 +30,10 @@ object UsersForTesting {
             is_ultra_restricted = false,
             is_bot = false,
             is_app_user = false)
+
+    fun gardenerUser() = testBot(profile = SlackTestProfiles.botProfile().copy(bot_id = "GARDENER_BOT_ID")).copy(name = "GARDENER", id = "GARDENER_BOT_ID")
+
+    fun nonGardenerBotUser() = testBot(profile = SlackTestProfiles.botProfile().copy(bot_id = "NON_GARDENER_BOT_ID")).copy(id = "NON_GARDENER_BOT_ID")
+
+    fun humanUser() = testUser(profile = SlackTestProfiles.userProfile())
 }

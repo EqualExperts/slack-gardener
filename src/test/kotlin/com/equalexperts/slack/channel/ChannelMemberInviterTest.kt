@@ -2,10 +2,10 @@ package com.equalexperts.slack.channel
 
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.api.users.SlackTestUsers
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.UserListsForTesting
-import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.equalexperts.slack.profile.SlackTestProfiles
 import com.nhaarman.mockitokotlin2.mock
 import com.nhaarman.mockitokotlin2.verify
 import com.nhaarman.mockitokotlin2.whenever
@@ -21,8 +21,8 @@ internal class ChannelMemberInviterTest {
 
         val numberOfUsersToCreate = 31
         val users = (0..numberOfUsersToCreate).map {
-            val profile = UserProfilesForTesting.testUserProfile().copy(email = "test$it@email.com")
-            UsersForTesting.testUser(profile = profile).copy(id = "id_$it")
+            val profile = SlackTestProfiles.userProfile().copy(email = "test$it@email.com")
+            SlackTestUsers.testUser(profile = profile).copy(id = "id_$it")
         }
 
         whenever(mockUsersApi.list()).thenReturn(UserListsForTesting.withEmptyCursorToken(users))

@@ -3,12 +3,12 @@ package com.equalexperts.slack.channel
 import com.equalexperts.slack.api.chat.ChatSlackApi
 import com.equalexperts.slack.api.conversations.ConversationsSlackApi
 import com.equalexperts.slack.api.conversations.model.Conversation
-import com.equalexperts.slack.api.users.UsersForTesting
 import com.equalexperts.slack.channel.ChannelChecker
 import com.equalexperts.slack.channel.ChannelState
 import com.equalexperts.slack.channel.ChannelStateCalculator
 import com.equalexperts.slack.channel.ConversationListsForTesting
-import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.equalexperts.slack.api.users.SlackTestUsers
+import com.equalexperts.slack.profile.SlackTestProfiles
 import com.nhaarman.mockitokotlin2.*
 import org.junit.jupiter.api.BeforeEach
 import org.junit.jupiter.api.Test
@@ -30,7 +30,7 @@ class ChannelCheckerTest {
 
     private val warningMessageContent = "WARNING MESSAGE"
 
-    private val botUser = UsersForTesting.testBot(profile = UserProfilesForTesting.testBotProfile())
+    private val botUser = SlackTestUsers.testBot(profile = SlackTestProfiles.botProfile())
 
     private lateinit var warningThreshold: ZonedDateTime
     private lateinit var afterWarningThreshold: ZonedDateTime

@@ -8,8 +8,8 @@ import com.equalexperts.slack.api.conversations.OpenConversationResponse
 import com.equalexperts.slack.api.profile.ProfilesSlackApi
 import com.equalexperts.slack.api.profile.model.UserProfileWrapper
 import com.equalexperts.slack.api.rest.model.Message
-import com.equalexperts.slack.api.rest.model.MessagesForTesting
-import com.equalexperts.slack.api.users.UsersForTesting
+import com.equalexperts.slack.api.rest.model.SlackTestMessages
+import com.equalexperts.slack.api.users.SlackTestUsers
 import com.equalexperts.slack.api.users.UsersSlackApi
 import com.equalexperts.slack.api.users.model.User
 import com.equalexperts.slack.api.users.model.UserId
@@ -48,8 +48,8 @@ internal class ProfileCheckerTest {
 
         val threshold = ZonedDateTime.now()
 
-        val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile)
+        val profile = SlackTestProfiles.userProfile()
+        val user = SlackTestUsers.testUser(profile)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -71,8 +71,8 @@ internal class ProfileCheckerTest {
     fun `should send a message to people with invalid profiles and no message history`() {
         val threshold = ZonedDateTime.now()
 
-        val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile)
+        val profile = SlackTestProfiles.userProfile()
+        val user = SlackTestUsers.testUser(profile)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -102,8 +102,8 @@ internal class ProfileCheckerTest {
     fun `should not message if last message was less than two days ago`() {
         val threshold = ZonedDateTime.now().minusDays(2)
 
-        val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile)
+        val profile = SlackTestProfiles.userProfile()
+        val user = SlackTestUsers.testUser(profile)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -117,7 +117,7 @@ internal class ProfileCheckerTest {
         whenever(mockConversationSlackApi.conversationOpen(user)).thenReturn(openConversationResponse)
 
         val yesterday = ZonedDateTime.now().minusDays(1)
-        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
+        val messages = listOf(SlackTestMessages.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
         whenever(mockConversationSlackApi.channelHistory(channelId)).thenReturn(ConversationHistoriesForTesting.withEmptyCursorToken(messages))
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
@@ -134,8 +134,8 @@ internal class ProfileCheckerTest {
     fun `should message if last message was greater than two days ago`() {
         val threshold = ZonedDateTime.now().minusDays(2)
 
-        val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile)
+        val profile = SlackTestProfiles.userProfile()
+        val user = SlackTestUsers.testUser(profile)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -149,7 +149,7 @@ internal class ProfileCheckerTest {
         whenever(mockConversationSlackApi.conversationOpen(user)).thenReturn(openConversationResponse)
 
         val yesterday = ZonedDateTime.now().minusDays(3)
-        val messages = listOf(MessagesForTesting.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
+        val messages = listOf(SlackTestMessages.botMessage(user.id, user.id, yesterday, "TEST_MESSAGE"))
         whenever(mockConversationSlackApi.channelHistory(channelId)).thenReturn(ConversationHistoriesForTesting.withEmptyCursorToken(messages))
 
         val rules = listOf(UserProfilesRulesForTesting.testFailingRule("TEST_FIELD_NAME"))
@@ -166,8 +166,8 @@ internal class ProfileCheckerTest {
     fun `should not message bots`() {
         val threshold = ZonedDateTime.now()
 
-        val profile = UserProfilesForTesting.testBotProfile()
-        val user = UsersForTesting.testBot(profile)
+        val profile = SlackTestProfiles.botProfile()
+        val user = SlackTestUsers.testBot(profile)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 
@@ -194,8 +194,8 @@ internal class ProfileCheckerTest {
     fun `should not message deactivated accounts`() {
         val threshold = ZonedDateTime.now()
 
-        val profile = UserProfilesForTesting.testUserProfile()
-        val user = UsersForTesting.testUser(profile).copy(deleted = true)
+        val profile = SlackTestProfiles.userProfile()
+        val user = SlackTestUsers.testUser(profile).copy(deleted = true)
         val userList = UserListsForTesting.withEmptyCursorToken(user)
         whenever(mockUserSlackApi.list(any())).thenReturn(userList)
 

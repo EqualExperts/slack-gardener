@@ -2,8 +2,8 @@ package com.equalexperts.slack.profile
 
 import com.equalexperts.slack.api.profile.model.UserProfile
 
-object UserProfilesForTesting {
-    fun testBotProfile(): UserProfile = UserProfile("TEST_BOT_ID",
+object SlackTestProfiles {
+    fun botProfile(): UserProfile = UserProfile("TEST_BOT_ID",
             "TEST_REAL_NAME",
             "TEST_REAL_NAME_NORMALISED",
             "TEST_DISPLAY_NAME",
@@ -22,7 +22,7 @@ object UserProfilesForTesting {
             mapOf(),
             "TEST_EMAIL@ADDRESS.COM")
 
-    fun testUserProfile(): UserProfile = UserProfile(null,
+    fun userProfile(): UserProfile = UserProfile(null,
             "TEST_REAL_NAME",
             "TEST_REAL_NAME_NORMALISED",
             "TEST_DISPLAY_NAME",

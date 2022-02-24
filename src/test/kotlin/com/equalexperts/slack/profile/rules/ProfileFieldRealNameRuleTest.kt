@@ -1,7 +1,7 @@
 package com.equalexperts.slack.profile.rules
 
-import com.equalexperts.slack.api.users.UsersForTesting
-import com.equalexperts.slack.profile.UserProfilesForTesting
+import com.equalexperts.slack.api.users.SlackTestUsers
+import com.equalexperts.slack.profile.SlackTestProfiles
 import org.junit.jupiter.api.Assertions.assertFalse
 import org.junit.jupiter.api.Assertions.assertTrue
 import org.junit.jupiter.api.Test
@@ -10,8 +10,8 @@ internal class ProfileFieldRealNameRuleTest {
 
     @Test
     fun `should return true for real name field presence`() {
-        val userProfile = UserProfilesForTesting.testBotProfile()
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile()
+        val testUser = SlackTestUsers.testBot(userProfile)
 
         val rule = ProfileFieldRealNameRule()
 
@@ -21,8 +21,8 @@ internal class ProfileFieldRealNameRuleTest {
 
     @Test
     fun `should return false for real name field absence`() {
-        val userProfile = UserProfilesForTesting.testBotProfile().copy(real_name = null)
-        val testUser = UsersForTesting.testBot(userProfile)
+        val userProfile = SlackTestProfiles.botProfile().copy(real_name = null)
+        val testUser = SlackTestUsers.testBot(userProfile)
 
         val rule = ProfileFieldRealNameRule()
 
