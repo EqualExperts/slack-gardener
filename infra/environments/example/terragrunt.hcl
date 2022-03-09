@@ -10,28 +10,30 @@ remote_state {
     }
 }
 
-terraform  {
-    extra_arguments "conditional_vars" {
-        commands = [
-            "apply",
-            "destroy",
-            "plan",
-            "import",
-            "push",
-            "refresh",
-        ]
-
-        ## The order of these files is reverse order of variable preference.
-        ## (eg. Variables in earlier files will be overriden by variables with the same name in later files)
-        ## This allows us to ensure that variables in 'child' .hcl files override the variables in 'parent' files
-        optional_var_files = [
-            "${get_parent_terragrunt_dir()}/terraform.tfvars",
-            "${get_terragrunt_dir()}/terraform.tfvars"
-        ]
+generate "required_providers" {
+    path      = "required_providers.tf"
+    if_exists = "overwrite_terragrunt"
+    contents  = <<EOF
+terraform {
+  required_providers {
+    aws = {
+        source = "hashicorp/aws"
+        version = "~> 2.0"
     }
-
+  }
+  required_version = "~> 1.1.1"
 }
-
+EOF
+}
+generate "provider" {
+    path      = "aws_provider.tf"
+    if_exists = "overwrite_terragrunt"
+    contents  = <<EOF
+provider "aws" {
+  region = var.region
+}
+EOF
+}
 
 inputs = {
     account_number = "INSERT_ACCOUNT_NUMBER"
