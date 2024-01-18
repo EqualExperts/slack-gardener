@@ -1,14 +1,21 @@
 resource "aws_s3_bucket" "lambda_artefacts" {
   bucket = var.lambda_artefact_bucket_name
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
 
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_s3_bucket_acl" "lambda_artefacts_acl" {
+    bucket = aws_s3_bucket.lambda_artefacts.id
+    acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "lambda_artefacts_versioning" {
+    bucket = aws_s3_bucket.lambda_artefacts.id
+    versioning_configuration {
+        status = "Enabled"
+    }
 }
 
 resource "aws_s3_bucket_public_access_block" "lambdas_s3_public_access_block" {
@@ -42,15 +49,22 @@ POLICY
 
 resource "aws_s3_bucket" "lambda_logs" {
   bucket = var.lambda_logs_bucket_name
-  acl    = "private"
-
-  versioning {
-    enabled = true
-  }
 
   lifecycle {
     prevent_destroy = true
   }
+}
+
+resource "aws_s3_bucket_acl" "lambda_logs_acl" {
+    bucket = aws_s3_bucket.lambda_logs.id
+    acl    = "private"
+}
+
+resource "aws_s3_bucket_versioning" "lambda_logs_versioning" {
+    bucket = aws_s3_bucket.lambda_logs.id
+    versioning_configuration {
+        status = "Enabled"
+    }
 }
 
 resource "aws_s3_bucket_public_access_block" "logs_s3_public_access_block" {
