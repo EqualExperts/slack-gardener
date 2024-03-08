@@ -109,9 +109,9 @@ You will need these tokens in the next steps.
 
 ### Configure the build scripts
 
-1. In the root of this repo, duplicate `build.example.gradle` and rename it to `build.gradle`
-2. Edit `build.gradle`
-   * Replace all occurrences of `INSERT_BUCKET_ARTEFACT_NAME` with the value used in the steps above
+1. Edit `app/build.gradle.kts`
+2. Replace all occurrences of `INSERT_BUCKET_ARTEFACT_NAME` with the value used in the steps above
+3. Replace all occurrences of `INSERT_LAMBDA_NAME` with the value used in the steps above
 
 ### Install dependencies
 

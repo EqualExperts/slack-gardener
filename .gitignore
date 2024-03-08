@@ -15,3 +15,6 @@ config.properties
 
 .DS_Store
 .terragrunt-cache
+
+# Ignore Gradle build output directory
+build
