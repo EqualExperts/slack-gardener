@@ -121,7 +121,7 @@ brew install pipenv terraform terragrunt gradle
 
 ### Choose the right version of Java
 
-1. You need Java 8 to run the next step. Check your current version with `java -version`.
+1. You need Java 21 to run the next step. Check your current version with `java -version`.
    * If you have it, great, skip to the next step.
    * If not, you might want to use [`jenv`](http://www.jenv.be/) to switch Java versions:
 
@@ -135,14 +135,14 @@ brew install pipenv terraform terragrunt gradle
     # restart bash to load new configs
     source ~/.bash_profile
     # install java and add it to jenv
-    brew cask install java8
+    brew install java
     jenv add $(/usr/libexec/java_home)
     # list all java versions installed on your machine
     ls -1 /Library/Java/JavaVirtualMachines
-    # add java 8 to jenv
-    jenv add /Library/Java/JavaVirtualMachines/jdk1.8.0_202.jdk/Contents/Home/
-    # set project version to 8
-    jenv local 1.8.0.202
+    # add java 21 to jenv
+    jenv add /opt/homebrew/Cellar/openjdk/21.0.2/
+    # set project version to 21
+    jenv local 21.0.2
     ```
 
 ### Provision infra
