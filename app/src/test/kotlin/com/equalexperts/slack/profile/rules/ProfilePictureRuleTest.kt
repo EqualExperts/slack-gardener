@@ -9,6 +9,7 @@ import org.mockito.kotlin.doReturn
 import org.mockito.kotlin.mock
 import org.junit.jupiter.api.Assertions.*
 import org.junit.jupiter.api.Test
+import java.net.URI
 import java.net.URL
 
 
@@ -27,7 +28,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 200,
                     responseMessage = "ok",
                     body = DefaultBody(openStream = { inputStream }),
-                    url = URL(testUrl)
+                    url = URI(testUrl).toURL()
             )
         }
         FuelManager.instance.client = client
@@ -50,7 +51,7 @@ internal class ProfilePictureRuleTest {
                 statusCode = 200,
                 responseMessage = "ok",
                 body = DefaultBody(openStream = { inputStream }),
-                url = URL(redirectedUrl)
+                url = URI(redirectedUrl).toURL()
             )
         }
         FuelManager.instance.client = client
@@ -72,7 +73,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 200,
                     responseMessage = "ok",
                     body = DefaultBody(openStream = { inputStream }),
-                    url = URL(testUrl)
+                    url = URI(testUrl).toURL()
             )
         }
         FuelManager.instance.client = client
@@ -107,7 +108,7 @@ internal class ProfilePictureRuleTest {
                     statusCode = 404,
                     responseMessage = "not found",
                     body = DefaultBody(openStream = { inputStream }),
-                    url = URL(testUrl)
+                    url = URI(testUrl).toURL()
             )
         }
         FuelManager.instance.client = client

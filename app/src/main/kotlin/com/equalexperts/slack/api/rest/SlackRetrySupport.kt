@@ -1,5 +1,6 @@
 package com.equalexperts.slack.api.rest
 
+import feign.Request
 import feign.Response
 import feign.RetryableException
 import feign.Retryer
@@ -28,7 +29,13 @@ class SlackRetrySupport(private val sleeper: (Long) -> Unit) : Retryer {
         throw e
     }
 
-    class SlackRetryException(internal val secondsToWait: Long) : RetryableException("Retrying due to a slack 429 response", null, Date.from(LocalDateTime.now().plusSeconds(secondsToWait).toInstant(ZoneOffset.UTC)))
+    class SlackRetryException(internal val secondsToWait: Long, request: Request) : RetryableException(
+        429,
+        "Retrying due to a slack 429 response",
+        request.httpMethod(),
+        Date.from(LocalDateTime.now().plusSeconds(secondsToWait).toInstant(ZoneOffset.UTC)),
+        request
+    )
 
     class SlackErrorDecoder : ErrorDecoder {
         private val logger = LoggerFactory.getLogger(this::class.java.name)
@@ -39,7 +46,7 @@ class SlackRetrySupport(private val sleeper: (Long) -> Unit) : Retryer {
                     logger.trace("Asked to backoff for ${response.headers()["Retry-After"]}")
                 }
                 val secondsToWait = response.headers()["Retry-After"]!!.first().toLong()
-                throw SlackRetryException(secondsToWait)
+                throw SlackRetryException(secondsToWait, response.request())
             }
             return default.decode(methodKey, response)
         }

@@ -33,39 +33,39 @@ dependencies {
     implementation(libs.guava)
     implementation(kotlin("stdlib"))
     implementation(kotlin("stdlib"))
-    implementation(kotlin("reflect", version = "1.9.21"))
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.3.2")
-    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.3.2")
+    implementation(kotlin("reflect"))
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.10.2")
+    implementation("org.jetbrains.kotlinx:kotlinx-coroutines-jdk8:1.10.2")
 
     //feign + okhttp
-    val feignVersion = "10.1.0"
+    val feignVersion = "13.11"
     implementation("io.github.openfeign:feign-core:$feignVersion")
     implementation("io.github.openfeign:feign-jackson:$feignVersion")
     implementation("io.github.openfeign:feign-okhttp:$feignVersion")
     implementation("io.github.openfeign:feign-slf4j:$feignVersion")
 
     //feign uses an older version of jackson so force a newer one
-    val jacksonVersion = "2.9.8"
+    val jacksonVersion = "2.21.2"
     implementation("com.fasterxml.jackson.core:jackson-databind:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-module-kotlin:$jacksonVersion")
     implementation("com.fasterxml.jackson.module:jackson-modules-java8:$jacksonVersion")
 
     implementation("org.slf4j:slf4j-api:1.7.2")
-    implementation("ch.qos.logback:logback-classic:1.0.9")
-    implementation("ch.qos.logback:logback-core:1.0.9")
+    implementation("ch.qos.logback:logback-classic:1.5.32")
+    implementation("ch.qos.logback:logback-core:1.5.32")
 
     implementation("com.amazonaws:aws-lambda-java-core:1.2.0")
-    implementation("com.amazonaws:aws-lambda-java-events:2.2.5")
+    implementation("com.amazonaws:aws-lambda-java-events:3.16.1")
     implementation("com.amazonaws:aws-java-sdk-ssm:1.+")
 
     implementation("com.github.kittinunf.fuel:fuel:2.3.1")
     implementation("com.github.kittinunf.fuel:fuel-jackson:2.3.1")
-    implementation("org.apache.commons:commons-lang3:3.0")
+    implementation("org.apache.commons:commons-lang3:3.20.0")
 
     testImplementation(kotlin("test"))
     testImplementation("org.mockito.kotlin:mockito-kotlin:5.2.1")
 
-    val junitVersion = "2.9.8"
+    val junitVersion = "5.11.4"
     testImplementation("org.junit.jupiter:junit-jupiter-api:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-params:$junitVersion")
     testImplementation("org.junit.jupiter:junit-jupiter-engine:$junitVersion")//testRuntime
