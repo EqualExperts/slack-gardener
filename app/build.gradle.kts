@@ -139,13 +139,14 @@ tasks {
         dependsOn(fatJar) // Trigger fat jar creation during build
     }
 
-    val uploadLambdaHash = register<S3Upload>("uploadLambdaHash"){
+    val uploadLambdaHash = register<Exec>("uploadLambdaHash"){
         dependsOn(buildHashFile, test)
-        bucket = "INSERT_BUCKET_ARTEFACT_NAME"
-        key = "$jarFileName.base64sha256"
-
-        file = "${project.projectDir}/build/$jarFileName.base64sha256"
-        overwrite = true
+        commandLine(
+            "aws", "s3", "cp",
+            "${project.projectDir}/build/$jarFileName.base64sha256",
+            "s3://INSERT_BUCKET_ARTEFACT_NAME/$jarFileName.base64sha256",
+            "--content-type", "text/plain"
+        )
     }
 
     val uploadLambda = register<S3Upload>("uploadLambda"){
