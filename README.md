@@ -116,7 +116,7 @@ You will need these tokens in the next steps.
 ### Install dependencies
 
 ```bash
-brew install pipenv terraform terragrunt gradle
+brew install awscli terraform terragrunt gradle
 ```
 
 ### Choose the right version of Java
@@ -173,20 +173,20 @@ brew install pipenv terraform terragrunt gradle
 5. Send the Slack app tokens to AWS as parameter store
 
     ```bash
-    pipenv run aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
-    pipenv run aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
+    aws ssm put-parameter --name "slack.gardener.oauth.access_token" --value "xoxp-TOKEN" --type "SecureString"
+    aws ssm put-parameter --name "slack.gardener.bot.oauth.access_token" --value "xoxb-TOKEN" --type "SecureString"
     ```
 
 6. Send other configurations to AWS as parameter store
 
     ```bash
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.months" --value "3" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.weeks" --value "1" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.years" --value "1" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.idle.long.channels" --value "annual-conference" --type "String"
-    pipenv run aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
+    aws ssm put-parameter --name "slack.gardener.idle.months" --value "3" --type "String"
+    aws ssm put-parameter --name "slack.gardener.warning.wait.weeks" --value "1" --type "String"
+    aws ssm put-parameter --name "slack.gardener.idle.long.years" --value "1" --type "String"
+    aws ssm put-parameter --name "slack.gardener.idle.long.channels" --value "annual-conference" --type "String"
+    aws ssm put-parameter --name "slack.gardener.warning.wait.message" --value 'Hi <!channel>. This channel has been inactive for a while, so I’d like to archive it. This will keep the list of channels smaller and help users find things more easily. If you _do not_ want this channel to be archived, just post a message and it will be left alone for a while. You can archive the channel now using the `/archive` command. If nobody posts in a few days I will come back and archive the channel for you.' --type "String"
     # Done via input json because the awscli v1 tries to auto-fetch any url, this apparently will be fixed in awscli v2
-    pipenv run aws ssm put-parameter --cli-input-json '{
+    aws ssm put-parameter --cli-input-json '{
       "Name": "slack.gardener.uri",
       "Value": "https://api.slack.com",
       "Type": "String",
@@ -199,13 +199,13 @@ brew install pipenv terraform terragrunt gradle
 
     ```bash
     # Enable
-    pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "true" --type "String"
+    aws ssm put-parameter --name "slack.gardener.channel.checking" --value "true" --type "String"
     # Disable
-    pipenv run aws ssm put-parameter --name "slack.gardener.channel.checking" --value "false" --type "String"
+    aws ssm put-parameter --name "slack.gardener.channel.checking" --value "false" --type "String"
     # Dry Run On
-    pipenv run aws ssm put-parameter --name "slack.channel.dryrun" --value "true" --type "String"
+    aws ssm put-parameter --name "slack.channel.dryrun" --value "true" --type "String"
     # Dry Run Off
-    pipenv run aws ssm put-parameter --name "slack.channel.dryrun" --value "false" --type "String"
+    aws ssm put-parameter --name "slack.channel.dryrun" --value "false" --type "String"
     ```
 
 8. Decide if you want the "enforce profile picture" feature and if it
@@ -213,13 +213,13 @@ brew install pipenv terraform terragrunt gradle
 
     ```bash
     # Enable
-    pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "true" --type "String"
+    aws ssm put-parameter --name "slack.gardener.profile.checking" --value "true" --type "String"
     # Disable
-    pipenv run aws ssm put-parameter --name "slack.gardener.profile.checking" --value "false" --type "String"
+    aws ssm put-parameter --name "slack.gardener.profile.checking" --value "false" --type "String"
     # Dry Run On
-    pipenv run aws ssm put-parameter --name "slack.profile.dryrun" --value "true" --type "String"
+    aws ssm put-parameter --name "slack.profile.dryrun" --value "true" --type "String"
     # Dry Run Off
-    pipenv run aws ssm put-parameter --name "slack.profile.dryrun" --value "false" --type "String"
+    aws ssm put-parameter --name "slack.profile.dryrun" --value "false" --type "String"
     ```
 
 ## Installation - Part 3
@@ -301,7 +301,6 @@ This removes conversations that have become inactive because it has either natur
 * [Kotlin](https://kotlinlang.org/)
 * [JUnit](https://junit.org/junit5/)
 * [Feign](https://github.com/OpenFeign/feign)
-* [Pipenv](https://github.com/pypa/pipenv)
 * [Terraform](https://terraform.io)
 * [Terragrunt](https://github.com/gruntwork-io/terragrunt)
 * [AWS](https://aws.amazon.com/)
